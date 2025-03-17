@@ -3,11 +3,11 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Pencil, Trash, Leaf, Flame, NutOff, WheatOff } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MenuItem } from "@/types";
-import { MenuItemDialog } from "./MenuItemDialog";
+import { MenuItemDialog } from "./menu/MenuItemDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MenuTabProps {
   menuItems: MenuItem[];
@@ -15,9 +15,13 @@ interface MenuTabProps {
   onDeleteRequest: (type: 'menu' | 'event', id: string) => void;
 }
 
+// Fixed category order
+const CATEGORY_ORDER = ["Apéritifs", "Entrées", "Plats", "Desserts", "Boissons"];
+
 export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabProps) => {
   const [isMenuItemDialogOpen, setIsMenuItemDialogOpen] = useState(false);
   const [editingMenuItem, setEditingMenuItem] = useState<MenuItem | null>(null);
+  const isMobile = useIsMobile();
 
   const handleEditMenuItem = (item: MenuItem) => {
     setEditingMenuItem(item);
@@ -35,118 +39,121 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
   };
 
   // Group menu items by category
-  const categories = ["Apéritifs", "Entrées", "Plats", "Desserts", "Boissons"];
-  const menuItemsByCategory = categories.reduce((acc, category) => {
-    acc[category] = menuItems.filter(item => item.categorie === category);
+  const menuItemsByCategory = CATEGORY_ORDER.reduce((acc, category) => {
+    const items = menuItems.filter(item => item.categorie === category);
+    if (items.length > 0) {
+      acc[category] = items;
+    }
     return acc;
   }, {} as Record<string, MenuItem[]>);
 
-  const renderCategoryTable = (categoryItems: MenuItem[]) => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Nom</TableHead>
-          <TableHead>Description</TableHead>
-          <TableHead>Prix (CAD)</TableHead>
-          <TableHead>Image</TableHead>
-          <TableHead>Options</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {categoryItems.length === 0 ? (
-          <TableRow>
-            <TableCell colSpan={6} className="text-center py-8">
-              Aucun item dans cette catégorie.
-            </TableCell>
-          </TableRow>
+  // Only show categories that have items
+  const availableCategories = Object.keys(menuItemsByCategory);
+
+  const renderMenuItemCard = (item: MenuItem) => (
+    <div 
+      key={item.id} 
+      className="bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer border border-gray-200 overflow-hidden"
+      onClick={() => handleEditMenuItem(item)}
+    >
+      <div className="relative h-40 bg-gray-100">
+        {item.image_url ? (
+          <img 
+            src={item.image_url} 
+            alt={item.nom}
+            className="w-full h-full object-cover"
+          />
         ) : (
-          categoryItems.map((item) => (
-            <TableRow key={item.id}>
-              <TableCell className="font-medium">{item.nom}</TableCell>
-              <TableCell className="max-w-xs truncate">{item.description}</TableCell>
-              <TableCell>{item.prix}</TableCell>
-              <TableCell>
-                {item.image_url ? (
-                  <img 
-                    src={item.image_url} 
-                    alt={item.nom}
-                    className="w-10 h-10 object-cover rounded"
-                  />
-                ) : (
-                  <span className="text-bistro-wood/50 text-sm">Aucune image</span>
-                )}
-              </TableCell>
-              <TableCell className="space-x-1">
-                <TooltipProvider>
-                  {item.is_vegan && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span>
-                          <Leaf className="inline-block w-4 h-4 text-green-600" />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>Végétalien</TooltipContent>
-                    </Tooltip>
-                  )}
-                  
-                  {item.is_spicy && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span>
-                          <Flame className="inline-block w-4 h-4 text-red-600" />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>Épicé</TooltipContent>
-                    </Tooltip>
-                  )}
-                  
-                  {item.is_peanut_free && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span>
-                          <NutOff className="inline-block w-4 h-4 text-amber-600" />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>Sans cacahuètes</TooltipContent>
-                    </Tooltip>
-                  )}
-                  
-                  {item.is_gluten_free && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span>
-                          <WheatOff className="inline-block w-4 h-4 text-yellow-600" />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>Sans gluten</TooltipContent>
-                    </Tooltip>
-                  )}
-                </TooltipProvider>
-              </TableCell>
-              <TableCell className="text-right space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleEditMenuItem(item)}
-                  className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => onDeleteRequest('menu', item.id)}
-                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                >
-                  <Trash className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))
+          <div className="flex items-center justify-center h-full bg-gray-200">
+            <span className="text-gray-400">Aucune image</span>
+          </div>
         )}
-      </TableBody>
-    </Table>
+        <div className="absolute top-2 right-2 flex gap-1">
+          <Button 
+            variant="outline" 
+            size="icon"
+            className="h-7 w-7 bg-white hover:bg-red-500 hover:text-white border-red-500 text-red-500"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteRequest('menu', item.id);
+            }}
+          >
+            <Trash className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+      <div className="p-3">
+        <div className="flex justify-between items-start mb-1">
+          <h3 className="font-medium text-bistro-wood truncate" title={item.nom}>
+            {item.nom}
+          </h3>
+          <span className="font-bold text-bistro-olive">{item.prix} CAD</span>
+        </div>
+        <p className="text-sm text-gray-600 line-clamp-2 h-10" title={item.description}>
+          {item.description}
+        </p>
+        
+        <div className="flex mt-2 gap-1">
+          <TooltipProvider>
+            {item.is_vegan && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Leaf className="inline-block w-4 h-4 text-green-600" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Végétalien</TooltipContent>
+              </Tooltip>
+            )}
+            
+            {item.is_spicy && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Flame className="inline-block w-4 h-4 text-red-600" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Épicé</TooltipContent>
+              </Tooltip>
+            )}
+            
+            {item.is_peanut_free && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <NutOff className="inline-block w-4 h-4 text-amber-600" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Sans cacahuètes</TooltipContent>
+              </Tooltip>
+            )}
+            
+            {item.is_gluten_free && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <WheatOff className="inline-block w-4 h-4 text-yellow-600" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Sans gluten</TooltipContent>
+              </Tooltip>
+            )}
+          </TooltipProvider>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderCategoryGrid = (categoryItems: MenuItem[]) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {categoryItems.length === 0 ? (
+        <div className="col-span-full text-center py-8 text-gray-500">
+          Aucun item dans cette catégorie.
+        </div>
+      ) : (
+        categoryItems.map(item => renderMenuItemCard(item))
+      )}
+    </div>
   );
 
   return (
@@ -163,20 +170,18 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
           </Button>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="Apéritifs" className="w-full">
-            <TabsList className="mb-4 w-full grid grid-cols-5">
-              {categories.map(category => (
-                <TabsTrigger key={category} value={category}>
+          <Tabs defaultValue={availableCategories[0] || "Apéritifs"} className="w-full">
+            <TabsList className={`mb-4 w-full grid ${isMobile ? 'grid-cols-2 flex-wrap gap-2' : `grid-cols-${availableCategories.length > 0 ? Math.min(availableCategories.length, 5) : 5}`}`}>
+              {availableCategories.map(category => (
+                <TabsTrigger key={category} value={category} className={isMobile ? "text-xs py-1 px-2" : ""}>
                   {category}
                 </TabsTrigger>
               ))}
             </TabsList>
             
-            {categories.map(category => (
+            {availableCategories.map(category => (
               <TabsContent key={category} value={category} className="mt-4">
-                <div className="rounded-md border">
-                  {renderCategoryTable(menuItemsByCategory[category])}
-                </div>
+                {renderCategoryGrid(menuItemsByCategory[category])}
               </TabsContent>
             ))}
           </Tabs>
