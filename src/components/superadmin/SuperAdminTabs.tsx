@@ -1,5 +1,5 @@
 
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -16,9 +16,14 @@ interface SuperAdminTabsProps {
 
 export const SuperAdminTabs = ({ tabs, defaultTab }: SuperAdminTabsProps) => {
   const isMobile = useIsMobile();
+  const [activeTab, setActiveTab] = useState(defaultTab || tabs[0].id);
   
   return (
-    <Tabs defaultValue={defaultTab || tabs[0].id} className="w-full">
+    <Tabs 
+      value={activeTab} 
+      onValueChange={setActiveTab}
+      className="w-full"
+    >
       <TabsList className={`bg-bistro-brick/90 w-full ${isMobile ? 'justify-between' : 'justify-start'} mb-6 md:mb-8 py-2 h-auto`}>
         {tabs.map((tab) => (
           <TabsTrigger 

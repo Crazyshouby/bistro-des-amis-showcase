@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Card, 
   CardContent,
@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Save, Paintbrush, RefreshCw, Info } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ColorConfig {
   id: string;
@@ -80,6 +81,86 @@ export const ColorSettings = () => {
       description: "Version claire de Olive, utilisée pour les états hover" 
     }
   ]);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    const loadColors = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('*')
+          .eq('type', 'color')
+          .order('id');
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          const loadedColors = data.map(item => ({
+            id: item.key,
+            name: item.name,
+            value: item.value,
+            variable: `--bistro-${item.key}`,
+            description: item.description || ""
+          }));
+          
+          setColors(loadedColors);
+          
+          // Apply loaded colors to the DOM
+          loadedColors.forEach(color => {
+            document.documentElement.style.setProperty(`--bistro-${color.id}`, color.value);
+          });
+        } else {
+          // If no colors found in DB, save the default ones
+          saveDefaultColors();
+        }
+      } catch (error) {
+        console.error('Error loading colors:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les couleurs depuis la base de données.",
+          variant: "destructive"
+        });
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    loadColors();
+  }, []);
+
+  const saveDefaultColors = async () => {
+    try {
+      // First, remove any existing color settings
+      await supabase
+        .from('site_settings')
+        .delete()
+        .eq('type', 'color');
+      
+      // Then insert the default colors
+      const colorData = colors.map(color => ({
+        type: 'color',
+        key: color.id,
+        name: color.name,
+        value: color.value,
+        description: color.description
+      }));
+      
+      const { error } = await supabase
+        .from('site_settings')
+        .insert(colorData);
+      
+      if (error) throw error;
+      
+    } catch (error) {
+      console.error('Error saving default colors:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'enregistrer les couleurs par défaut.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleColorChange = (id: string, newValue: string) => {
     setColors(prevColors => 
@@ -90,12 +171,13 @@ export const ColorSettings = () => {
       )
     );
     
-    // In a real app, this would update a CSS variable or a theme context
-    // For demonstration, we'll just change the color in the DOM
+    // Update CSS variable in real-time
     document.documentElement.style.setProperty(`--bistro-${id}`, newValue);
   };
 
-  const resetColors = () => {
+  const resetColors = async () => {
+    setLoading(true);
+    
     const defaultColors = {
       "brick": "#C14D33",
       "brick-light": "#E7BAA0",
@@ -107,42 +189,100 @@ export const ColorSettings = () => {
       "olive-light": "#8A9A5B"
     };
     
-    setColors(prevColors => 
-      prevColors.map(color => ({
-        ...color,
-        value: defaultColors[color.id as keyof typeof defaultColors]
-      }))
-    );
-    
-    // Reset CSS variables
-    Object.entries(defaultColors).forEach(([id, value]) => {
-      document.documentElement.style.setProperty(`--bistro-${id}`, value);
-    });
-    
-    toast({
-      title: "Couleurs réinitialisées",
-      description: "Les couleurs ont été réinitialisées aux valeurs par défaut."
-    });
+    try {
+      // Update colors in state
+      setColors(prevColors => 
+        prevColors.map(color => ({
+          ...color,
+          value: defaultColors[color.id as keyof typeof defaultColors]
+        }))
+      );
+      
+      // Reset CSS variables
+      Object.entries(defaultColors).forEach(([id, value]) => {
+        document.documentElement.style.setProperty(`--bistro-${id}`, value);
+      });
+      
+      // Update in database
+      await saveColorChanges(
+        prevColors => prevColors.map(color => ({
+          ...color,
+          value: defaultColors[color.id as keyof typeof defaultColors]
+        }))
+      );
+      
+      toast({
+        title: "Couleurs réinitialisées",
+        description: "Les couleurs ont été réinitialisées aux valeurs par défaut."
+      });
+    } catch (error) {
+      console.error('Error resetting colors:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de réinitialiser les couleurs.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const saveColorChanges = () => {
-    // In a real app, this would save to a database or CSS file
-    toast({
-      title: "Couleurs enregistrées",
-      description: "Les modifications de couleurs ont été enregistrées (simulation)."
-    });
+  const saveColorChanges = async (colorsToSave = colors) => {
+    setLoading(true);
+    
+    try {
+      // Update the database
+      // First, remove existing color settings
+      await supabase
+        .from('site_settings')
+        .delete()
+        .eq('type', 'color');
+      
+      // Then insert the new values
+      const colorData = colorsToSave.map(color => ({
+        type: 'color',
+        key: color.id,
+        name: color.name,
+        value: color.value,
+        description: color.description
+      }));
+      
+      const { error } = await supabase
+        .from('site_settings')
+        .insert(colorData);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Couleurs enregistrées",
+        description: "Les modifications de couleurs ont été enregistrées avec succès."
+      });
+    } catch (error) {
+      console.error('Error saving colors:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'enregistrer les couleurs.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (initialLoading) {
+    return <div className="flex justify-center py-12">Chargement des couleurs...</div>;
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Gestion des couleurs du site</h2>
         <div className="flex space-x-3">
-          <Button variant="outline" onClick={resetColors}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+          <Button variant="outline" onClick={resetColors} disabled={loading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Réinitialiser
           </Button>
-          <Button onClick={saveColorChanges}>
+          <Button onClick={() => saveColorChanges()} disabled={loading}>
             <Save className="mr-2 h-4 w-4" />
             Enregistrer
           </Button>
@@ -196,8 +336,7 @@ export const ColorSettings = () => {
       <div className="mt-6 p-4 bg-muted rounded-md flex items-start">
         <Info className="h-5 w-5 mr-2 mt-0.5 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
-          Note: Dans cette version de démonstration, les modifications de couleurs ne sont pas persistantes et s'appliquent uniquement à la session actuelle.
-          Dans une version de production, les modifications seraient enregistrées dans une base de données ou un fichier CSS.
+          Les modifications de couleurs sont appliquées en temps réel et sauvegardées dans la base de données pour être persistantes.
         </p>
       </div>
     </div>
