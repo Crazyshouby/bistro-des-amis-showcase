@@ -5,7 +5,7 @@ import { SuperAdminTabs } from "@/components/superadmin/SuperAdminTabs";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ImageSettings } from "@/components/superadmin/ImageSettings";
-import { ColorSettings } from "@/components/superadmin/ColorSettings";
+import { ColorSettings } from "@/components/superadmin/colors/ColorSettings";
 import { supabase } from "@/integrations/supabase/client";
 
 interface SiteSettingsRow {
