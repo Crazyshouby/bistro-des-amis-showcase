@@ -37,26 +37,6 @@
     --ring: 15 60% 48%;
 
     --radius: 0.5rem;
-    
-    /* Bistro custom colors - default values that will be overridden by JS */
-    --bistro-brick: #C14D33;
-    --bistro-brick-light: #E7BAA0;
-    --bistro-sand: #F5DEB3;
-    --bistro-sand-light: #FFF8E7;
-    --bistro-wood: #8B4513;
-    --bistro-wood-light: #C19A6B;
-    --bistro-olive: #556B2F;
-    --bistro-olive-light: #8A9A5B;
-    
-    /* RGB versions for opacity control */
-    --bistro-brick-rgb: 193, 77, 51;
-    --bistro-brick-light-rgb: 231, 186, 160;
-    --bistro-sand-rgb: 245, 222, 179;
-    --bistro-sand-light-rgb: 255, 248, 231;
-    --bistro-wood-rgb: 139, 69, 19;
-    --bistro-wood-light-rgb: 193, 154, 107;
-    --bistro-olive-rgb: 85, 107, 47;
-    --bistro-olive-light-rgb: 138, 154, 91;
   }
 }
 

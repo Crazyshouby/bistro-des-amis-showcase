@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Save, RefreshCw, Info } from "lucide-react";
@@ -9,8 +10,7 @@ import {
   getInitialColors, 
   loadColorsFromDb, 
   saveColorChangesToDb, 
-  defaultColors,
-  hexToRgb 
+  defaultColors 
 } from "./colorUtils";
 
 export const ColorSettings = () => {
@@ -64,9 +64,8 @@ export const ColorSettings = () => {
       )
     );
     
-    // Update CSS variable in real-time across the entire application
+    // Update CSS variable in real-time
     document.documentElement.style.setProperty(`--bistro-${id}`, newValue);
-    document.documentElement.style.setProperty(`--bistro-${id}-rgb`, hexToRgb(newValue));
   };
 
   const resetColors = async () => {
@@ -84,7 +83,6 @@ export const ColorSettings = () => {
       // Reset CSS variables
       Object.entries(defaultColors).forEach(([id, value]) => {
         document.documentElement.style.setProperty(`--bistro-${id}`, value);
-        document.documentElement.style.setProperty(`--bistro-${id}-rgb`, hexToRgb(value));
       });
       
       // Update in database
