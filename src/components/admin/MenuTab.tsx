@@ -219,9 +219,17 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={availableCategories[0] || "Apéritifs"} className="w-full">
-            <TabsList className={`mb-4 w-full grid ${isMobile ? 'grid-cols-2 flex-wrap gap-2' : `grid-cols-${availableCategories.length > 0 ? Math.min(availableCategories.length, 5) : 5}`}`}>
+            <TabsList className="mb-4 w-full justify-center bg-transparent p-0 flex gap-4">
               {availableCategories.map(category => (
-                <TabsTrigger key={category} value={category} className={isMobile ? "text-xs py-1 px-2" : ""}>
+                <TabsTrigger 
+                  key={category} 
+                  value={category} 
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors
+                    data-[state=active]:bg-bistro-olive data-[state=active]:text-white
+                    data-[state=inactive]:bg-[#843c08]/80 data-[state=inactive]:text-white
+                    hover:bg-bistro-olive/90 hover:text-white
+                  `}
+                >
                   {category}
                 </TabsTrigger>
               ))}
