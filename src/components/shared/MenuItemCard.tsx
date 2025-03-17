@@ -1,6 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import type { MenuItem } from "@/types";
+import { Leaf, Flame, NutOff, WheatOff } from "lucide-react";
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -31,9 +32,17 @@ const MenuItemCard = ({ item, className }: MenuItemCardProps) => {
       {/* Content Section */}
       <div className="flex-1">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-playfair font-bold text-bistro-wood group-hover:text-bistro-brick transition-colors duration-300">
-            {item.nom}
-          </h3>
+          <div>
+            <h3 className="text-xl font-playfair font-bold text-bistro-wood group-hover:text-bistro-brick transition-colors duration-300">
+              {item.nom}
+            </h3>
+            <div className="flex space-x-1 mt-1">
+              {item.is_vegan && <Leaf className="w-4 h-4 text-green-600" title="Végétalien" />}
+              {item.is_spicy && <Flame className="w-4 h-4 text-red-600" title="Épicé" />}
+              {item.is_peanut_free && <NutOff className="w-4 h-4 text-amber-600" title="Sans Cacahuètes" />}
+              {item.is_gluten_free && <WheatOff className="w-4 h-4 text-yellow-600" title="Sans Gluten" />}
+            </div>
+          </div>
           <span className="menu-item-price text-lg">
             {item.prix} CAD
           </span>

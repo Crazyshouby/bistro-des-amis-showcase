@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Eye, EyeOff, Pencil, PlusCircle, Save, Trash, LogOut, Upload, X } from "lucide-react";
+import { Eye, EyeOff, Pencil, PlusCircle, Save, Trash, LogOut, Upload, X, User, Leaf, Flame, NutOff, WheatOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
 import { MenuItem, Event } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -23,7 +23,11 @@ const menuItemSchema = z.object({
   nom: z.string().min(1, "Le nom est requis"),
   description: z.string().min(1, "La description est requise"),
   prix: z.coerce.number().min(0, "Le prix doit être positif"),
-  image_url: z.string().optional()
+  image_url: z.string().optional(),
+  is_vegan: z.boolean().optional().default(false),
+  is_spicy: z.boolean().optional().default(false),
+  is_peanut_free: z.boolean().optional().default(false),
+  is_gluten_free: z.boolean().optional().default(false)
 });
 
 const eventSchema = z.object({
@@ -32,6 +36,13 @@ const eventSchema = z.object({
   titre: z.string().min(1, "Le titre est requis"),
   description: z.string().min(1, "La description est requise"),
   image_url: z.string().optional(),
+});
+
+const profileSchema = z.object({
+  fullName: z.string().min(1, "Le nom complet est requis"),
+  phone: z.string().min(1, "Le numéro de téléphone est requis"),
+  email: z.string().email("Email invalide").min(1, "L'email est requis"),
+  address: z.string().min(1, "L'adresse est requise"),
 });
 
 const Admin = () => {
@@ -64,7 +75,11 @@ const Admin = () => {
       nom: "",
       description: "",
       prix: 0,
-      image_url: ""
+      image_url: "",
+      is_vegan: false,
+      is_spicy: false,
+      is_peanut_free: false,
+      is_gluten_free: false
     }
   });
   
@@ -77,6 +92,27 @@ const Admin = () => {
       image_url: "",
     }
   });
+
+  const profileForm = useForm<z.infer<typeof profileSchema>>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      fullName: user?.user_metadata?.full_name || "",
+      phone: user?.user_metadata?.phone || "",
+      email: user?.email || "",
+      address: user?.user_metadata?.address || "",
+    }
+  });
+
+  useEffect(() => {
+    if (user) {
+      profileForm.reset({
+        fullName: user?.user_metadata?.full_name || "",
+        phone: user?.user_metadata?.phone || "",
+        email: user?.email || "",
+        address: user?.user_metadata?.address || "",
+      });
+    }
+  }, [user, profileForm]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -125,7 +161,11 @@ const Admin = () => {
       nom: item.nom,
       description: item.description,
       prix: item.prix,
-      image_url: item.image_url || ""
+      image_url: item.image_url || "",
+      is_vegan: item.is_vegan || false,
+      is_spicy: item.is_spicy || false,
+      is_peanut_free: item.is_peanut_free || false,
+      is_gluten_free: item.is_gluten_free || false
     });
     
     if (item.image_url) {
@@ -145,7 +185,11 @@ const Admin = () => {
       nom: "",
       description: "",
       prix: 0,
-      image_url: ""
+      image_url: "",
+      is_vegan: false,
+      is_spicy: false,
+      is_peanut_free: false,
+      is_gluten_free: false
     });
     setSelectedMenuImage(null);
     setMenuImagePreview(null);
@@ -181,6 +225,10 @@ const Admin = () => {
             description: data.description,
             prix: data.prix,
             image_url: imageUrl,
+            is_vegan: data.is_vegan,
+            is_spicy: data.is_spicy,
+            is_peanut_free: data.is_peanut_free,
+            is_gluten_free: data.is_gluten_free,
             updated_at: new Date().toISOString()
           })
           .eq('id', editingMenuItem.id);
@@ -195,14 +243,18 @@ const Admin = () => {
               nom: data.nom,
               description: data.description,
               prix: data.prix,
-              image_url: imageUrl
+              image_url: imageUrl,
+              is_vegan: data.is_vegan,
+              is_spicy: data.is_spicy,
+              is_peanut_free: data.is_peanut_free,
+              is_gluten_free: data.is_gluten_free
             } : item
           )
         );
         
         toast({
           title: "Item mis à jour",
-          description: `"${data.nom}" a été mis à jour avec succès.`,
+          description: `"${data.nom}" a été mis à jour avec succès.`
         });
       } else {
         const { data: newItem, error } = await supabase
@@ -212,7 +264,11 @@ const Admin = () => {
             nom: data.nom,
             description: data.description,
             prix: data.prix,
-            image_url: imageUrl
+            image_url: imageUrl,
+            is_vegan: data.is_vegan,
+            is_spicy: data.is_spicy,
+            is_peanut_free: data.is_peanut_free,
+            is_gluten_free: data.is_gluten_free
           })
           .select()
           .single();
@@ -223,7 +279,7 @@ const Admin = () => {
         
         toast({
           title: "Item ajouté",
-          description: `"${data.nom}" a été ajouté au menu.`,
+          description: `"${data.nom}" a été ajouté au menu.`
         });
       }
       
@@ -235,6 +291,33 @@ const Admin = () => {
       toast({
         title: "Erreur",
         description: "Une erreur s'est produite lors de l'enregistrement de l'item.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveProfile = async (data: z.infer<typeof profileSchema>) => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        email: data.email,
+        data: {
+          full_name: data.fullName,
+          phone: data.phone,
+          address: data.address
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Profil mis à jour",
+        description: "Vos informations ont été mises à jour avec succès."
+      });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de la mise à jour du profil.",
         variant: "destructive",
       });
     }
@@ -580,6 +663,12 @@ const Admin = () => {
                 >
                   Gestion des Événements
                 </TabsTrigger>
+                <TabsTrigger 
+                  value="account"
+                  className="data-[state=active]:bg-bistro-olive data-[state=active]:text-white"
+                >
+                  Informations du Compte
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="menu" className="mt-0">
@@ -603,13 +692,14 @@ const Admin = () => {
                           <TableHead>Description</TableHead>
                           <TableHead>Prix (CAD)</TableHead>
                           <TableHead>Image</TableHead>
+                          <TableHead>Options</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {menuItems.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={6} className="text-center py-8">
+                            <TableCell colSpan={7} className="text-center py-8">
                               Aucun item dans le menu. Cliquez sur "Ajouter un item" pour commencer.
                             </TableCell>
                           </TableRow>
@@ -630,6 +720,12 @@ const Admin = () => {
                                 ) : (
                                   <span className="text-bistro-wood/50 text-sm">Aucune image</span>
                                 )}
+                              </TableCell>
+                              <TableCell className="space-x-1">
+                                {item.is_vegan && <Leaf className="inline-block w-4 h-4 text-green-600" />}
+                                {item.is_spicy && <Flame className="inline-block w-4 h-4 text-red-600" />}
+                                {item.is_peanut_free && <NutOff className="inline-block w-4 h-4 text-amber-600" />}
+                                {item.is_gluten_free && <WheatOff className="inline-block w-4 h-4 text-yellow-600" />}
                               </TableCell>
                               <TableCell className="text-right space-x-2">
                                 <Button 
@@ -731,360 +827,91 @@ const Admin = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
-            </Tabs>
-          )}
-        </div>
-      </section>
-      
-      <Dialog open={isMenuItemDialogOpen} onOpenChange={setIsMenuItemDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-playfair text-bistro-wood">
-              {editingMenuItem ? "Modifier un item" : "Ajouter un item"}
-            </DialogTitle>
-          </DialogHeader>
-          <Form {...menuItemForm}>
-            <form onSubmit={menuItemForm.handleSubmit(handleSaveMenuItem)} className="space-y-4">
-              <FormField
-                control={menuItemForm.control}
-                name="categorie"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-bistro-wood">Catégorie</FormLabel>
-                    <FormControl>
-                      <select 
-                        {...field} 
-                        className="w-full border-bistro-sand rounded-md focus:border-bistro-olive focus:ring-bistro-olive p-2"
-                      >
-                        <option value="Apéritifs">Apéritifs</option>
-                        <option value="Plats">Plats</option>
-                        <option value="Desserts">Desserts</option>
-                        <option value="Boissons">Boissons</option>
-                      </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={menuItemForm.control}
-                name="nom"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-bistro-wood">Nom</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Nom de l'item" 
-                        {...field} 
-                        className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={menuItemForm.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-bistro-wood">Description</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Description de l'item" 
-                        {...field} 
-                        className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={menuItemForm.control}
-                name="prix"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-bistro-wood">Prix (CAD)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01" 
-                        placeholder="0.00" 
-                        {...field} 
-                        className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="space-y-2">
-                <FormLabel className="text-bistro-wood block">Image</FormLabel>
-                
-                {menuImagePreview ? (
-                  <div className="relative w-full h-48 bg-gray-100 rounded-md overflow-hidden">
-                    <img 
-                      src={menuImagePreview} 
-                      alt="Aperçu" 
-                      className="w-full h-full object-cover"
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2"
-                      onClick={handleRemoveMenuImage}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="border-2 border-dashed border-bistro-sand rounded-md p-8 text-center">
-                    <Upload className="h-10 w-10 text-bistro-olive/50 mx-auto mb-4" />
-                    <p className="text-bistro-wood mb-2">Cliquez pour ajouter une image</p>
-                    <p className="text-bistro-wood/50 text-sm">PNG, JPG ou JPEG</p>
-                    <Input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={handleMenuImageChange}
-                      className="hidden"
-                      id="menu-item-image"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="mt-4 border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
-                      onClick={() => document.getElementById('menu-item-image')?.click()}
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Sélectionner une image
-                    </Button>
-                  </div>
-                )}
-                
-                <FormField
-                  control={menuItemForm.control}
-                  name="image_url"
-                  render={({ field }) => (
-                    <FormControl>
-                      <Input 
-                        type="hidden" 
-                        {...field} 
-                      />
-                    </FormControl>
-                  )}
-                />
-              </div>
-              
-              <DialogFooter className="mt-6">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setIsMenuItemDialogOpen(false)}
-                >
-                  Annuler
-                </Button>
-                <Button 
-                  type="submit" 
-                  className="bg-bistro-olive hover:bg-bistro-olive-light text-white"
-                  disabled={uploadingMenuImage}
-                >
-                  {uploadingMenuImage ? (
-                    <>Chargement...</>
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      Enregistrer
-                    </>
-                  )}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={isEventDialogOpen} onOpenChange={setIsEventDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-playfair text-bistro-wood">
-              {editingEvent ? "Modifier un événement" : "Ajouter un événement"}
-            </DialogTitle>
-          </DialogHeader>
-          <Form {...eventForm}>
-            <form onSubmit={eventForm.handleSubmit(handleSaveEvent)} className="space-y-4">
-              <FormField
-                control={eventForm.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-bistro-wood">Date (YYYY-MM-DD)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="date" 
-                        {...field} 
-                        className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={eventForm.control}
-                name="titre"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-bistro-wood">Titre</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Titre de l'événement" 
-                        {...field} 
-                        className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={eventForm.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-bistro-wood">Description</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Description de l'événement" 
-                        {...field} 
-                        className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="space-y-2">
-                <FormLabel className="text-bistro-wood block">Image</FormLabel>
-                
-                {imagePreview ? (
-                  <div className="relative w-full h-48 bg-gray-100 rounded-md overflow-hidden">
-                    <img 
-                      src={imagePreview} 
-                      alt="Aperçu" 
-                      className="w-full h-full object-cover"
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2"
-                      onClick={handleRemoveImage}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="border-2 border-dashed border-bistro-sand rounded-md p-8 text-center">
-                    <Upload className="h-10 w-10 text-bistro-olive/50 mx-auto mb-4" />
-                    <p className="text-bistro-wood mb-2">Cliquez pour ajouter une image</p>
-                    <p className="text-bistro-wood/50 text-sm">PNG, JPG ou JPEG</p>
-                    <Input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                      id="event-image"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="mt-4 border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
-                      onClick={() => document.getElementById('event-image')?.click()}
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Sélectionner une image
-                    </Button>
-                  </div>
-                )}
-                
-                <FormField
-                  control={eventForm.control}
-                  name="image_url"
-                  render={({ field }) => (
-                    <FormControl>
-                      <Input 
-                        type="hidden" 
-                        {...field} 
-                      />
-                    </FormControl>
-                  )}
-                />
-              </div>
-              
-              <DialogFooter className="mt-6">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setIsEventDialogOpen(false)}
-                >
-                  Annuler
-                </Button>
-                <Button 
-                  type="submit" 
-                  className="bg-bistro-olive hover:bg-bistro-olive-light text-white"
-                  disabled={uploadingImage}
-                >
-                  {uploadingImage ? (
-                    <>Chargement...</>
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      Enregistrer
-                    </>
-                  )}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-playfair text-bistro-wood">Confirmer la suppression</DialogTitle>
-          </DialogHeader>
-          <p>Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.</p>
-          <DialogFooter className="mt-6">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => setIsDeleteConfirmOpen(false)}
-            >
-              Annuler
-            </Button>
-            <Button 
-              type="button" 
-              onClick={handleDeleteItem}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              <Trash className="mr-2 h-4 w-4" />
-              Supprimer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
 
-export default Admin;
+              <TabsContent value="account" className="mt-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-2xl font-playfair text-bistro-wood">Informations du Compte</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...profileForm}>
+                      <form onSubmit={profileForm.handleSubmit(handleSaveProfile)} className="space-y-6">
+                        <FormField
+                          control={profileForm.control}
+                          name="fullName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-bistro-wood">Nom Complet</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="Nom complet" 
+                                  {...field} 
+                                  className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={profileForm.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-bistro-wood">Numéro de Téléphone</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="Numéro de téléphone" 
+                                  {...field} 
+                                  className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={profileForm.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-bistro-wood">Adresse Email</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="email" 
+                                  placeholder="Email" 
+                                  {...field} 
+                                  className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={profileForm.control}
+                          name="address"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-bistro-wood">Adresse</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Adresse complète" 
+                                  {...field} 
+                                  className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <Button 
+                          type="submit" 
+                          className="bg-bistro-olive hover:bg-bistro-olive-light text-white"
+                        >
+                          <Save className="mr-2 h-4 w-4" />
+                          Enregistrer

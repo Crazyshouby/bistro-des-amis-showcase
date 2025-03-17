@@ -1,4 +1,3 @@
-
 export interface MenuItem {
   id: string;
   categorie: string;
@@ -6,6 +5,10 @@ export interface MenuItem {
   description: string;
   prix: number;
   image_url?: string;
+  is_vegan?: boolean;
+  is_spicy?: boolean;
+  is_peanut_free?: boolean;
+  is_gluten_free?: boolean;
 }
 
 export interface Event {
