@@ -7,6 +7,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ImageSettings } from "@/components/superadmin/ImageSettings";
 import { ColorSettings } from "@/components/superadmin/colors/ColorSettings";
 import { supabase } from "@/integrations/supabase/client";
+import { SocialSettings } from "@/components/superadmin/SocialSettings";
 
 interface SiteSettingsRow {
   id: number;
@@ -58,6 +59,11 @@ const SuperAdmin = () => {
       id: "colors",
       label: "Couleurs du site",
       content: <ColorSettings />
+    },
+    {
+      id: "social",
+      label: "Réseaux sociaux",
+      content: <SocialSettings />
     }
   ];
 
