@@ -6,6 +6,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import type { MenuItem } from "@/types";
 import { MenuItemCard } from "@/components/admin/menu/MenuItemCard";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
+import { Leaf, Flame, NutOff, WheatOff } from "lucide-react";
 
 // Définition de l'ordre fixe des catégories
 const CATEGORY_ORDER = ["Apéritifs", "Entrées", "Plats", "Desserts", "Boissons"];
@@ -15,6 +22,7 @@ const Menu = () => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("");
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [ref, isVisible] = useIntersectionObserver({
     threshold: 0.1,
     rootMargin: "-100px 0px",
@@ -66,6 +74,10 @@ const Menu = () => {
   const filteredItems = activeCategory
     ? menuItems.filter((item) => item.categorie === activeCategory)
     : menuItems;
+
+  const handleItemClick = (item: MenuItem) => {
+    setSelectedItem(item);
+  };
 
   return (
     <div className="bg-texture">
@@ -119,7 +131,7 @@ const Menu = () => {
                 </div>
               </div>
               
-              {/* Menu Grid - Now using admin MenuItemCard */}
+              {/* Menu Grid - Using MenuItemCard */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6" ref={ref}>
                 {filteredItems.length === 0 ? (
                   <p className="text-center text-bistro-wood/70 col-span-2 py-8">
@@ -131,8 +143,7 @@ const Menu = () => {
                       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full">
                         <MenuItemCard 
                           item={item}
-                          onEdit={() => {}} 
-                          onDelete={() => {}}
+                          onEdit={() => handleItemClick(item)} 
                         />
                       </div>
                     </AnimatedSection>
@@ -143,6 +154,84 @@ const Menu = () => {
           )}
         </div>
       </section>
+
+      {/* Menu Item Detail Dialog */}
+      <Dialog open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
+        <DialogContent className="sm:max-w-[500px]">
+          {selectedItem && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-playfair font-bold text-bistro-wood">
+                  {selectedItem.nom}
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="mt-4">
+                {/* Image */}
+                {selectedItem.image_url && (
+                  <div className="mb-4 rounded-md overflow-hidden h-56">
+                    <img 
+                      src={selectedItem.image_url} 
+                      alt={selectedItem.nom}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                
+                {/* Price */}
+                <div className="text-xl font-bold text-bistro-olive mb-3">
+                  {selectedItem.prix} CAD
+                </div>
+                
+                {/* Description */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-medium text-bistro-wood mb-2">Description</h3>
+                  <p className="text-bistro-wood/80">{selectedItem.description}</p>
+                </div>
+                
+                {/* Dietary Options */}
+                <div>
+                  <h3 className="text-lg font-medium text-bistro-wood mb-2">Options alimentaires</h3>
+                  <div className="space-y-2">
+                    {selectedItem.is_vegan && (
+                      <div className="flex items-center gap-2">
+                        <Leaf className="w-5 h-5 text-green-600" />
+                        <span>Végétalien</span>
+                      </div>
+                    )}
+                    
+                    {selectedItem.is_spicy && (
+                      <div className="flex items-center gap-2">
+                        <Flame className="w-5 h-5 text-red-600" />
+                        <span>Épicé</span>
+                      </div>
+                    )}
+                    
+                    {selectedItem.is_peanut_free && (
+                      <div className="flex items-center gap-2">
+                        <NutOff className="w-5 h-5 text-amber-600" />
+                        <span>Sans Cacahuètes</span>
+                      </div>
+                    )}
+                    
+                    {selectedItem.is_gluten_free && (
+                      <div className="flex items-center gap-2">
+                        <WheatOff className="w-5 h-5 text-yellow-600" />
+                        <span>Sans Gluten</span>
+                      </div>
+                    )}
+                    
+                    {!selectedItem.is_vegan && !selectedItem.is_spicy && 
+                     !selectedItem.is_peanut_free && !selectedItem.is_gluten_free && (
+                      <p className="text-gray-500">Aucune option spéciale</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
