@@ -176,61 +176,74 @@ const Contact = () => {
             
             {/* Contact Information */}
             <AnimatedSection delay={300} direction="right">
-              <div className="bg-bistro-brick-light rounded-lg shadow-xl p-6 md:p-8 text-bistro-wood">
-                <h2 className="text-2xl font-playfair font-bold mb-8">Infos pratiques</h2>
+              <div className="rounded-lg shadow-xl p-6 md:p-8 text-white overflow-hidden relative">
+                {/* Background image with blur and brightness */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center blur-sm brightness-[0.8] z-0"
+                  style={{ backgroundImage: "url('/lovable-uploads/99813d7a-a237-43a1-b751-9371096b7fc2.png')" }}
+                >
+                </div>
                 
-                <div className="space-y-6">
-                  <div className="flex items-start space-x-4">
-                    <MapPin className="h-6 w-6 text-bistro-olive flex-shrink-0 mt-1" />
-                    <div>
-                      <h3 className="font-bold mb-1">Adresse</h3>
-                      <p>12 Rue Wellington</p>
-                      <p>Verdun, QC H4G 1N1</p>
+                {/* Dark overlay for better text readability */}
+                <div className="absolute inset-0 bg-black bg-opacity-40 z-10"></div>
+                
+                {/* Content */}
+                <div className="relative z-20">
+                  <h2 className="text-2xl font-playfair font-bold mb-8">Infos pratiques</h2>
+                  
+                  <div className="space-y-6">
+                    <div className="flex items-start space-x-4">
+                      <MapPin className="h-6 w-6 text-bistro-olive flex-shrink-0 mt-1" />
+                      <div>
+                        <h3 className="font-bold mb-1">Adresse</h3>
+                        <p>12 Rue Wellington</p>
+                        <p>Verdun, QC H4G 1N1</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-4">
+                      <Phone className="h-6 w-6 text-bistro-olive flex-shrink-0 mt-1" />
+                      <div>
+                        <h3 className="font-bold mb-1">Téléphone</h3>
+                        <p>(418) 555-1234</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-4">
+                      <Mail className="h-6 w-6 text-bistro-olive flex-shrink-0 mt-1" />
+                      <div>
+                        <h3 className="font-bold mb-1">Email</h3>
+                        <p>info@bistrodesamis.com</p>
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-start space-x-4">
-                    <Phone className="h-6 w-6 text-bistro-olive flex-shrink-0 mt-1" />
-                    <div>
-                      <h3 className="font-bold mb-1">Téléphone</h3>
-                      <p>(418) 555-1234</p>
-                    </div>
+                  <div className="mt-12">
+                    <h3 className="text-lg font-bold mb-4">Horaires d'ouverture</h3>
+                    <ul className="space-y-2">
+                      <li className="flex justify-between">
+                        <span>Lundi - Vendredi</span>
+                        <span>16h - 23h</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>Samedi - Dimanche</span>
+                        <span>11h - 23h</span>
+                      </li>
+                    </ul>
                   </div>
                   
-                  <div className="flex items-start space-x-4">
-                    <Mail className="h-6 w-6 text-bistro-olive flex-shrink-0 mt-1" />
-                    <div>
-                      <h3 className="font-bold mb-1">Email</h3>
-                      <p>info@bistrodesamis.com</p>
+                  <div className="mt-12">
+                    <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-lg shadow-md">
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2798.1901917997275!2d-73.5710056845905!3d45.461396379101126!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4cc910c079aea3fb%3A0xbec0b80c7a6645d5!2sRue%20Wellington%2C%20Montr%C3%A9al%2C%20QC!5e0!3m2!1sfr!2sca!4v1629471543873!5m2!1sfr!2sca"
+                        width="100%"
+                        height="300"
+                        style={{ border: 0 }}
+                        allowFullScreen={false}
+                        loading="lazy"
+                        title="Carte Google Maps"
+                      ></iframe>
                     </div>
-                  </div>
-                </div>
-                
-                <div className="mt-12">
-                  <h3 className="text-lg font-bold mb-4">Horaires d'ouverture</h3>
-                  <ul className="space-y-2">
-                    <li className="flex justify-between">
-                      <span>Lundi - Vendredi</span>
-                      <span>16h - 23h</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Samedi - Dimanche</span>
-                      <span>11h - 23h</span>
-                    </li>
-                  </ul>
-                </div>
-                
-                <div className="mt-12">
-                  <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-lg shadow-md">
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2798.1901917997275!2d-73.5710056845905!3d45.461396379101126!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4cc910c079aea3fb%3A0xbec0b80c7a6645d5!2sRue%20Wellington%2C%20Montr%C3%A9al%2C%20QC!5e0!3m2!1sfr!2sca!4v1629471543873!5m2!1sfr!2sca"
-                      width="100%"
-                      height="300"
-                      style={{ border: 0 }}
-                      allowFullScreen={false}
-                      loading="lazy"
-                      title="Carte Google Maps"
-                    ></iframe>
                   </div>
                 </div>
               </div>
