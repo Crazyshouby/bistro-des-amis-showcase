@@ -25,6 +25,17 @@ interface HomepageImage {
   isChanged?: boolean;
 }
 
+interface SiteSettingsRow {
+  id: number;
+  type: string;
+  key: string;
+  name: string;
+  value: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export const ImageSettings = () => {
   const [images, setImages] = useState<HomepageImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,7 +65,7 @@ export const ImageSettings = () => {
         if (error) throw error;
         
         if (data && data.length > 0) {
-          const loadedImages = data.map(item => ({
+          const loadedImages = data.map((item: SiteSettingsRow) => ({
             id: item.key,
             src: item.value,
             alt: item.description || "",

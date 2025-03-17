@@ -22,6 +22,17 @@ interface ColorConfig {
   description: string;
 }
 
+interface SiteSettingsRow {
+  id: number;
+  type: string;
+  key: string;
+  name: string;
+  value: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export const ColorSettings = () => {
   const [colors, setColors] = useState<ColorConfig[]>([
     { 
@@ -96,7 +107,7 @@ export const ColorSettings = () => {
         if (error) throw error;
         
         if (data && data.length > 0) {
-          const loadedColors = data.map(item => ({
+          const loadedColors = data.map((item: SiteSettingsRow) => ({
             id: item.key,
             name: item.name,
             value: item.value,
@@ -191,12 +202,12 @@ export const ColorSettings = () => {
     
     try {
       // Update colors in state
-      setColors(prevColors => 
-        prevColors.map(color => ({
-          ...color,
-          value: defaultColors[color.id as keyof typeof defaultColors]
-        }))
-      );
+      const updatedColors = colors.map(color => ({
+        ...color,
+        value: defaultColors[color.id as keyof typeof defaultColors]
+      }));
+      
+      setColors(updatedColors);
       
       // Reset CSS variables
       Object.entries(defaultColors).forEach(([id, value]) => {
@@ -204,12 +215,7 @@ export const ColorSettings = () => {
       });
       
       // Update in database
-      await saveColorChanges(
-        prevColors => prevColors.map(color => ({
-          ...color,
-          value: defaultColors[color.id as keyof typeof defaultColors]
-        }))
-      );
+      await saveColorChanges(updatedColors);
       
       toast({
         title: "Couleurs réinitialisées",
