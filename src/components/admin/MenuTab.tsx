@@ -6,6 +6,7 @@ import { PlusCircle, Pencil, Trash, Leaf, Flame, NutOff, WheatOff } from "lucide
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MenuItem } from "@/types";
 import { MenuItemDialog } from "./MenuItemDialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface MenuTabProps {
   menuItems: MenuItem[];
@@ -32,6 +33,80 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
     setEditingMenuItem(null);
   };
 
+  // Group menu items by category
+  const categories = ["Apéritifs", "Entrées", "Plats", "Desserts", "Boissons"];
+  const menuItemsByCategory = categories.reduce((acc, category) => {
+    acc[category] = menuItems.filter(item => item.categorie === category);
+    return acc;
+  }, {} as Record<string, MenuItem[]>);
+
+  const renderCategoryTable = (categoryItems: MenuItem[]) => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nom</TableHead>
+          <TableHead>Description</TableHead>
+          <TableHead>Prix (CAD)</TableHead>
+          <TableHead>Image</TableHead>
+          <TableHead>Options</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {categoryItems.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={6} className="text-center py-8">
+              Aucun item dans cette catégorie.
+            </TableCell>
+          </TableRow>
+        ) : (
+          categoryItems.map((item) => (
+            <TableRow key={item.id}>
+              <TableCell className="font-medium">{item.nom}</TableCell>
+              <TableCell className="max-w-xs truncate">{item.description}</TableCell>
+              <TableCell>{item.prix}</TableCell>
+              <TableCell>
+                {item.image_url ? (
+                  <img 
+                    src={item.image_url} 
+                    alt={item.nom}
+                    className="w-10 h-10 object-cover rounded"
+                  />
+                ) : (
+                  <span className="text-bistro-wood/50 text-sm">Aucune image</span>
+                )}
+              </TableCell>
+              <TableCell className="space-x-1">
+                {item.is_vegan && <Leaf className="inline-block w-4 h-4 text-green-600" title="Végétalien" />}
+                {item.is_spicy && <Flame className="inline-block w-4 h-4 text-red-600" title="Épicé" />}
+                {item.is_peanut_free && <NutOff className="inline-block w-4 h-4 text-amber-600" title="Sans cacahuètes" />}
+                {item.is_gluten_free && <WheatOff className="inline-block w-4 h-4 text-yellow-600" title="Sans gluten" />}
+              </TableCell>
+              <TableCell className="text-right space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleEditMenuItem(item)}
+                  className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => onDeleteRequest('menu', item.id)}
+                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))
+        )}
+      </TableBody>
+    </Table>
+  );
+
   return (
     <>
       <Card>
@@ -46,72 +121,23 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
           </Button>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Catégorie</TableHead>
-                <TableHead>Nom</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Prix (CAD)</TableHead>
-                <TableHead>Image</TableHead>
-                <TableHead>Options</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {menuItems.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
-                    Aucun item dans le menu. Cliquez sur "Ajouter un item" pour commencer.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                menuItems.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.categorie}</TableCell>
-                    <TableCell className="font-medium">{item.nom}</TableCell>
-                    <TableCell className="max-w-xs truncate">{item.description}</TableCell>
-                    <TableCell>{item.prix}</TableCell>
-                    <TableCell>
-                      {item.image_url ? (
-                        <img 
-                          src={item.image_url} 
-                          alt={item.nom}
-                          className="w-10 h-10 object-cover rounded"
-                        />
-                      ) : (
-                        <span className="text-bistro-wood/50 text-sm">Aucune image</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="space-x-1">
-                      {item.is_vegan && <Leaf className="inline-block w-4 h-4 text-green-600" />}
-                      {item.is_spicy && <Flame className="inline-block w-4 h-4 text-red-600" />}
-                      {item.is_peanut_free && <NutOff className="inline-block w-4 h-4 text-amber-600" />}
-                      {item.is_gluten_free && <WheatOff className="inline-block w-4 h-4 text-yellow-600" />}
-                    </TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleEditMenuItem(item)}
-                        className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => onDeleteRequest('menu', item.id)}
-                        className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <Tabs defaultValue="Apéritifs" className="w-full">
+            <TabsList className="mb-4 w-full grid grid-cols-5">
+              {categories.map(category => (
+                <TabsTrigger key={category} value={category}>
+                  {category}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            
+            {categories.map(category => (
+              <TabsContent key={category} value={category} className="mt-4">
+                <div className="rounded-md border">
+                  {renderCategoryTable(menuItemsByCategory[category])}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
         </CardContent>
       </Card>
 
