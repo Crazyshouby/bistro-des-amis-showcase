@@ -219,16 +219,16 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={availableCategories[0] || "Apéritifs"} className="w-full">
-            <TabsList className="mb-4 w-full justify-center bg-transparent p-0 flex gap-4">
+            <TabsList className="mb-4 w-full bg-transparent p-0 flex overflow-x-auto space-x-2 justify-start">
               {availableCategories.map(category => (
                 <TabsTrigger 
                   key={category} 
                   value={category} 
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors
+                  className="px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors
                     data-[state=active]:bg-bistro-olive data-[state=active]:text-white
                     data-[state=inactive]:bg-[#843c08]/80 data-[state=inactive]:text-white
                     hover:bg-bistro-olive/90 hover:text-white
-                  `}
+                    flex-shrink-0"
                 >
                   {category}
                 </TabsTrigger>
