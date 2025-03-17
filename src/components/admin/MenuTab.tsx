@@ -93,52 +93,30 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
           {item.description}
         </p>
         
-        <div className="flex mt-2 gap-1">
-          <TooltipProvider>
-            {item.is_vegan && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <Leaf className="inline-block w-4 h-4 text-green-600" />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>Végétalien</TooltipContent>
-              </Tooltip>
-            )}
-            
-            {item.is_spicy && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <Flame className="inline-block w-4 h-4 text-red-600" />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>Épicé</TooltipContent>
-              </Tooltip>
-            )}
-            
-            {item.is_peanut_free && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <NutOff className="inline-block w-4 h-4 text-amber-600" />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>Sans cacahuètes</TooltipContent>
-              </Tooltip>
-            )}
-            
-            {item.is_gluten_free && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <WheatOff className="inline-block w-4 h-4 text-yellow-600" />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>Sans gluten</TooltipContent>
-              </Tooltip>
-            )}
-          </TooltipProvider>
+        <div className="flex mt-2 gap-2">
+          {item.is_vegan && (
+            <div className="flex items-center">
+              <Leaf className="w-4 h-4 text-green-600" />
+            </div>
+          )}
+          
+          {item.is_spicy && (
+            <div className="flex items-center">
+              <Flame className="w-4 h-4 text-red-600" />
+            </div>
+          )}
+          
+          {item.is_peanut_free && (
+            <div className="flex items-center">
+              <NutOff className="w-4 h-4 text-amber-600" />
+            </div>
+          )}
+          
+          {item.is_gluten_free && (
+            <div className="flex items-center">
+              <WheatOff className="w-4 h-4 text-yellow-600" />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -165,7 +143,7 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
             onClick={handleAddMenuItem}
             className="bg-bistro-olive hover:bg-bistro-olive-light text-white"
           >
-            <PlusCircle className="mr-2 h-4 w-4" />
+            <PlusCircle className="h-4 w-4 mr-2" />
             Ajouter un item
           </Button>
         </CardHeader>
