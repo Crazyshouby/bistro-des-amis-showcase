@@ -5,6 +5,7 @@ export interface MenuItem {
   nom: string;
   description: string;
   prix: number;
+  image_url?: string;
 }
 
 export interface Event {

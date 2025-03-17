@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,7 +24,8 @@ const menuItemSchema = z.object({
   categorie: z.string().min(1, "La catégorie est requise"),
   nom: z.string().min(1, "Le nom est requis"),
   description: z.string().min(1, "La description est requise"),
-  prix: z.coerce.number().min(0, "Le prix doit être positif")
+  prix: z.coerce.number().min(0, "Le prix doit être positif"),
+  image_url: z.string().optional()
 });
 
 // Schéma de validation pour un événement
@@ -53,6 +55,11 @@ const Admin = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   
+  // États pour l'upload d'image du menu
+  const [selectedMenuImage, setSelectedMenuImage] = useState<File | null>(null);
+  const [menuImagePreview, setMenuImagePreview] = useState<string | null>(null);
+  const [uploadingMenuImage, setUploadingMenuImage] = useState(false);
+  
   // États pour la vue
   const [menuView, setMenuView] = useState<'list' | 'calendar'>('list');
   const [selectedMenuDate, setSelectedMenuDate] = useState<Date>(new Date());
@@ -70,7 +77,8 @@ const Admin = () => {
       categorie: "Apéritifs",
       nom: "",
       description: "",
-      prix: 0
+      prix: 0,
+      image_url: ""
     }
   });
   
@@ -136,8 +144,18 @@ const Admin = () => {
       categorie: item.categorie,
       nom: item.nom,
       description: item.description,
-      prix: item.prix
+      prix: item.prix,
+      image_url: item.image_url || ""
     });
+    
+    // Set image preview if item has an image
+    if (item.image_url) {
+      setMenuImagePreview(item.image_url);
+    } else {
+      setMenuImagePreview(null);
+    }
+    
+    setSelectedMenuImage(null);
     setIsMenuItemDialogOpen(true);
   };
   
@@ -147,14 +165,37 @@ const Admin = () => {
       categorie: "Apéritifs",
       nom: "",
       description: "",
-      prix: 0
+      prix: 0,
+      image_url: ""
     });
+    setSelectedMenuImage(null);
+    setMenuImagePreview(null);
     setIsMenuItemDialogOpen(true);
   };
   
   const handleSaveMenuItem = async (data: z.infer<typeof menuItemSchema>) => {
     try {
+      let imageUrl = data.image_url || null;
+      
+      // Upload image if selected
+      if (selectedMenuImage) {
+        const uploadedUrl = await uploadMenuImage(selectedMenuImage);
+        if (uploadedUrl) {
+          imageUrl = uploadedUrl;
+        }
+      }
+      
       if (editingMenuItem) {
+        // If image was removed but there was one before, delete old image
+        if (!imageUrl && editingMenuItem.image_url) {
+          const oldImagePath = editingMenuItem.image_url.split('/').pop();
+          if (oldImagePath) {
+            await supabase.storage
+              .from('event_images')
+              .remove([oldImagePath]);
+          }
+        }
+        
         // Update existing item
         const { error } = await supabase
           .from('menu_items')
@@ -163,6 +204,7 @@ const Admin = () => {
             nom: data.nom,
             description: data.description,
             prix: data.prix,
+            image_url: imageUrl,
             updated_at: new Date().toISOString()
           })
           .eq('id', editingMenuItem.id);
@@ -177,14 +219,15 @@ const Admin = () => {
               categorie: data.categorie,
               nom: data.nom,
               description: data.description,
-              prix: data.prix
+              prix: data.prix,
+              image_url: imageUrl
             } : item
           )
         );
         
         toast({
           title: "Item mis à jour",
-          description: `"${data.nom}" a été mis à jour avec succès.",
+          description: `"${data.nom}" a été mis à jour avec succès.`,
         });
       } else {
         // Add new item
@@ -194,7 +237,8 @@ const Admin = () => {
             categorie: data.categorie,
             nom: data.nom,
             description: data.description,
-            prix: data.prix
+            prix: data.prix,
+            image_url: imageUrl
           })
           .select()
           .single();
@@ -206,9 +250,13 @@ const Admin = () => {
         
         toast({
           title: "Item ajouté",
-          description: `"${data.nom}" a été ajouté au menu.",
+          description: `"${data.nom}" a été ajouté au menu.`,
         });
       }
+      
+      // Reset states
+      setSelectedMenuImage(null);
+      setMenuImagePreview(null);
       setIsMenuItemDialogOpen(false);
     } catch (error) {
       console.error('Error saving menu item:', error);
@@ -230,6 +278,23 @@ const Admin = () => {
     
     try {
       if (itemToDelete.type === 'menu') {
+        // Get menu item to check if it has an image
+        const menuItemToDelete = menuItems.find(e => e.id === itemToDelete.id);
+        
+        // If menu item has an image, delete it from storage
+        if (menuItemToDelete?.image_url) {
+          const imagePath = menuItemToDelete.image_url.split('/').pop();
+          if (imagePath) {
+            const { error: storageError } = await supabase.storage
+              .from('event_images')
+              .remove([imagePath]);
+              
+            if (storageError) {
+              console.error('Error deleting image:', storageError);
+            }
+          }
+        }
+        
         // Delete menu item
         const { error } = await supabase
           .from('menu_items')
@@ -292,7 +357,58 @@ const Admin = () => {
     }
   };
   
-  // Gestion des images
+  // Gestion des images pour les menus
+  const handleMenuImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedMenuImage(file);
+      setMenuImagePreview(URL.createObjectURL(file));
+    }
+  };
+  
+  const handleRemoveMenuImage = () => {
+    setSelectedMenuImage(null);
+    setMenuImagePreview(null);
+    if (editingMenuItem && editingMenuItem.image_url) {
+      menuItemForm.setValue('image_url', '');
+    }
+  };
+  
+  const uploadMenuImage = async (file: File): Promise<string | null> => {
+    try {
+      setUploadingMenuImage(true);
+      
+      // Generate a unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `menu_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('event_images')
+        .upload(fileName, file);
+      
+      if (error) throw error;
+      
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('event_images')
+        .getPublicUrl(fileName);
+        
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de l'upload de l'image.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setUploadingMenuImage(false);
+    }
+  };
+  
+  // Gestion des images pour les événements
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -430,7 +546,7 @@ const Admin = () => {
         
         toast({
           title: "Événement mis à jour",
-          description: `"${data.titre}" a été mis à jour avec succès.",
+          description: `"${data.titre}" a été mis à jour avec succès.`,
         });
       } else {
         // Add new event
@@ -452,7 +568,7 @@ const Admin = () => {
         
         toast({
           title: "Événement ajouté",
-          description: `"${data.titre}" a été ajouté au calendrier.",
+          description: `"${data.titre}" a été ajouté au calendrier.`,
         });
       }
       
@@ -576,13 +692,14 @@ const Admin = () => {
                             <TableHead>Nom</TableHead>
                             <TableHead>Description</TableHead>
                             <TableHead>Prix (CAD)</TableHead>
+                            <TableHead>Image</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {menuItems.length === 0 ? (
                             <TableRow>
-                              <TableCell colSpan={5} className="text-center py-8">
+                              <TableCell colSpan={6} className="text-center py-8">
                                 Aucun item dans le menu. Cliquez sur "Ajouter un item" pour commencer.
                               </TableCell>
                             </TableRow>
@@ -593,6 +710,17 @@ const Admin = () => {
                                 <TableCell className="font-medium">{item.nom}</TableCell>
                                 <TableCell className="max-w-xs truncate">{item.description}</TableCell>
                                 <TableCell>{item.prix}</TableCell>
+                                <TableCell>
+                                  {item.image_url ? (
+                                    <img 
+                                      src={item.image_url} 
+                                      alt={item.nom}
+                                      className="w-10 h-10 object-cover rounded"
+                                    />
+                                  ) : (
+                                    <span className="text-bistro-wood/50 text-sm">Aucune image</span>
+                                  )}
+                                </TableCell>
                                 <TableCell className="text-right space-x-2">
                                   <Button 
                                     variant="outline" 
@@ -827,6 +955,66 @@ const Admin = () => {
                 )}
               />
               
+              {/* Image Upload for Menu Items */}
+              <div className="space-y-2">
+                <FormLabel className="text-bistro-wood block">Image</FormLabel>
+                
+                {menuImagePreview ? (
+                  <div className="relative w-full h-48 bg-gray-100 rounded-md overflow-hidden">
+                    <img 
+                      src={menuImagePreview} 
+                      alt="Aperçu" 
+                      className="w-full h-full object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={handleRemoveMenuImage}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-bistro-sand rounded-md p-8 text-center">
+                    <Upload className="h-10 w-10 text-bistro-olive/50 mx-auto mb-4" />
+                    <p className="text-bistro-wood mb-2">Cliquez pour ajouter une image</p>
+                    <p className="text-bistro-wood/50 text-sm">PNG, JPG ou JPEG</p>
+                    <Input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleMenuImageChange}
+                      className="hidden"
+                      id="menu-item-image"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="mt-4 border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
+                      onClick={() => document.getElementById('menu-item-image')?.click()}
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      Sélectionner une image
+                    </Button>
+                  </div>
+                )}
+                
+                {/* Hidden field to store the image URL */}
+                <FormField
+                  control={menuItemForm.control}
+                  name="image_url"
+                  render={({ field }) => (
+                    <FormControl>
+                      <Input 
+                        type="hidden" 
+                        {...field} 
+                      />
+                    </FormControl>
+                  )}
+                />
+              </div>
+              
               <DialogFooter className="mt-6">
                 <Button 
                   type="button" 
@@ -838,9 +1026,16 @@ const Admin = () => {
                 <Button 
                   type="submit" 
                   className="bg-bistro-olive hover:bg-bistro-olive-light text-white"
+                  disabled={uploadingMenuImage}
                 >
-                  <Save className="mr-2 h-4 w-4" />
-                  Enregistrer
+                  {uploadingMenuImage ? (
+                    <>Chargement...</>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Enregistrer
+                    </>
+                  )}
                 </Button>
               </DialogFooter>
             </form>
