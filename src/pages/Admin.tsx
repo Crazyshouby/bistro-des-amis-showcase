@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -181,7 +180,15 @@ const Admin = () => {
       // Mise à jour d'un item existant
       setMenuItems(prevItems => 
         prevItems.map(item => 
-          item.id === editingMenuItem.id ? { ...data, id: item.id } : item
+          item.id === editingMenuItem.id ? { 
+            ...data, 
+            id: item.id,
+            // Ensure all required properties are non-optional by adding them explicitly
+            categorie: data.categorie,
+            nom: data.nom,
+            description: data.description,
+            prix: data.prix
+          } : item
         )
       );
       toast({
@@ -190,9 +197,12 @@ const Admin = () => {
       });
     } else {
       // Ajout d'un nouvel item
-      const newItem = {
-        ...data,
-        id: `menu-${Date.now()}`
+      const newItem: MenuItem = {
+        id: `menu-${Date.now()}`,
+        categorie: data.categorie,
+        nom: data.nom,
+        description: data.description,
+        prix: data.prix
       };
       setMenuItems(prevItems => [...prevItems, newItem]);
       toast({
@@ -255,7 +265,14 @@ const Admin = () => {
       // Mise à jour d'un événement existant
       setEvents(prevEvents => 
         prevEvents.map(event => 
-          event.id === editingEvent.id ? { ...data, id: event.id } : event
+          event.id === editingEvent.id ? {
+            ...data,
+            id: event.id,
+            // Ensure all required properties are non-optional
+            date: data.date,
+            titre: data.titre,
+            description: data.description
+          } : event
         )
       );
       toast({
@@ -264,9 +281,11 @@ const Admin = () => {
       });
     } else {
       // Ajout d'un nouvel événement
-      const newEvent = {
-        ...data,
-        id: `event-${Date.now()}`
+      const newEvent: Event = {
+        id: `event-${Date.now()}`,
+        date: data.date,
+        titre: data.titre,
+        description: data.description
       };
       setEvents(prevEvents => [...prevEvents, newEvent]);
       toast({
