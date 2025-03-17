@@ -12,6 +12,7 @@ export interface Event {
   date: string;
   titre: string;
   description: string;
+  image_url?: string;
 }
 
 export interface ContactFormData {

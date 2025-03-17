@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Eye, EyeOff, Pencil, PlusCircle, Save, Trash, LogOut } from "lucide-react";
+import { Eye, EyeOff, Pencil, PlusCircle, Save, Trash, LogOut, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -31,7 +31,8 @@ const eventSchema = z.object({
   id: z.string().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format de date invalide (YYYY-MM-DD)"),
   titre: z.string().min(1, "Le titre est requis"),
-  description: z.string().min(1, "La description est requise")
+  description: z.string().min(1, "La description est requise"),
+  image_url: z.string().optional(),
 });
 
 const Admin = () => {
@@ -46,6 +47,11 @@ const Admin = () => {
   // États pour l'édition
   const [editingMenuItem, setEditingMenuItem] = useState<MenuItem | null>(null);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  
+  // États pour l'upload d'image
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   
   // Modales
   const [isMenuItemDialogOpen, setIsMenuItemDialogOpen] = useState(false);
@@ -70,7 +76,8 @@ const Admin = () => {
     defaultValues: {
       date: "",
       titre: "",
-      description: ""
+      description: "",
+      image_url: "",
     }
   });
 
@@ -236,6 +243,23 @@ const Admin = () => {
         });
       } else {
         // Delete event
+        const eventToDelete = events.find(e => e.id === itemToDelete.id);
+        
+        // If event has an image, delete it from storage
+        if (eventToDelete?.image_url) {
+          const imagePath = eventToDelete.image_url.split('/').pop();
+          if (imagePath) {
+            const { error: storageError } = await supabase.storage
+              .from('event_images')
+              .remove([imagePath]);
+              
+            if (storageError) {
+              console.error('Error deleting image:', storageError);
+            }
+          }
+        }
+        
+        // Delete event from database
         const { error } = await supabase
           .from('events')
           .delete()
@@ -264,6 +288,57 @@ const Admin = () => {
     }
   };
   
+  // Gestion des images
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+  
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (editingEvent && editingEvent.image_url) {
+      eventForm.setValue('image_url', '');
+    }
+  };
+  
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      setUploadingImage(true);
+      
+      // Generate a unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('event_images')
+        .upload(fileName, file);
+      
+      if (error) throw error;
+      
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('event_images')
+        .getPublicUrl(fileName);
+        
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de l'upload de l'image.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+  
   // Gestion des événements
   const handleEditEvent = (event: Event) => {
     setEditingEvent(event);
@@ -271,8 +346,18 @@ const Admin = () => {
       id: event.id,
       date: event.date,
       titre: event.titre,
-      description: event.description
+      description: event.description,
+      image_url: event.image_url || '',
     });
+    
+    // Set image preview if event has an image
+    if (event.image_url) {
+      setImagePreview(event.image_url);
+    } else {
+      setImagePreview(null);
+    }
+    
+    setSelectedImage(null);
     setIsEventDialogOpen(true);
   };
   
@@ -281,14 +366,37 @@ const Admin = () => {
     eventForm.reset({
       date: "",
       titre: "",
-      description: ""
+      description: "",
+      image_url: "",
     });
+    setSelectedImage(null);
+    setImagePreview(null);
     setIsEventDialogOpen(true);
   };
   
   const handleSaveEvent = async (data: z.infer<typeof eventSchema>) => {
     try {
+      let imageUrl = data.image_url || null;
+      
+      // Upload image if selected
+      if (selectedImage) {
+        const uploadedUrl = await uploadImage(selectedImage);
+        if (uploadedUrl) {
+          imageUrl = uploadedUrl;
+        }
+      }
+      
       if (editingEvent) {
+        // If image was removed but there was one before, delete old image
+        if (!imageUrl && editingEvent.image_url) {
+          const oldImagePath = editingEvent.image_url.split('/').pop();
+          if (oldImagePath) {
+            await supabase.storage
+              .from('event_images')
+              .remove([oldImagePath]);
+          }
+        }
+        
         // Update existing event
         const { error } = await supabase
           .from('events')
@@ -296,6 +404,7 @@ const Admin = () => {
             date: data.date,
             titre: data.titre,
             description: data.description,
+            image_url: imageUrl,
             updated_at: new Date().toISOString()
           })
           .eq('id', editingEvent.id);
@@ -309,7 +418,8 @@ const Admin = () => {
               ...event,
               date: data.date,
               titre: data.titre,
-              description: data.description
+              description: data.description,
+              image_url: imageUrl,
             } : event
           )
         );
@@ -325,7 +435,8 @@ const Admin = () => {
           .insert({
             date: data.date,
             titre: data.titre,
-            description: data.description
+            description: data.description,
+            image_url: imageUrl,
           })
           .select()
           .single();
@@ -340,6 +451,10 @@ const Admin = () => {
           description: `"${data.titre}" a été ajouté au calendrier.`,
         });
       }
+      
+      // Reset states
+      setSelectedImage(null);
+      setImagePreview(null);
       setIsEventDialogOpen(false);
     } catch (error) {
       console.error('Error saving event:', error);
@@ -487,13 +602,14 @@ const Admin = () => {
                           <TableHead>Date</TableHead>
                           <TableHead>Titre</TableHead>
                           <TableHead>Description</TableHead>
+                          <TableHead>Image</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {events.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={4} className="text-center py-8">
+                            <TableCell colSpan={5} className="text-center py-8">
                               Aucun événement programmé. Cliquez sur "Ajouter un événement" pour commencer.
                             </TableCell>
                           </TableRow>
@@ -503,6 +619,17 @@ const Admin = () => {
                               <TableCell>{event.date}</TableCell>
                               <TableCell className="font-medium">{event.titre}</TableCell>
                               <TableCell className="max-w-xs truncate">{event.description}</TableCell>
+                              <TableCell>
+                                {event.image_url ? (
+                                  <img 
+                                    src={event.image_url} 
+                                    alt={event.titre}
+                                    className="w-10 h-10 object-cover rounded"
+                                  />
+                                ) : (
+                                  <span className="text-bistro-wood/50 text-sm">Aucune image</span>
+                                )}
+                              </TableCell>
                               <TableCell className="text-right space-x-2">
                                 <Button 
                                   variant="outline" 
@@ -707,6 +834,66 @@ const Admin = () => {
                 )}
               />
               
+              {/* Image Upload */}
+              <div className="space-y-2">
+                <FormLabel className="text-bistro-wood block">Image</FormLabel>
+                
+                {imagePreview ? (
+                  <div className="relative w-full h-48 bg-gray-100 rounded-md overflow-hidden">
+                    <img 
+                      src={imagePreview} 
+                      alt="Aperçu" 
+                      className="w-full h-full object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={handleRemoveImage}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-bistro-sand rounded-md p-8 text-center">
+                    <Upload className="h-10 w-10 text-bistro-olive/50 mx-auto mb-4" />
+                    <p className="text-bistro-wood mb-2">Cliquez pour ajouter une image</p>
+                    <p className="text-bistro-wood/50 text-sm">PNG, JPG ou JPEG</p>
+                    <Input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                      id="event-image"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="mt-4 border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
+                      onClick={() => document.getElementById('event-image')?.click()}
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      Sélectionner une image
+                    </Button>
+                  </div>
+                )}
+                
+                {/* Hidden field to store the image URL */}
+                <FormField
+                  control={eventForm.control}
+                  name="image_url"
+                  render={({ field }) => (
+                    <FormControl>
+                      <Input 
+                        type="hidden" 
+                        {...field} 
+                      />
+                    </FormControl>
+                  )}
+                />
+              </div>
+              
               <DialogFooter className="mt-6">
                 <Button 
                   type="button" 
@@ -718,9 +905,16 @@ const Admin = () => {
                 <Button 
                   type="submit" 
                   className="bg-bistro-olive hover:bg-bistro-olive-light text-white"
+                  disabled={uploadingImage}
                 >
-                  <Save className="mr-2 h-4 w-4" />
-                  Enregistrer
+                  {uploadingImage ? (
+                    <>Chargement...</>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Enregistrer
+                    </>
+                  )}
                 </Button>
               </DialogFooter>
             </form>

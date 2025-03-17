@@ -26,13 +26,13 @@ const EventCard = ({ event, className, compact = false }: EventCardProps) => {
     <>
       <div 
         className={cn(
-          "bg-bistro-sand-light border border-bistro-sand rounded-md p-4 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer",
+          "bg-bistro-sand-light border border-bistro-sand rounded-md shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer",
           className
         )}
         onClick={() => setIsOpen(true)}
       >
         {compact ? (
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-4">
             <div>
               <h3 className="text-lg font-bold text-bistro-wood">{event.titre}</h3>
               <p className="text-sm text-bistro-wood/70">{capitalizedDay} {formattedDate}</p>
@@ -46,39 +46,66 @@ const EventCard = ({ event, className, compact = false }: EventCardProps) => {
             </Button>
           </div>
         ) : (
-          <>
-            <div className="flex justify-between items-start mb-2">
-              <h3 className="text-xl font-playfair font-bold text-bistro-wood">{event.titre}</h3>
+          <div className="flex flex-col md:flex-row">
+            {event.image_url && (
+              <div className="w-full md:w-1/3 h-48 md:h-auto">
+                <img 
+                  src={event.image_url} 
+                  alt={event.titre}
+                  className="w-full h-full object-cover rounded-t-md md:rounded-l-md md:rounded-t-none"
+                />
+              </div>
+            )}
+            <div className={cn(
+              "flex flex-col justify-between p-4", 
+              event.image_url ? "w-full md:w-2/3" : "w-full"
+            )}>
+              <div>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-xl font-playfair font-bold text-bistro-wood">{event.titre}</h3>
+                </div>
+                <div className="flex items-center text-bistro-olive mb-2">
+                  <CalendarDays size={16} className="mr-1" />
+                  <span className="text-sm">{capitalizedDay} {formattedDate}</span>
+                </div>
+                <p className="text-sm text-bistro-wood/80 line-clamp-2">{event.description}</p>
+              </div>
+              <Button 
+                variant="link" 
+                className="p-0 h-auto mt-2 text-bistro-olive hover:text-bistro-olive-light self-start"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsOpen(true);
+                }}
+              >
+                Voir les détails
+              </Button>
             </div>
-            <div className="flex items-center text-bistro-olive mb-2">
-              <CalendarDays size={16} className="mr-1" />
-              <span className="text-sm">{capitalizedDay} {formattedDate}</span>
-            </div>
-            <p className="text-sm text-bistro-wood/80 line-clamp-2">{event.description}</p>
-            <Button 
-              variant="link" 
-              className="p-0 h-auto mt-2 text-bistro-olive hover:text-bistro-olive-light"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen(true);
-              }}
-            >
-              Voir les détails
-            </Button>
-          </>
+          </div>
         )}
       </div>
       
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="bg-bistro-sand-light border-bistro-sand">
+        <DialogContent className="bg-bistro-sand-light border-bistro-sand max-w-3xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-playfair text-bistro-wood">{event.titre}</DialogTitle>
             <DialogDescription className="text-bistro-olive font-medium">
               {capitalizedDay} {formattedDate}
             </DialogDescription>
           </DialogHeader>
-          <div className="mt-4">
-            <p className="text-bistro-wood/90 whitespace-pre-line">{event.description}</p>
+          <div className="mt-4 flex flex-col md:flex-row gap-6">
+            {event.image_url && (
+              <div className="w-full md:w-1/2">
+                <img 
+                  src={event.image_url} 
+                  alt={event.titre}
+                  className="w-full h-auto rounded-md object-cover"
+                />
+              </div>
+            )}
+            <div className={event.image_url ? "w-full md:w-1/2" : "w-full"}>
+              <p className="text-bistro-wood/90 whitespace-pre-line">{event.description}</p>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
