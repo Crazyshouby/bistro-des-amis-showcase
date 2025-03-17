@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -228,6 +227,7 @@ const Auth = () => {
                           <FormLabel className="text-bistro-wood">Nom complet</FormLabel>
                           <FormControl>
                             <Input 
+                              type="text"
                               placeholder="Jean Dupont" 
                               {...field} 
                               className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
