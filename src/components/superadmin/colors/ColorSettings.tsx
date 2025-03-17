@@ -10,7 +10,8 @@ import {
   getInitialColors, 
   loadColorsFromDb, 
   saveColorChangesToDb, 
-  defaultColors 
+  defaultColors,
+  hexToRgb 
 } from "./colorUtils";
 
 export const ColorSettings = () => {
