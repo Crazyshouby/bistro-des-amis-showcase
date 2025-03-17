@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { MenuItem } from "@/types";
 import { MenuItemDialog } from "./MenuItemDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MenuTabProps {
   menuItems: MenuItem[];
@@ -77,10 +78,51 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
                 )}
               </TableCell>
               <TableCell className="space-x-1">
-                {item.is_vegan && <Leaf className="inline-block w-4 h-4 text-green-600" title="Végétalien" />}
-                {item.is_spicy && <Flame className="inline-block w-4 h-4 text-red-600" title="Épicé" />}
-                {item.is_peanut_free && <NutOff className="inline-block w-4 h-4 text-amber-600" title="Sans cacahuètes" />}
-                {item.is_gluten_free && <WheatOff className="inline-block w-4 h-4 text-yellow-600" title="Sans gluten" />}
+                <TooltipProvider>
+                  {item.is_vegan && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <Leaf className="inline-block w-4 h-4 text-green-600" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>Végétalien</TooltipContent>
+                    </Tooltip>
+                  )}
+                  
+                  {item.is_spicy && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <Flame className="inline-block w-4 h-4 text-red-600" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>Épicé</TooltipContent>
+                    </Tooltip>
+                  )}
+                  
+                  {item.is_peanut_free && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <NutOff className="inline-block w-4 h-4 text-amber-600" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>Sans cacahuètes</TooltipContent>
+                    </Tooltip>
+                  )}
+                  
+                  {item.is_gluten_free && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <WheatOff className="inline-block w-4 h-4 text-yellow-600" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>Sans gluten</TooltipContent>
+                    </Tooltip>
+                  )}
+                </TooltipProvider>
               </TableCell>
               <TableCell className="text-right space-x-2">
                 <Button 
