@@ -14,10 +14,32 @@ export const defaultColors = {
   "olive-light": "#8A9A5B"
 };
 
+// Apply colors to both CSS custom properties and Tailwind classes via the root element
 export const applyColorsToCss = (colors: ColorConfig[]): void => {
+  const root = document.documentElement;
+  
   colors.forEach(color => {
-    document.documentElement.style.setProperty(`--bistro-${color.id}`, color.value);
+    // Set the CSS custom property
+    root.style.setProperty(`--bistro-${color.id}`, color.value);
+    
+    // Update the corresponding entry in tailwind config's bistro theme
+    // This is done directly on the CSS variables of the document root
+    root.style.setProperty(`--bistro-${color.id}-rgb`, hexToRgb(color.value));
   });
+};
+
+// Convert hex to RGB format for CSS variables
+export const hexToRgb = (hex: string): string => {
+  // Remove the # if present
+  hex = hex.replace(/^#/, '');
+  
+  // Parse the hex values to RGB
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  
+  return `${r}, ${g}, ${b}`;
 };
 
 export const saveColorChangesToDb = async (colors: ColorConfig[]): Promise<boolean> => {

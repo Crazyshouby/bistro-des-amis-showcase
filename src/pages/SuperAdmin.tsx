@@ -7,18 +7,8 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ImageSettings } from "@/components/superadmin/ImageSettings";
 import { ColorSettings } from "@/components/superadmin/colors/ColorSettings";
 import { supabase } from "@/integrations/supabase/client";
-import { SocialSettings } from "@/components/superadmin/SocialSettings";
-
-interface SiteSettingsRow {
-  id: number;
-  type: string;
-  key: string;
-  name: string;
-  value: string;
-  description?: string;
-  created_at: string;
-  updated_at: string;
-}
+import { applyColorsToCss } from "@/components/superadmin/colors/colorUtils";
+import { ColorConfig } from "@/components/superadmin/colors/types";
 
 const SuperAdmin = () => {
   const { user } = useAuth();
@@ -36,10 +26,17 @@ const SuperAdmin = () => {
         if (error) throw error;
         
         if (data && data.length > 0) {
+          // Convert data to ColorConfig format
+          const colorConfigs: ColorConfig[] = data.map(item => ({
+            id: item.key,
+            name: item.name,
+            value: item.value,
+            variable: `--bistro-${item.key}`,
+            description: item.description || ""
+          }));
+          
           // Apply colors to CSS variables
-          data.forEach((color: SiteSettingsRow) => {
-            document.documentElement.style.setProperty(`--bistro-${color.key}`, color.value);
-          });
+          applyColorsToCss(colorConfigs);
         }
       } catch (error) {
         console.error('Error loading colors:', error);
@@ -59,11 +56,6 @@ const SuperAdmin = () => {
       id: "colors",
       label: "Couleurs du site",
       content: <ColorSettings />
-    },
-    {
-      id: "social",
-      label: "Réseaux sociaux",
-      content: <SocialSettings />
     }
   ];
 

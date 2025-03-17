@@ -88,35 +88,23 @@ export type Database = {
         Row: {
           created_at: string
           email: string
-          facebook_url: string | null
           full_name: string | null
           id: string
-          instagram_url: string | null
-          twitter_url: string | null
           updated_at: string
-          youtube_url: string | null
         }
         Insert: {
           created_at?: string
           email: string
-          facebook_url?: string | null
           full_name?: string | null
           id: string
-          instagram_url?: string | null
-          twitter_url?: string | null
           updated_at?: string
-          youtube_url?: string | null
         }
         Update: {
           created_at?: string
           email?: string
-          facebook_url?: string | null
           full_name?: string | null
           id?: string
-          instagram_url?: string | null
-          twitter_url?: string | null
           updated_at?: string
-          youtube_url?: string | null
         }
         Relationships: []
       }
