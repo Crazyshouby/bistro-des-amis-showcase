@@ -177,9 +177,9 @@ const Contact = () => {
             {/* Contact Information */}
             <AnimatedSection delay={300} direction="right">
               <div className="rounded-lg shadow-xl p-6 md:p-8 text-white overflow-hidden relative">
-                {/* Background image with blur and brightness */}
+                {/* Background image with blur but no brightness adjustment */}
                 <div 
-                  className="absolute inset-0 bg-cover bg-center blur-sm brightness-[0.8] z-0"
+                  className="absolute inset-0 bg-cover bg-center blur-sm z-0"
                   style={{ backgroundImage: "url('/lovable-uploads/99813d7a-a237-43a1-b751-9371096b7fc2.png')" }}
                 >
                 </div>
