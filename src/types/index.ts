@@ -40,3 +40,8 @@ export interface ParallaxProps {
   overlayOpacity?: number;
   speed?: number;
 }
+
+export interface CalendarView {
+  date: Date;
+  view: 'month' | 'week' | 'day';
+}
