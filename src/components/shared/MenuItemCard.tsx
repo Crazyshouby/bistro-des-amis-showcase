@@ -2,6 +2,7 @@
 import { cn } from "@/lib/utils";
 import type { MenuItem } from "@/types";
 import { Leaf, Flame, NutOff, WheatOff } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -37,10 +38,54 @@ const MenuItemCard = ({ item, className }: MenuItemCardProps) => {
               {item.nom}
             </h3>
             <div className="flex space-x-1 mt-1">
-              {item.is_vegan && <Leaf className="w-4 h-4 text-green-600" title="Végétalien" />}
-              {item.is_spicy && <Flame className="w-4 h-4 text-red-600" title="Épicé" />}
-              {item.is_peanut_free && <NutOff className="w-4 h-4 text-amber-600" title="Sans Cacahuètes" />}
-              {item.is_gluten_free && <WheatOff className="w-4 h-4 text-yellow-600" title="Sans Gluten" />}
+              {item.is_vegan && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span><Leaf className="w-4 h-4 text-green-600" /></span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Végétalien</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              {item.is_spicy && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span><Flame className="w-4 h-4 text-red-600" /></span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Épicé</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              {item.is_peanut_free && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span><NutOff className="w-4 h-4 text-amber-600" /></span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Sans Cacahuètes</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              {item.is_gluten_free && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span><WheatOff className="w-4 h-4 text-yellow-600" /></span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Sans Gluten</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </div>
           </div>
           <span className="menu-item-price text-lg">
