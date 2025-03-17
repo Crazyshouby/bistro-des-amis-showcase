@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Eye, EyeOff, Pencil, PlusCircle, Save, Trash, LogOut, Upload, X, Calendar } from "lucide-react";
+import { Eye, EyeOff, Pencil, PlusCircle, Save, Trash, LogOut, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -12,10 +13,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
-import { MenuItem, Event, CalendarView } from "@/types";
+import { MenuItem, Event } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth/AuthProvider";
-import MenuCalendar from "@/components/shared/MenuCalendar";
 
 const menuItemSchema = z.object({
   id: z.string().optional(),
@@ -52,9 +52,6 @@ const Admin = () => {
   const [menuImagePreview, setMenuImagePreview] = useState<string | null>(null);
   const [uploadingMenuImage, setUploadingMenuImage] = useState(false);
   
-  const [menuView, setMenuView] = useState<'list' | 'calendar'>('list');
-  const [selectedMenuDate, setSelectedMenuDate] = useState<Date>(new Date());
-
   const [isMenuItemDialogOpen, setIsMenuItemDialogOpen] = useState(false);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -535,14 +532,6 @@ const Admin = () => {
       });
     }
   };
-  
-  const handleMenuDateSelect = (date: Date) => {
-    setSelectedMenuDate(date);
-  };
-  
-  const handleMenuItemSelect = (item: MenuItem) => {
-    handleEditMenuItem(item);
-  };
 
   return (
     <div className="bg-texture">
@@ -597,137 +586,74 @@ const Admin = () => {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="text-2xl font-playfair text-bistro-wood">Menu</CardTitle>
-                    <div className="flex gap-2">
-                      <div className="flex bg-bistro-sand rounded-md p-1 mr-4">
-                        <Button 
-                          variant={menuView === 'list' ? 'secondary' : 'ghost'} 
-                          size="sm" 
-                          onClick={() => setMenuView('list')}
-                          className={menuView === 'list' ? 'bg-white' : ''}
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          Liste
-                        </Button>
-                        <Button 
-                          variant={menuView === 'calendar' ? 'secondary' : 'ghost'} 
-                          size="sm" 
-                          onClick={() => setMenuView('calendar')}
-                          className={menuView === 'calendar' ? 'bg-white' : ''}
-                        >
-                          <Calendar className="h-4 w-4 mr-1" />
-                          Calendrier
-                        </Button>
-                      </div>
-                      <Button 
-                        onClick={handleAddMenuItem}
-                        className="bg-bistro-olive hover:bg-bistro-olive-light text-white"
-                      >
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Ajouter un item
-                      </Button>
-                    </div>
+                    <Button 
+                      onClick={handleAddMenuItem}
+                      className="bg-bistro-olive hover:bg-bistro-olive-light text-white"
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Ajouter un item
+                    </Button>
                   </CardHeader>
                   <CardContent>
-                    {menuView === 'list' ? (
-                      <Table>
-                        <TableHeader>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Catégorie</TableHead>
+                          <TableHead>Nom</TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead>Prix (CAD)</TableHead>
+                          <TableHead>Image</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {menuItems.length === 0 ? (
                           <TableRow>
-                            <TableHead>Catégorie</TableHead>
-                            <TableHead>Nom</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>Prix (CAD)</TableHead>
-                            <TableHead>Image</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableCell colSpan={6} className="text-center py-8">
+                              Aucun item dans le menu. Cliquez sur "Ajouter un item" pour commencer.
+                            </TableCell>
                           </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {menuItems.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={6} className="text-center py-8">
-                                Aucun item dans le menu. Cliquez sur "Ajouter un item" pour commencer.
+                        ) : (
+                          menuItems.map((item) => (
+                            <TableRow key={item.id}>
+                              <TableCell>{item.categorie}</TableCell>
+                              <TableCell className="font-medium">{item.nom}</TableCell>
+                              <TableCell className="max-w-xs truncate">{item.description}</TableCell>
+                              <TableCell>{item.prix}</TableCell>
+                              <TableCell>
+                                {item.image_url ? (
+                                  <img 
+                                    src={item.image_url} 
+                                    alt={item.nom}
+                                    className="w-10 h-10 object-cover rounded"
+                                  />
+                                ) : (
+                                  <span className="text-bistro-wood/50 text-sm">Aucune image</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right space-x-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleEditMenuItem(item)}
+                                  className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => confirmDeleteItem('menu', item.id)}
+                                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </Button>
                               </TableCell>
                             </TableRow>
-                          ) : (
-                            menuItems.map((item) => (
-                              <TableRow key={item.id}>
-                                <TableCell>{item.categorie}</TableCell>
-                                <TableCell className="font-medium">{item.nom}</TableCell>
-                                <TableCell className="max-w-xs truncate">{item.description}</TableCell>
-                                <TableCell>{item.prix}</TableCell>
-                                <TableCell>
-                                  {item.image_url ? (
-                                    <img 
-                                      src={item.image_url} 
-                                      alt={item.nom}
-                                      className="w-10 h-10 object-cover rounded"
-                                    />
-                                  ) : (
-                                    <span className="text-bistro-wood/50 text-sm">Aucune image</span>
-                                  )}
-                                </TableCell>
-                                <TableCell className="text-right space-x-2">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => handleEditMenuItem(item)}
-                                    className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
-                                  >
-                                    <Pencil className="h-4 w-4" />
-                                  </Button>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => confirmDeleteItem('menu', item.id)}
-                                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                                  >
-                                    <Trash className="h-4 w-4" />
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    ) : (
-                      <div className="flex flex-col md:flex-row gap-4">
-                        <div className="w-full md:w-3/4">
-                          <MenuCalendar 
-                            menuItems={menuItems} 
-                            onSelectDate={handleMenuDateSelect}
-                            onSelectItem={handleMenuItemSelect}
-                          />
-                        </div>
-                        <div className="w-full md:w-1/4">
-                          <Card className="bg-bistro-sand-light border-bistro-sand">
-                            <CardHeader>
-                              <CardTitle className="text-lg font-playfair text-bistro-wood">Statistiques</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <div className="space-y-2">
-                                <div className="flex justify-between">
-                                  <span className="text-bistro-wood/70">Total des items:</span>
-                                  <span className="font-medium text-bistro-wood">{menuItems.length}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-bistro-wood/70">Catégories:</span>
-                                  <span className="font-medium text-bistro-wood">
-                                    {new Set(menuItems.map(item => item.categorie)).size}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-bistro-wood/70">Prix moyen:</span>
-                                  <span className="font-medium text-bistro-wood">
-                                    {menuItems.length > 0 
-                                      ? (menuItems.reduce((sum, item) => sum + item.prix, 0) / menuItems.length).toFixed(2)
-                                      : "0.00"} CAD
-                                  </span>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </div>
-                    )}
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
                   </CardContent>
                 </Card>
               </TabsContent>
