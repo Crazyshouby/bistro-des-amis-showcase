@@ -254,7 +254,7 @@ const Admin = () => {
         
         toast({
           title: "Item mis à jour",
-          description: `"${data.nom}" a été mis à jour avec succès.`
+          description: `"${data.nom}" a été mis à jour avec succès."
         });
       } else {
         const { data: newItem, error } = await supabase
@@ -279,7 +279,7 @@ const Admin = () => {
         
         toast({
           title: "Item ajouté",
-          description: `"${data.nom}" a été ajouté au menu.`
+          description: `"${data.nom}" a été ajouté au menu."
         });
       }
       
@@ -915,3 +915,18 @@ const Admin = () => {
                         >
                           <Save className="mr-2 h-4 w-4" />
                           Enregistrer
+                        </Button>
+                      </form>
+                    </Form>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Admin;
