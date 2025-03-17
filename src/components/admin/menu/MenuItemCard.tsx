@@ -1,12 +1,12 @@
 
 import { Button } from "@/components/ui/button";
 import { MenuItem } from "@/types";
-import { Leaf, Flame, NutOff, WheatOff, Trash } from "lucide-react";
+import { Leaf, Flame, NutOff, WheatOff } from "lucide-react";
 
 interface MenuItemCardProps {
   item: MenuItem;
   onEdit: (item: MenuItem) => void;
-  onDelete: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 export const MenuItemCard = ({ item, onEdit, onDelete }: MenuItemCardProps) => {
@@ -26,21 +26,6 @@ export const MenuItemCard = ({ item, onEdit, onDelete }: MenuItemCardProps) => {
         ) : (
           <div className="flex items-center justify-center h-full bg-gray-200">
             <span className="text-gray-400">Aucune image</span>
-          </div>
-        )}
-        {onDelete && (
-          <div className="absolute top-2 right-2 flex gap-1">
-            <Button 
-              variant="outline" 
-              size="icon"
-              className="h-7 w-7 bg-white hover:bg-red-500 hover:text-white border-red-500 text-red-500"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(item.id);
-              }}
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
           </div>
         )}
       </div>
