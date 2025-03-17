@@ -6,12 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminContent } from "@/components/admin/AdminContent";
+import { useIsMobile } from "@/hooks/use-mobile"; 
 
 const Admin = () => {
   const { signOut, user } = useAuth();
   const [dataLoading, setDataLoading] = useState(true);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,7 +55,7 @@ const Admin = () => {
   }, []);
 
   return (
-    <AdminLayout title="Espace Propriétaire">
+    <AdminLayout title={isMobile ? "Administration" : "Espace Propriétaire"}>
       <AdminContent
         user={user}
         signOut={signOut}

@@ -10,6 +10,7 @@ import { MenuTab } from "./MenuTab";
 import { EventsTab } from "./EventsTab";
 import { AccountTab } from "./AccountTab";
 import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AdminContentProps {
   user: User | null;
@@ -32,6 +33,7 @@ export const AdminContent = ({
 }: AdminContentProps) => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{type: 'menu' | 'event', id: string} | null>(null);
+  const isMobile = useIsMobile();
 
   const confirmDeleteItem = (type: 'menu' | 'event', id: string) => {
     setItemToDelete({ type, id });
@@ -125,7 +127,7 @@ export const AdminContent = ({
   const tabs = [
     {
       id: "menu",
-      label: "Gestion du Menu",
+      label: "Menu",
       content: (
         <MenuTab 
           menuItems={menuItems} 
@@ -136,7 +138,7 @@ export const AdminContent = ({
     },
     {
       id: "events",
-      label: "Gestion des Événements",
+      label: "Événements",
       content: (
         <EventsTab 
           events={events} 
@@ -147,14 +149,14 @@ export const AdminContent = ({
     },
     {
       id: "account",
-      label: "Informations du Compte",
+      label: "Compte",
       content: <AccountTab user={user} />
     }
   ];
 
   return (
     <>
-      <AdminHeader user={user} signOut={signOut} />
+      <AdminHeader user={user} signOut={signOut} isMobile={isMobile} />
       <AdminTabs tabs={tabs} defaultTab="menu" />
       
       <DeleteConfirmDialog
