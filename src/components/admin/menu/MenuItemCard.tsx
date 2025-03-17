@@ -13,8 +13,8 @@ export const MenuItemCard = ({ item, onEdit, onDelete }: MenuItemCardProps) => {
   return (
     <div 
       key={item.id} 
-      className="bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer border border-gray-200 overflow-hidden"
-      onClick={() => onEdit(item)}
+      className="bg-white rounded-lg hover:shadow-md transition-shadow cursor-pointer border-gray-200 overflow-hidden"
+      onClick={() => onEdit && onEdit(item)}
     >
       <div className="relative h-40 bg-gray-100">
         {item.image_url ? (
@@ -28,19 +28,21 @@ export const MenuItemCard = ({ item, onEdit, onDelete }: MenuItemCardProps) => {
             <span className="text-gray-400">Aucune image</span>
           </div>
         )}
-        <div className="absolute top-2 right-2 flex gap-1">
-          <Button 
-            variant="outline" 
-            size="icon"
-            className="h-7 w-7 bg-white hover:bg-red-500 hover:text-white border-red-500 text-red-500"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(item.id);
-            }}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        </div>
+        {onDelete && (
+          <div className="absolute top-2 right-2 flex gap-1">
+            <Button 
+              variant="outline" 
+              size="icon"
+              className="h-7 w-7 bg-white hover:bg-red-500 hover:text-white border-red-500 text-red-500"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(item.id);
+              }}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
       <div className="p-3">
         <div className="flex justify-between items-start mb-1">

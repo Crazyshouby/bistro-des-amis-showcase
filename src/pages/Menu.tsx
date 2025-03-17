@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react";
 import { useIntersectionObserver } from "@/lib/hooks";
 import AnimatedSection from "@/components/shared/AnimatedSection";
-import MenuItemCard from "@/components/shared/MenuItemCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import type { MenuItem } from "@/types";
+import { MenuItemCard } from "@/components/admin/menu/MenuItemCard";
 
 // Définition de l'ordre fixe des catégories
 const CATEGORY_ORDER = ["Apéritifs", "Entrées", "Plats", "Desserts", "Boissons"];
@@ -119,16 +119,22 @@ const Menu = () => {
                 </div>
               </div>
               
-              {/* Menu Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8" ref={ref}>
+              {/* Menu Grid - Now using admin MenuItemCard */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6" ref={ref}>
                 {filteredItems.length === 0 ? (
                   <p className="text-center text-bistro-wood/70 col-span-2 py-8">
                     Aucun élément trouvé dans cette catégorie.
                   </p>
                 ) : (
                   filteredItems.map((item) => (
-                    <AnimatedSection key={item.id} delay={0.1} className="menu-item-wrapper">
-                      <MenuItemCard item={item} className="bg-white/80 border border-bistro-sand/30 p-4 rounded-md shadow-sm h-full" />
+                    <AnimatedSection key={item.id} delay={0.1} className="h-full">
+                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full">
+                        <MenuItemCard 
+                          item={item}
+                          onEdit={() => {}} 
+                          onDelete={() => {}}
+                        />
+                      </div>
                     </AnimatedSection>
                   ))
                 )}
