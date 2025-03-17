@@ -33,10 +33,11 @@ export const NavigationProvider = ({ children }: { children: React.ReactNode }) 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  return (
-    <NavigationContext.Provider value={{ isScrolled, isOpen, setIsOpen }}>
-      {children}
-    </NavigationContext.Provider>
+  // Use createElement instead of JSX since this is a .ts file
+  return React.createElement(
+    NavigationContext.Provider,
+    { value: { isScrolled, isOpen, setIsOpen } },
+    children
   );
 };
 
