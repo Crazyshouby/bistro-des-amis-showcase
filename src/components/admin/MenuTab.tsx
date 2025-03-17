@@ -6,8 +6,8 @@ import { PlusCircle, Pencil, Trash, Leaf, Flame, NutOff, WheatOff } from "lucide
 import { MenuItem } from "@/types";
 import { MenuItemDialog } from "./menu/MenuItemDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface MenuTabProps {
   menuItems: MenuItem[];
@@ -122,17 +122,87 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
     </div>
   );
 
-  const renderCategoryGrid = (categoryItems: MenuItem[]) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {categoryItems.length === 0 ? (
-        <div className="col-span-full text-center py-8 text-gray-500">
-          Aucun item dans cette catégorie.
-        </div>
-      ) : (
-        categoryItems.map(item => renderMenuItemCard(item))
-      )}
+  const renderMenuItemTable = (categoryItems: MenuItem[]) => (
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Image</TableHead>
+            <TableHead>Nom</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Prix</TableHead>
+            <TableHead>Options</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {categoryItems.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-8">
+                Aucun item dans cette catégorie.
+              </TableCell>
+            </TableRow>
+          ) : (
+            categoryItems.map((item) => (
+              <TableRow key={item.id} className="cursor-pointer" onClick={() => handleEditMenuItem(item)}>
+                <TableCell>
+                  {item.image_url ? (
+                    <img 
+                      src={item.image_url} 
+                      alt={item.nom}
+                      className="w-12 h-12 object-cover rounded"
+                    />
+                  ) : (
+                    <span className="text-bistro-wood/50 text-sm">Aucune image</span>
+                  )}
+                </TableCell>
+                <TableCell className="font-medium">{item.nom}</TableCell>
+                <TableCell className="max-w-xs truncate">{item.description}</TableCell>
+                <TableCell>{item.prix} CAD</TableCell>
+                <TableCell>
+                  <div className="flex space-x-2">
+                    {item.is_vegan && <Leaf className="w-4 h-4 text-green-600" />}
+                    {item.is_spicy && <Flame className="w-4 h-4 text-red-600" />}
+                    {item.is_peanut_free && <NutOff className="w-4 h-4 text-amber-600" />}
+                    {item.is_gluten_free && <WheatOff className="w-4 h-4 text-yellow-600" />}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="outline" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteRequest('menu', item.id);
+                    }}
+                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
+
+  const renderCategoryContent = (categoryItems: MenuItem[]) => {
+    return isMobile 
+      ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {categoryItems.length === 0 ? (
+            <div className="col-span-full text-center py-8 text-gray-500">
+              Aucun item dans cette catégorie.
+            </div>
+          ) : (
+            categoryItems.map(item => renderMenuItemCard(item))
+          )}
+        </div>
+      ) 
+      : renderMenuItemTable(categoryItems);
+  };
 
   return (
     <>
@@ -159,7 +229,7 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
             
             {availableCategories.map(category => (
               <TabsContent key={category} value={category} className="mt-4">
-                {renderCategoryGrid(menuItemsByCategory[category])}
+                {renderCategoryContent(menuItemsByCategory[category])}
               </TabsContent>
             ))}
           </Tabs>
