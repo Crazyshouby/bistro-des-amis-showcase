@@ -7,6 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import type { MenuItem } from "@/types";
 
+// Définition de l'ordre fixe des catégories
+const CATEGORY_ORDER = ["Apéritifs", "Entrées", "Plats", "Desserts", "Boissons"];
+
 const Menu = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,16 +34,19 @@ const Menu = () => {
         
         setMenuItems(data as MenuItem[]);
         
-        // Extract unique categories
-        const uniqueCategories = Array.from(
-          new Set(data.map((item: MenuItem) => item.categorie))
+        // Extract unique categories from the data
+        const uniqueCategoriesSet = new Set(data.map((item: MenuItem) => item.categorie));
+        
+        // Filter the ordered categories to only include ones that exist in our data
+        const orderedCategories = CATEGORY_ORDER.filter(category => 
+          uniqueCategoriesSet.has(category)
         );
         
-        setCategories(uniqueCategories);
+        setCategories(orderedCategories);
         
         // Set first category as active by default
-        if (uniqueCategories.length > 0 && !activeCategory) {
-          setActiveCategory(uniqueCategories[0]);
+        if (orderedCategories.length > 0 && !activeCategory) {
+          setActiveCategory(orderedCategories[0]);
         }
       } catch (error) {
         console.error('Error fetching menu items:', error);
