@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -61,8 +60,7 @@ export const MenuItemDialog = ({
     }
   });
 
-  // Reset form when dialog opens with editing data
-  useState(() => {
+  useEffect(() => {
     if (isOpen && editingMenuItem) {
       form.reset({
         id: editingMenuItem.id,
@@ -97,7 +95,7 @@ export const MenuItemDialog = ({
       setSelectedImage(null);
       setImagePreview(null);
     }
-  });
+  }, [isOpen, editingMenuItem, form]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

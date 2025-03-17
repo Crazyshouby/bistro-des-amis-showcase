@@ -46,6 +46,10 @@ export type Database = {
           description: string
           id: string
           image_url: string | null
+          is_gluten_free: boolean | null
+          is_peanut_free: boolean | null
+          is_spicy: boolean | null
+          is_vegan: boolean | null
           nom: string
           prix: number
           updated_at: string
@@ -56,6 +60,10 @@ export type Database = {
           description: string
           id?: string
           image_url?: string | null
+          is_gluten_free?: boolean | null
+          is_peanut_free?: boolean | null
+          is_spicy?: boolean | null
+          is_vegan?: boolean | null
           nom: string
           prix: number
           updated_at?: string
@@ -66,6 +74,10 @@ export type Database = {
           description?: string
           id?: string
           image_url?: string | null
+          is_gluten_free?: boolean | null
+          is_peanut_free?: boolean | null
+          is_spicy?: boolean | null
+          is_vegan?: boolean | null
           nom?: string
           prix?: number
           updated_at?: string
