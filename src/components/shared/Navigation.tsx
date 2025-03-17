@@ -87,16 +87,16 @@ const Navigation = () => {
           </button>
         </nav>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - Added dark background */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 flex flex-col space-y-3">
+          <div className="md:hidden mt-4 pb-4 flex flex-col space-y-3 bg-bistro-wood rounded-md p-4 shadow-lg">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={cn(
-                  "font-medium text-bistro-wood hover:text-bistro-olive transition-colors",
-                  location.pathname === link.path && "text-bistro-olive"
+                  "font-medium text-white hover:text-bistro-sand transition-colors",
+                  location.pathname === link.path && "text-bistro-sand"
                 )}
               >
                 {link.name}
