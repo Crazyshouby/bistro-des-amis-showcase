@@ -1,8 +1,9 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Eye, EyeOff, Pencil, PlusCircle, Save, Trash } from "lucide-react";
+import { Eye, EyeOff, Pencil, PlusCircle, Save, Trash, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -12,13 +13,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
-import { AdminCredentials, MenuItem, Event } from "@/types";
-
-// Schéma de validation du login
-const loginSchema = z.object({
-  username: z.string().min(1, "Le nom d'utilisateur est requis"),
-  password: z.string().min(1, "Le mot de passe est requis")
-});
+import { MenuItem, Event } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 // Schéma de validation pour un item du menu
 const menuItemSchema = z.object({
@@ -37,61 +34,14 @@ const eventSchema = z.object({
   description: z.string().min(1, "La description est requise")
 });
 
-// Données initiales pour démonstration
-const initialMenuItems: MenuItem[] = [
-  {
-    id: "1",
-    categorie: "Apéritifs",
-    nom: "Planche charcuterie/fromage",
-    description: "Jambon sec, saucisson, cheddar vieilli, pain grillé artisanal.",
-    prix: 18
-  },
-  {
-    id: "2",
-    categorie: "Apéritifs",
-    nom: "Croquettes de camembert",
-    description: "Servies avec une sauce aux canneberges maison.",
-    prix: 12
-  },
-  {
-    id: "3",
-    categorie: "Plats",
-    nom: "Burger du Bistro",
-    description: "Pain artisanal, steak Angus, cheddar, frites maison.",
-    prix: 22
-  },
-  {
-    id: "4",
-    categorie: "Plats",
-    nom: "Tartine printanière",
-    description: "Avocat frais, œuf poché, graines de tournesol.",
-    prix: 19
-  }
-];
-
-const initialEvents: Event[] = [
-  {
-    id: "1",
-    date: "2025-03-19",
-    titre: "Soirée Quiz - Culture Générale",
-    description: "Lots à gagner : vin ou conso gratuite."
-  },
-  {
-    id: "2",
-    date: "2025-03-21",
-    titre: "Concert acoustique - Les Étoiles Vagabondes",
-    description: "Duo guitare/voix, dès 20h."
-  }
-];
-
 const Admin = () => {
-  // État d'authentification
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  // Get auth context
+  const { signOut, user } = useAuth();
   
   // États pour les données
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuItems);
-  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
   
   // États pour l'édition
   const [editingMenuItem, setEditingMenuItem] = useState<MenuItem | null>(null);
@@ -102,15 +52,6 @@ const Admin = () => {
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{type: 'menu' | 'event', id: string} | null>(null);
-  
-  // Formulaire de login
-  const loginForm = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      username: "",
-      password: ""
-    }
-  });
   
   // Formulaire de menu item
   const menuItemForm = useForm<z.infer<typeof menuItemSchema>>({
@@ -132,24 +73,49 @@ const Admin = () => {
       description: ""
     }
   });
-  
-  // Authentification
-  const handleLogin = (data: z.infer<typeof loginSchema>) => {
-    // Vérification des identifiants (dans un vrai projet, cela serait fait côté serveur)
-    if (data.username === "admin" && data.password === "bistro2025") {
-      setIsAuthenticated(true);
-      toast({
-        title: "Connecté avec succès",
-        description: "Bienvenue dans l'espace propriétaire",
-      });
-    } else {
-      toast({
-        title: "Erreur d'authentification",
-        description: "Identifiants incorrects",
-        variant: "destructive",
-      });
-    }
-  };
+
+  // Fetch menu items and events from Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      setDataLoading(true);
+      try {
+        // Fetch menu items
+        const { data: menuData, error: menuError } = await supabase
+          .from('menu_items')
+          .select('*')
+          .order('categorie');
+        
+        if (menuError) {
+          throw menuError;
+        }
+        
+        // Fetch events
+        const { data: eventData, error: eventError } = await supabase
+          .from('events')
+          .select('*')
+          .order('date');
+        
+        if (eventError) {
+          throw eventError;
+        }
+        
+        // Update state
+        setMenuItems(menuData as MenuItem[]);
+        setEvents(eventData as Event[]);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        toast({
+          title: "Erreur de chargement",
+          description: "Impossible de charger les données depuis la base de données.",
+          variant: "destructive",
+        });
+      } finally {
+        setDataLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
   
   // Gestion du menu
   const handleEditMenuItem = (item: MenuItem) => {
@@ -175,42 +141,72 @@ const Admin = () => {
     setIsMenuItemDialogOpen(true);
   };
   
-  const handleSaveMenuItem = (data: z.infer<typeof menuItemSchema>) => {
-    if (editingMenuItem) {
-      // Mise à jour d'un item existant
-      setMenuItems(prevItems => 
-        prevItems.map(item => 
-          item.id === editingMenuItem.id ? { 
-            ...data, 
-            id: item.id,
-            // Ensure all required properties are non-optional by adding them explicitly
+  const handleSaveMenuItem = async (data: z.infer<typeof menuItemSchema>) => {
+    try {
+      if (editingMenuItem) {
+        // Update existing item
+        const { error } = await supabase
+          .from('menu_items')
+          .update({
+            categorie: data.categorie,
+            nom: data.nom,
+            description: data.description,
+            prix: data.prix,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', editingMenuItem.id);
+        
+        if (error) throw error;
+        
+        // Update local state
+        setMenuItems(prevItems => 
+          prevItems.map(item => 
+            item.id === editingMenuItem.id ? {
+              ...item,
+              categorie: data.categorie,
+              nom: data.nom,
+              description: data.description,
+              prix: data.prix
+            } : item
+          )
+        );
+        
+        toast({
+          title: "Item mis à jour",
+          description: `"${data.nom}" a été mis à jour avec succès.`,
+        });
+      } else {
+        // Add new item
+        const { data: newItem, error } = await supabase
+          .from('menu_items')
+          .insert({
             categorie: data.categorie,
             nom: data.nom,
             description: data.description,
             prix: data.prix
-          } : item
-        )
-      );
+          })
+          .select()
+          .single();
+        
+        if (error) throw error;
+        
+        // Update local state
+        setMenuItems(prevItems => [...prevItems, newItem as MenuItem]);
+        
+        toast({
+          title: "Item ajouté",
+          description: `"${data.nom}" a été ajouté au menu.`,
+        });
+      }
+      setIsMenuItemDialogOpen(false);
+    } catch (error) {
+      console.error('Error saving menu item:', error);
       toast({
-        title: "Item mis à jour",
-        description: `"${data.nom}" a été mis à jour avec succès.`,
-      });
-    } else {
-      // Ajout d'un nouvel item
-      const newItem: MenuItem = {
-        id: `menu-${Date.now()}`,
-        categorie: data.categorie,
-        nom: data.nom,
-        description: data.description,
-        prix: data.prix
-      };
-      setMenuItems(prevItems => [...prevItems, newItem]);
-      toast({
-        title: "Item ajouté",
-        description: `"${data.nom}" a été ajouté au menu.`,
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de l'enregistrement de l'item.",
+        variant: "destructive",
       });
     }
-    setIsMenuItemDialogOpen(false);
   };
   
   const confirmDeleteItem = (type: 'menu' | 'event', id: string) => {
@@ -218,24 +214,54 @@ const Admin = () => {
     setIsDeleteConfirmOpen(true);
   };
   
-  const handleDeleteItem = () => {
+  const handleDeleteItem = async () => {
     if (!itemToDelete) return;
     
-    if (itemToDelete.type === 'menu') {
-      setMenuItems(prevItems => prevItems.filter(item => item.id !== itemToDelete.id));
+    try {
+      if (itemToDelete.type === 'menu') {
+        // Delete menu item
+        const { error } = await supabase
+          .from('menu_items')
+          .delete()
+          .eq('id', itemToDelete.id);
+        
+        if (error) throw error;
+        
+        // Update local state
+        setMenuItems(prevItems => prevItems.filter(item => item.id !== itemToDelete.id));
+        
+        toast({
+          title: "Item supprimé",
+          description: "L'item a été supprimé du menu.",
+        });
+      } else {
+        // Delete event
+        const { error } = await supabase
+          .from('events')
+          .delete()
+          .eq('id', itemToDelete.id);
+        
+        if (error) throw error;
+        
+        // Update local state
+        setEvents(prevEvents => prevEvents.filter(event => event.id !== itemToDelete.id));
+        
+        toast({
+          title: "Événement supprimé",
+          description: "L'événement a été supprimé du calendrier.",
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error);
       toast({
-        title: "Item supprimé",
-        description: "L'item a été supprimé du menu.",
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de la suppression.",
+        variant: "destructive",
       });
-    } else {
-      setEvents(prevEvents => prevEvents.filter(event => event.id !== itemToDelete.id));
-      toast({
-        title: "Événement supprimé",
-        description: "L'événement a été supprimé du calendrier.",
-      });
+    } finally {
+      setIsDeleteConfirmOpen(false);
+      setItemToDelete(null);
     }
-    setIsDeleteConfirmOpen(false);
-    setItemToDelete(null);
   };
   
   // Gestion des événements
@@ -260,40 +286,69 @@ const Admin = () => {
     setIsEventDialogOpen(true);
   };
   
-  const handleSaveEvent = (data: z.infer<typeof eventSchema>) => {
-    if (editingEvent) {
-      // Mise à jour d'un événement existant
-      setEvents(prevEvents => 
-        prevEvents.map(event => 
-          event.id === editingEvent.id ? {
-            ...data,
-            id: event.id,
-            // Ensure all required properties are non-optional
+  const handleSaveEvent = async (data: z.infer<typeof eventSchema>) => {
+    try {
+      if (editingEvent) {
+        // Update existing event
+        const { error } = await supabase
+          .from('events')
+          .update({
+            date: data.date,
+            titre: data.titre,
+            description: data.description,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', editingEvent.id);
+        
+        if (error) throw error;
+        
+        // Update local state
+        setEvents(prevEvents => 
+          prevEvents.map(event => 
+            event.id === editingEvent.id ? {
+              ...event,
+              date: data.date,
+              titre: data.titre,
+              description: data.description
+            } : event
+          )
+        );
+        
+        toast({
+          title: "Événement mis à jour",
+          description: `"${data.titre}" a été mis à jour avec succès.`,
+        });
+      } else {
+        // Add new event
+        const { data: newEvent, error } = await supabase
+          .from('events')
+          .insert({
             date: data.date,
             titre: data.titre,
             description: data.description
-          } : event
-        )
-      );
+          })
+          .select()
+          .single();
+        
+        if (error) throw error;
+        
+        // Update local state
+        setEvents(prevEvents => [...prevEvents, newEvent as Event]);
+        
+        toast({
+          title: "Événement ajouté",
+          description: `"${data.titre}" a été ajouté au calendrier.`,
+        });
+      }
+      setIsEventDialogOpen(false);
+    } catch (error) {
+      console.error('Error saving event:', error);
       toast({
-        title: "Événement mis à jour",
-        description: `"${data.titre}" a été mis à jour avec succès.`,
-      });
-    } else {
-      // Ajout d'un nouvel événement
-      const newEvent: Event = {
-        id: `event-${Date.now()}`,
-        date: data.date,
-        titre: data.titre,
-        description: data.description
-      };
-      setEvents(prevEvents => [...prevEvents, newEvent]);
-      toast({
-        title: "Événement ajouté",
-        description: `"${data.titre}" a été ajouté au calendrier.`,
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de l'enregistrement de l'événement.",
+        variant: "destructive",
       });
     }
-    setIsEventDialogOpen(false);
   };
 
   return (
@@ -312,73 +367,25 @@ const Admin = () => {
       {/* Admin Content */}
       <section className="py-16 md:py-24">
         <div className="content-container">
-          {!isAuthenticated ? (
-            // Login Form
-            <Card className="mx-auto max-w-md">
-              <CardHeader>
-                <CardTitle className="text-2xl font-playfair text-bistro-wood">Connexion</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-6">
-                    <FormField
-                      control={loginForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-bistro-wood">Nom d'utilisateur</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="admin" 
-                              {...field} 
-                              className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={loginForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-bistro-wood">Mot de passe</FormLabel>
-                          <div className="relative">
-                            <FormControl>
-                              <Input 
-                                type={showPassword ? "text" : "password"} 
-                                placeholder="••••••••" 
-                                {...field} 
-                                className="border-bistro-sand focus:border-bistro-olive focus:ring-bistro-olive pr-10"
-                              />
-                            </FormControl>
-                            <button 
-                              type="button"
-                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-bistro-wood/70 hover:text-bistro-wood"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                            </button>
-                          </div>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-bistro-olive hover:bg-bistro-olive-light text-white"
-                    >
-                      Se connecter
-                    </Button>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h2 className="text-2xl font-playfair text-bistro-wood">Bienvenue, {user?.email}</h2>
+            </div>
+            <Button 
+              onClick={signOut}
+              variant="outline" 
+              className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Se déconnecter
+            </Button>
+          </div>
+          
+          {dataLoading ? (
+            <div className="flex justify-center py-12">
+              <p className="text-bistro-wood">Chargement des données...</p>
+            </div>
           ) : (
-            // Admin Dashboard
             <Tabs defaultValue="menu" className="w-full">
               <TabsList className="bg-bistro-sand w-full justify-start mb-8">
                 <TabsTrigger 
@@ -420,32 +427,40 @@ const Admin = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {menuItems.map((item) => (
-                          <TableRow key={item.id}>
-                            <TableCell>{item.categorie}</TableCell>
-                            <TableCell className="font-medium">{item.nom}</TableCell>
-                            <TableCell className="max-w-xs truncate">{item.description}</TableCell>
-                            <TableCell>{item.prix}</TableCell>
-                            <TableCell className="text-right space-x-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleEditMenuItem(item)}
-                                className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => confirmDeleteItem('menu', item.id)}
-                                className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                              >
-                                <Trash className="h-4 w-4" />
-                              </Button>
+                        {menuItems.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-8">
+                              Aucun item dans le menu. Cliquez sur "Ajouter un item" pour commencer.
                             </TableCell>
                           </TableRow>
-                        ))}
+                        ) : (
+                          menuItems.map((item) => (
+                            <TableRow key={item.id}>
+                              <TableCell>{item.categorie}</TableCell>
+                              <TableCell className="font-medium">{item.nom}</TableCell>
+                              <TableCell className="max-w-xs truncate">{item.description}</TableCell>
+                              <TableCell>{item.prix}</TableCell>
+                              <TableCell className="text-right space-x-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleEditMenuItem(item)}
+                                  className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => confirmDeleteItem('menu', item.id)}
+                                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
                       </TableBody>
                     </Table>
                   </CardContent>
@@ -476,31 +491,39 @@ const Admin = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {events.map((event) => (
-                          <TableRow key={event.id}>
-                            <TableCell>{event.date}</TableCell>
-                            <TableCell className="font-medium">{event.titre}</TableCell>
-                            <TableCell className="max-w-xs truncate">{event.description}</TableCell>
-                            <TableCell className="text-right space-x-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleEditEvent(event)}
-                                className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => confirmDeleteItem('event', event.id)}
-                                className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                              >
-                                <Trash className="h-4 w-4" />
-                              </Button>
+                        {events.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={4} className="text-center py-8">
+                              Aucun événement programmé. Cliquez sur "Ajouter un événement" pour commencer.
                             </TableCell>
                           </TableRow>
-                        ))}
+                        ) : (
+                          events.map((event) => (
+                            <TableRow key={event.id}>
+                              <TableCell>{event.date}</TableCell>
+                              <TableCell className="font-medium">{event.titre}</TableCell>
+                              <TableCell className="max-w-xs truncate">{event.description}</TableCell>
+                              <TableCell className="text-right space-x-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleEditEvent(event)}
+                                  className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white"
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => confirmDeleteItem('event', event.id)}
+                                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
                       </TableBody>
                     </Table>
                   </CardContent>
