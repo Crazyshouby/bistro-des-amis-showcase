@@ -12,6 +12,7 @@ import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import SuperAdmin from "./pages/SuperAdmin";
 import Footer from "./components/shared/Footer";
 import Navigation from "./components/shared/Navigation";
 import { AuthProvider } from "./components/auth/AuthProvider";
@@ -41,6 +42,7 @@ const App = () => (
                       <Admin />
                     </ProtectedRoute>
                   } />
+                  <Route path="/superadmin" element={<SuperAdmin />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>
