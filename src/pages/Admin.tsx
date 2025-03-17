@@ -205,7 +205,7 @@ const Admin = () => {
         
         toast({
           title: "Item mis à jour",
-          description: `"${data.nom}" a été mis à jour avec succès.",
+          description: `"${data.nom}" a été mis à jour avec succès.`,
         });
       } else {
         const { data: newItem, error } = await supabase
@@ -226,7 +226,7 @@ const Admin = () => {
         
         toast({
           title: "Item ajouté",
-          description: `"${data.nom}" a été ajouté au menu.",
+          description: `"${data.nom}" a été ajouté au menu.`,
         });
       }
       
@@ -499,7 +499,7 @@ const Admin = () => {
         
         toast({
           title: "Événement mis à jour",
-          description: `"${data.titre}" a été mis à jour avec succès.",
+          description: `"${data.titre}" a été mis à jour avec succès.`,
         });
       } else {
         const { data: newEvent, error } = await supabase
@@ -519,7 +519,7 @@ const Admin = () => {
         
         toast({
           title: "Événement ajouté",
-          description: `"${data.titre}" a été ajouté au calendrier.",
+          description: `"${data.titre}" a été ajouté au calendrier.`,
         });
       }
       
