@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +17,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth/AuthProvider";
 import MenuCalendar from "@/components/shared/MenuCalendar";
 
-// Schéma de validation pour un item du menu
 const menuItemSchema = z.object({
   id: z.string().optional(),
   categorie: z.string().min(1, "La catégorie est requise"),
@@ -28,7 +26,6 @@ const menuItemSchema = z.object({
   image_url: z.string().optional()
 });
 
-// Schéma de validation pour un événement
 const eventSchema = z.object({
   id: z.string().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format de date invalide (YYYY-MM-DD)"),
@@ -38,39 +35,31 @@ const eventSchema = z.object({
 });
 
 const Admin = () => {
-  // Get auth context
   const { signOut, user } = useAuth();
   
-  // États pour les données
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   
-  // États pour l'édition
   const [editingMenuItem, setEditingMenuItem] = useState<MenuItem | null>(null);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   
-  // États pour l'upload d'image
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   
-  // États pour l'upload d'image du menu
   const [selectedMenuImage, setSelectedMenuImage] = useState<File | null>(null);
   const [menuImagePreview, setMenuImagePreview] = useState<string | null>(null);
   const [uploadingMenuImage, setUploadingMenuImage] = useState(false);
   
-  // États pour la vue
   const [menuView, setMenuView] = useState<'list' | 'calendar'>('list');
   const [selectedMenuDate, setSelectedMenuDate] = useState<Date>(new Date());
 
-  // Modales
   const [isMenuItemDialogOpen, setIsMenuItemDialogOpen] = useState(false);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{type: 'menu' | 'event', id: string} | null>(null);
   
-  // Formulaire de menu item
   const menuItemForm = useForm<z.infer<typeof menuItemSchema>>({
     resolver: zodResolver(menuItemSchema),
     defaultValues: {
@@ -82,7 +71,6 @@ const Admin = () => {
     }
   });
   
-  // Formulaire d'événement
   const eventForm = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
@@ -93,12 +81,10 @@ const Admin = () => {
     }
   });
 
-  // Fetch menu items and events from Supabase
   useEffect(() => {
     const fetchData = async () => {
       setDataLoading(true);
       try {
-        // Fetch menu items
         const { data: menuData, error: menuError } = await supabase
           .from('menu_items')
           .select('*')
@@ -108,7 +94,6 @@ const Admin = () => {
           throw menuError;
         }
         
-        // Fetch events
         const { data: eventData, error: eventError } = await supabase
           .from('events')
           .select('*')
@@ -118,7 +103,6 @@ const Admin = () => {
           throw eventError;
         }
         
-        // Update state
         setMenuItems(menuData as MenuItem[]);
         setEvents(eventData as Event[]);
       } catch (error) {
@@ -136,7 +120,6 @@ const Admin = () => {
     fetchData();
   }, []);
   
-  // Gestion du menu
   const handleEditMenuItem = (item: MenuItem) => {
     setEditingMenuItem(item);
     menuItemForm.reset({
@@ -148,7 +131,6 @@ const Admin = () => {
       image_url: item.image_url || ""
     });
     
-    // Set image preview if item has an image
     if (item.image_url) {
       setMenuImagePreview(item.image_url);
     } else {
@@ -177,7 +159,6 @@ const Admin = () => {
     try {
       let imageUrl = data.image_url || null;
       
-      // Upload image if selected
       if (selectedMenuImage) {
         const uploadedUrl = await uploadMenuImage(selectedMenuImage);
         if (uploadedUrl) {
@@ -186,7 +167,6 @@ const Admin = () => {
       }
       
       if (editingMenuItem) {
-        // If image was removed but there was one before, delete old image
         if (!imageUrl && editingMenuItem.image_url) {
           const oldImagePath = editingMenuItem.image_url.split('/').pop();
           if (oldImagePath) {
@@ -196,7 +176,6 @@ const Admin = () => {
           }
         }
         
-        // Update existing item
         const { error } = await supabase
           .from('menu_items')
           .update({
@@ -211,7 +190,6 @@ const Admin = () => {
         
         if (error) throw error;
         
-        // Update local state
         setMenuItems(prevItems => 
           prevItems.map(item => 
             item.id === editingMenuItem.id ? {
@@ -227,10 +205,9 @@ const Admin = () => {
         
         toast({
           title: "Item mis à jour",
-          description: `"${data.nom}" a été mis à jour avec succès.`,
+          description: `"${data.nom}" a été mis à jour avec succès.",
         });
       } else {
-        // Add new item
         const { data: newItem, error } = await supabase
           .from('menu_items')
           .insert({
@@ -245,16 +222,14 @@ const Admin = () => {
         
         if (error) throw error;
         
-        // Update local state
         setMenuItems(prevItems => [...prevItems, newItem as MenuItem]);
         
         toast({
           title: "Item ajouté",
-          description: `"${data.nom}" a été ajouté au menu.`,
+          description: `"${data.nom}" a été ajouté au menu.",
         });
       }
       
-      // Reset states
       setSelectedMenuImage(null);
       setMenuImagePreview(null);
       setIsMenuItemDialogOpen(false);
@@ -278,10 +253,8 @@ const Admin = () => {
     
     try {
       if (itemToDelete.type === 'menu') {
-        // Get menu item to check if it has an image
         const menuItemToDelete = menuItems.find(e => e.id === itemToDelete.id);
         
-        // If menu item has an image, delete it from storage
         if (menuItemToDelete?.image_url) {
           const imagePath = menuItemToDelete.image_url.split('/').pop();
           if (imagePath) {
@@ -295,7 +268,6 @@ const Admin = () => {
           }
         }
         
-        // Delete menu item
         const { error } = await supabase
           .from('menu_items')
           .delete()
@@ -303,7 +275,6 @@ const Admin = () => {
         
         if (error) throw error;
         
-        // Update local state
         setMenuItems(prevItems => prevItems.filter(item => item.id !== itemToDelete.id));
         
         toast({
@@ -311,10 +282,8 @@ const Admin = () => {
           description: "L'item a été supprimé du menu.",
         });
       } else {
-        // Delete event
         const eventToDelete = events.find(e => e.id === itemToDelete.id);
         
-        // If event has an image, delete it from storage
         if (eventToDelete?.image_url) {
           const imagePath = eventToDelete.image_url.split('/').pop();
           if (imagePath) {
@@ -328,7 +297,6 @@ const Admin = () => {
           }
         }
         
-        // Delete event from database
         const { error } = await supabase
           .from('events')
           .delete()
@@ -336,7 +304,6 @@ const Admin = () => {
         
         if (error) throw error;
         
-        // Update local state
         setEvents(prevEvents => prevEvents.filter(event => event.id !== itemToDelete.id));
         
         toast({
@@ -357,7 +324,6 @@ const Admin = () => {
     }
   };
   
-  // Gestion des images pour les menus
   const handleMenuImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -378,18 +344,15 @@ const Admin = () => {
     try {
       setUploadingMenuImage(true);
       
-      // Generate a unique filename
       const fileExt = file.name.split('.').pop();
       const fileName = `menu_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
       
-      // Upload to Supabase Storage
       const { data, error } = await supabase.storage
         .from('event_images')
         .upload(fileName, file);
       
       if (error) throw error;
       
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('event_images')
         .getPublicUrl(fileName);
@@ -408,7 +371,6 @@ const Admin = () => {
     }
   };
   
-  // Gestion des images pour les événements
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -429,18 +391,15 @@ const Admin = () => {
     try {
       setUploadingImage(true);
       
-      // Generate a unique filename
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
       
-      // Upload to Supabase Storage
       const { data, error } = await supabase.storage
         .from('event_images')
         .upload(fileName, file);
       
       if (error) throw error;
       
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('event_images')
         .getPublicUrl(fileName);
@@ -459,7 +418,6 @@ const Admin = () => {
     }
   };
   
-  // Gestion des événements
   const handleEditEvent = (event: Event) => {
     setEditingEvent(event);
     eventForm.reset({
@@ -470,7 +428,6 @@ const Admin = () => {
       image_url: event.image_url || '',
     });
     
-    // Set image preview if event has an image
     if (event.image_url) {
       setImagePreview(event.image_url);
     } else {
@@ -498,7 +455,6 @@ const Admin = () => {
     try {
       let imageUrl = data.image_url || null;
       
-      // Upload image if selected
       if (selectedImage) {
         const uploadedUrl = await uploadImage(selectedImage);
         if (uploadedUrl) {
@@ -507,7 +463,6 @@ const Admin = () => {
       }
       
       if (editingEvent) {
-        // If image was removed but there was one before, delete old image
         if (!imageUrl && editingEvent.image_url) {
           const oldImagePath = editingEvent.image_url.split('/').pop();
           if (oldImagePath) {
@@ -517,7 +472,6 @@ const Admin = () => {
           }
         }
         
-        // Update existing event
         const { error } = await supabase
           .from('events')
           .update({
@@ -531,7 +485,6 @@ const Admin = () => {
         
         if (error) throw error;
         
-        // Update local state
         setEvents(prevEvents => 
           prevEvents.map(event => 
             event.id === editingEvent.id ? {
@@ -546,10 +499,9 @@ const Admin = () => {
         
         toast({
           title: "Événement mis à jour",
-          description: `"${data.titre}" a été mis à jour avec succès.`,
+          description: `"${data.titre}" a été mis à jour avec succès.",
         });
       } else {
-        // Add new event
         const { data: newEvent, error } = await supabase
           .from('events')
           .insert({
@@ -563,16 +515,14 @@ const Admin = () => {
         
         if (error) throw error;
         
-        // Update local state
         setEvents(prevEvents => [...prevEvents, newEvent as Event]);
         
         toast({
           title: "Événement ajouté",
-          description: `"${data.titre}" a été ajouté au calendrier.`,
+          description: `"${data.titre}" a été ajouté au calendrier.",
         });
       }
       
-      // Reset states
       setSelectedImage(null);
       setImagePreview(null);
       setIsEventDialogOpen(false);
@@ -585,21 +535,17 @@ const Admin = () => {
       });
     }
   };
-
-  // Gestion du clic sur une date dans le calendrier du menu
+  
   const handleMenuDateSelect = (date: Date) => {
     setSelectedMenuDate(date);
-    // Ici vous pourriez charger ou filtrer les données spécifiques à cette date
   };
-
-  // Gestion du clic sur un item dans le calendrier
+  
   const handleMenuItemSelect = (item: MenuItem) => {
     handleEditMenuItem(item);
   };
 
   return (
     <div className="bg-texture">
-      {/* Banner */}
       <div 
         className="relative h-64 bg-cover bg-center"
         style={{ backgroundImage: "url('/lovable-uploads/17ae501f-c21a-4f1e-964e-ffdff257c0cb.png')" }}
@@ -610,7 +556,6 @@ const Admin = () => {
         </div>
       </div>
       
-      {/* Admin Content */}
       <section className="py-16 md:py-24">
         <div className="content-container">
           <div className="flex justify-between items-center mb-8">
@@ -648,7 +593,6 @@ const Admin = () => {
                 </TabsTrigger>
               </TabsList>
               
-              {/* Menu Management */}
               <TabsContent value="menu" className="mt-0">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
@@ -788,7 +732,6 @@ const Admin = () => {
                 </Card>
               </TabsContent>
               
-              {/* Events Management */}
               <TabsContent value="events" className="mt-0">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
@@ -867,7 +810,6 @@ const Admin = () => {
         </div>
       </section>
       
-      {/* Menu Item Dialog */}
       <Dialog open={isMenuItemDialogOpen} onOpenChange={setIsMenuItemDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -955,7 +897,6 @@ const Admin = () => {
                 )}
               />
               
-              {/* Image Upload for Menu Items */}
               <div className="space-y-2">
                 <FormLabel className="text-bistro-wood block">Image</FormLabel>
                 
@@ -1000,7 +941,6 @@ const Admin = () => {
                   </div>
                 )}
                 
-                {/* Hidden field to store the image URL */}
                 <FormField
                   control={menuItemForm.control}
                   name="image_url"
@@ -1043,7 +983,6 @@ const Admin = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Event Dialog */}
       <Dialog open={isEventDialogOpen} onOpenChange={setIsEventDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -1107,7 +1046,6 @@ const Admin = () => {
                 )}
               />
               
-              {/* Image Upload */}
               <div className="space-y-2">
                 <FormLabel className="text-bistro-wood block">Image</FormLabel>
                 
@@ -1152,7 +1090,6 @@ const Admin = () => {
                   </div>
                 )}
                 
-                {/* Hidden field to store the image URL */}
                 <FormField
                   control={eventForm.control}
                   name="image_url"
@@ -1195,7 +1132,6 @@ const Admin = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
