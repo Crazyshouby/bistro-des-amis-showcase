@@ -1,13 +1,19 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Pencil, Trash, Leaf, Flame, NutOff, WheatOff } from "lucide-react";
+import { PlusCircle, Pencil, Trash, Leaf, Flame, NutOff, WheatOff, ChevronDown } from "lucide-react";
 import { MenuItem } from "@/types";
 import { MenuItemDialog } from "./menu/MenuItemDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 
 interface MenuTabProps {
   menuItems: MenuItem[];
@@ -21,6 +27,7 @@ const CATEGORY_ORDER = ["Apéritifs", "Entrées", "Plats", "Desserts", "Boissons
 export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabProps) => {
   const [isMenuItemDialogOpen, setIsMenuItemDialogOpen] = useState(false);
   const [editingMenuItem, setEditingMenuItem] = useState<MenuItem | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>("");
   const isMobile = useIsMobile();
 
   const handleEditMenuItem = (item: MenuItem) => {
@@ -49,6 +56,11 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
 
   // Only show categories that have items
   const availableCategories = Object.keys(menuItemsByCategory);
+  
+  // Set default active category if not set yet
+  if (!activeCategory && availableCategories.length > 0) {
+    setActiveCategory(availableCategories[0]);
+  }
 
   const renderMenuItemCard = (item: MenuItem) => (
     <div 
@@ -204,6 +216,10 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
       : renderMenuItemTable(categoryItems);
   };
 
+  const handleCategoryChange = (value: string) => {
+    setActiveCategory(value);
+  };
+
   return (
     <>
       <Card>
@@ -218,22 +234,51 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
           </Button>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue={availableCategories[0] || "Apéritifs"} className="w-full">
-            <TabsList className="mb-4 w-full bg-transparent p-0 flex overflow-x-auto space-x-2 justify-start">
-              {availableCategories.map(category => (
-                <TabsTrigger 
-                  key={category} 
-                  value={category} 
-                  className="px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors
-                    data-[state=active]:bg-bistro-olive data-[state=active]:text-white
-                    data-[state=inactive]:bg-[#843c08]/80 data-[state=inactive]:text-white
-                    hover:bg-bistro-olive/90 hover:text-white
-                    flex-shrink-0"
+          <Tabs 
+            defaultValue={availableCategories[0] || "Apéritifs"} 
+            value={activeCategory}
+            onValueChange={handleCategoryChange}
+            className="w-full"
+          >
+            {isMobile ? (
+              <div className="mb-4">
+                <Select 
+                  value={activeCategory} 
+                  onValueChange={handleCategoryChange}
                 >
-                  {category}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+                  <SelectTrigger className="w-full bg-[#843c08]/80 text-white border-none">
+                    <SelectValue placeholder="Sélectionnez une catégorie" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-gray-200">
+                    {availableCategories.map(category => (
+                      <SelectItem 
+                        key={category} 
+                        value={category}
+                        className="cursor-pointer"
+                      >
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              <TabsList className="mb-4 w-full bg-transparent p-0 flex overflow-x-auto space-x-2 justify-start">
+                {availableCategories.map(category => (
+                  <TabsTrigger 
+                    key={category} 
+                    value={category} 
+                    className="px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors
+                      data-[state=active]:bg-bistro-olive data-[state=active]:text-white
+                      data-[state=inactive]:bg-[#843c08]/80 data-[state=inactive]:text-white
+                      hover:bg-bistro-olive/90 hover:text-white
+                      flex-shrink-0"
+                  >
+                    {category}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            )}
             
             {availableCategories.map(category => (
               <TabsContent key={category} value={category} className="mt-4">
