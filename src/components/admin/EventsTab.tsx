@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, Pencil, Trash } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Event } from "@/types";
-import { EventDialog } from "./EventDialog";
+import { EventDialog } from "./events/EventDialog";
 
 interface EventsTabProps {
   events: Event[];
