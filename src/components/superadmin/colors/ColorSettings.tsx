@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Save, RefreshCw, Info } from "lucide-react";
@@ -9,8 +10,7 @@ import {
   getInitialColors, 
   loadColorsFromDb, 
   saveColorChangesToDb, 
-  defaultColors,
-  hexToRgb 
+  defaultColors 
 } from "./colorUtils";
 
 export const ColorSettings = () => {
