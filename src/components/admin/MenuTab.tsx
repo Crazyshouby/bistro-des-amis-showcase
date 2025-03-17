@@ -6,7 +6,7 @@ import { PlusCircle, Pencil, Trash, Leaf, Flame, NutOff, WheatOff } from "lucide
 import { MenuItem } from "@/types";
 import { MenuItemDialog } from "./menu/MenuItemDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MenuTabProps {
@@ -95,27 +95,31 @@ export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabPro
         
         <div className="flex mt-2 gap-2">
           {item.is_vegan && (
-            <div className="flex items-center">
-              <Leaf className="w-4 h-4 text-green-600" />
-            </div>
+            <Badge variant="outline" className="flex items-center gap-1 border-green-600 text-green-600 px-2 py-0">
+              <Leaf size={14} />
+              <span className="text-xs">Végétalien</span>
+            </Badge>
           )}
           
           {item.is_spicy && (
-            <div className="flex items-center">
-              <Flame className="w-4 h-4 text-red-600" />
-            </div>
+            <Badge variant="outline" className="flex items-center gap-1 border-red-600 text-red-600 px-2 py-0">
+              <Flame size={14} />
+              <span className="text-xs">Épicé</span>
+            </Badge>
           )}
           
           {item.is_peanut_free && (
-            <div className="flex items-center">
-              <NutOff className="w-4 h-4 text-amber-600" />
-            </div>
+            <Badge variant="outline" className="flex items-center gap-1 border-amber-600 text-amber-600 px-2 py-0">
+              <NutOff size={14} />
+              <span className="text-xs">Sans cacahuètes</span>
+            </Badge>
           )}
           
           {item.is_gluten_free && (
-            <div className="flex items-center">
-              <WheatOff className="w-4 h-4 text-yellow-600" />
-            </div>
+            <Badge variant="outline" className="flex items-center gap-1 border-yellow-600 text-yellow-600 px-2 py-0">
+              <WheatOff size={14} />
+              <span className="text-xs">Sans gluten</span>
+            </Badge>
           )}
         </div>
       </div>
