@@ -1,6 +1,8 @@
 
 import React from "react";
 import { CalendarIcon, ListFilter } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface EventsViewToggleProps {
   viewMode: 'list' | 'calendar';
@@ -12,37 +14,28 @@ const EventsViewToggle = ({
   setViewMode
 }: EventsViewToggleProps) => {
   return (
-    <div className="bg-transparent">
-      <div 
-        style={{
-          backgroundColor: 'var(--dynamic-background)'
-        }} 
-        className="inline-flex rounded-lg p-1 bg-orange-200"
+    <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'list' | 'calendar')}>
+      <ToggleGroupItem 
+        value="list" 
+        className={`relative flex items-center gap-2 border border-bistro-wood/20 
+          ${viewMode === 'list' 
+            ? 'bg-primary text-primary-foreground' 
+            : 'bg-background text-foreground hover:bg-muted'}`}
       >
-        <button 
-          className={`px-4 py-2 rounded-md flex items-center`} 
-          onClick={() => setViewMode('list')}
-          style={{
-            backgroundColor: viewMode === 'list' ? 'var(--dynamic-button)' : 'transparent',
-            color: viewMode === 'list' ? 'var(--dynamic-background)' : 'var(--dynamic-text)'
-          }}
-        >
-          <ListFilter className="mr-2 h-4 w-4" />
-          Liste
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-md flex items-center`} 
-          onClick={() => setViewMode('calendar')}
-          style={{
-            backgroundColor: viewMode === 'calendar' ? 'var(--dynamic-button)' : 'transparent',
-            color: viewMode === 'calendar' ? 'var(--dynamic-background)' : 'var(--dynamic-text)'
-          }}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          Calendrier
-        </button>
-      </div>
-    </div>
+        <ListFilter className="h-4 w-4 stroke-[1.5px]" />
+        <span>Liste</span>
+      </ToggleGroupItem>
+      <ToggleGroupItem 
+        value="calendar" 
+        className={`relative flex items-center gap-2 border border-bistro-wood/20 
+          ${viewMode === 'calendar' 
+            ? 'bg-primary text-primary-foreground' 
+            : 'bg-background text-foreground hover:bg-muted'}`}
+      >
+        <CalendarIcon className="h-4 w-4 stroke-[1.5px]" />
+        <span>Calendrier</span>
+      </ToggleGroupItem>
+    </ToggleGroup>
   );
 };
 
