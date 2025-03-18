@@ -107,12 +107,12 @@ const EventCard = ({ event, className, compact = false }: EventCardProps) => {
               variant="ghost" 
               size="icon" 
               onClick={() => setIsOpen(false)}
-              className="absolute right-0 top-0 text-[#5A5A5A] hover:text-[#3A2E1F] hover:bg-transparent"
+              className="absolute right-0 top-0 text-[#5A5A5A] hover:text-[#D4A017] hover:bg-transparent"
               aria-label="Fermer le pop-up"
             >
               <X className="h-5 w-5" />
             </Button>
-            <DialogTitle className="text-2xl font-playfair text-[#3A2E1F] pr-8">{event.titre}</DialogTitle>
+            <DialogTitle className="text-2xl font-playfair text-[#D4A017] pr-8">{event.titre}</DialogTitle>
             <DialogDescription className="text-bistro-olive font-medium">
               {capitalizedDay} {formattedDate}
             </DialogDescription>
