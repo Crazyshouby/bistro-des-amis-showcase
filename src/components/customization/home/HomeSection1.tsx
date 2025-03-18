@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,8 @@ import { toast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useInPlaceEditing } from "../InPlaceEditingProvider";
+import { EditableHomeContent } from "./EditableHomeContent";
 
 export const HomeSection1 = () => {
   const { colors, images, textContent, updateTheme, refreshTheme } = useTheme();
@@ -24,6 +25,7 @@ export const HomeSection1 = () => {
   const [heroSubtitleColor, setHeroSubtitleColor] = useState(textContent?.heroSubtitleColor || "#F5E9D7");
   const [uploading, setUploading] = useState(false);
   const [changed, setChanged] = useState(false);
+  const { isEditingEnabled } = useInPlaceEditing();
   const [fontOptions] = useState([
     { value: "Playfair Display", label: "Playfair Display" },
     { value: "Roboto", label: "Roboto" },
@@ -201,192 +203,44 @@ export const HomeSection1 = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Section Hero - Bannière d'accueil</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <Tabs defaultValue="image" className="w-full">
-          <TabsList>
-            <TabsTrigger value="image">Image d'arrière-plan</TabsTrigger>
-            <TabsTrigger value="texts">Textes</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="image" className="pt-4">
-            <div className="space-y-4">
-              <div className="aspect-video bg-gray-100 rounded-md overflow-hidden relative">
-                {backgroundImage ? (
-                  <img 
-                    src={backgroundImage} 
-                    alt="Aperçu de l'arrière-plan" 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full bg-gray-200">
-                    <p className="text-gray-500">Aucune image</p>
-                  </div>
-                )}
-              </div>
+    <>
+      {isEditingEnabled ? (
+        <EditableHomeContent />
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Section Hero - Bannière d'accueil</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <Tabs defaultValue="image" className="w-full">
+              <TabsList>
+                <TabsTrigger value="image">Image d'arrière-plan</TabsTrigger>
+                <TabsTrigger value="texts">Textes</TabsTrigger>
+              </TabsList>
               
-              <div>
-                <Label htmlFor="background-image" className="block mb-2">
-                  Changer l'image d'arrière-plan
-                </Label>
-                <div className="flex items-center gap-4">
-                  <Button 
-                    variant="outline" 
-                    className="relative" 
-                    disabled={uploading}
-                  >
-                    <input
-                      type="file"
-                      id="background-image"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    />
-                    <Upload className="h-4 w-4 mr-2" />
-                    {uploading ? "Téléchargement..." : "Télécharger une image"}
-                  </Button>
+              <TabsContent value="image" className="pt-4">
+                <div className="space-y-4">
+                  <div className="aspect-video bg-gray-100 rounded-md overflow-hidden relative">
+                    {backgroundImage ? (
+                      <img 
+                        src={backgroundImage} 
+                        alt="Aperçu de l'arrière-plan" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full bg-gray-200">
+                        <p className="text-gray-500">Aucune image</p>
+                      </div>
+                    )}
+                  </div>
                   
-                  {changed && (
-                    <Button 
-                      onClick={handleApplyImage} 
-                      disabled={uploading || !changed}
-                    >
-                      {uploading ? "Application..." : "Appliquer l'image"}
-                    </Button>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Pour de meilleurs résultats, utilisez une image au format paysage d'au moins 1920x1080 pixels.
-                </p>
-                
-                {changed && (
-                  <Alert className="bg-yellow-50 border-yellow-200 text-yellow-800 mt-2">
-                    <AlertCircle className="h-4 w-4 mr-2" />
-                    <AlertDescription>
-                      N'oubliez pas de cliquer sur "Appliquer l'image" pour sauvegarder vos changements.
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="texts" className="pt-4">
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="hero-title">Titre principal</Label>
-                <Textarea 
-                  id="hero-title" 
-                  value={heroTitle}
-                  onChange={handleTextChange(setHeroTitle)}
-                  className="resize-none"
-                  rows={2}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="hero-subtitle">Sous-titre</Label>
-                <Textarea 
-                  id="hero-subtitle" 
-                  value={heroSubtitle}
-                  onChange={handleTextChange(setHeroSubtitle)}
-                  className="resize-none"
-                  rows={2}
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="hero-title-font">Police du titre</Label>
-                  <Select 
-                    value={heroTitleFont} 
-                    onValueChange={(value) => {
-                      setHeroTitleFont(value);
-                      setChanged(true);
-                    }}
-                  >
-                    <SelectTrigger id="hero-title-font">
-                      <SelectValue placeholder="Choisir une police" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fontOptions.map((font) => (
-                        <SelectItem key={font.value} value={font.value}>
-                          {font.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="hero-title-color">Couleur du titre</Label>
-                  <div className="flex gap-2">
-                    <div className="w-10 h-10 rounded border">
-                      <input
-                        type="color"
-                        id="hero-title-color"
-                        value={heroTitleColor}
-                        onChange={(e) => {
-                          setHeroTitleColor(e.target.value);
-                          setChanged(true);
-                        }}
-                        className="w-full h-full cursor-pointer bg-transparent border-0"
-                      />
-                    </div>
-                    <Input 
-                      value={heroTitleColor}
-                      onChange={handleTextChange(setHeroTitleColor)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="hero-subtitle-color">Couleur du sous-titre</Label>
-                  <div className="flex gap-2">
-                    <div className="w-10 h-10 rounded border">
-                      <input
-                        type="color"
-                        id="hero-subtitle-color"
-                        value={heroSubtitleColor}
-                        onChange={(e) => {
-                          setHeroSubtitleColor(e.target.value);
-                          setChanged(true);
-                        }}
-                        className="w-full h-full cursor-pointer bg-transparent border-0"
-                      />
-                    </div>
-                    <Input 
-                      value={heroSubtitleColor}
-                      onChange={handleTextChange(setHeroSubtitleColor)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <Button 
-                onClick={handleSaveTexts}
-                disabled={uploading || !changed}
-              >
-                {uploading ? "Enregistrement..." : "Enregistrer les textes"}
-              </Button>
-              
-              {changed && (
-                <Alert className="bg-yellow-50 border-yellow-200 text-yellow-800 mt-2">
-                  <AlertCircle className="h-4 w-4 mr-2" />
-                  <AlertDescription>
-                    N'oubliez pas de cliquer sur "Enregistrer les textes" pour sauvegarder vos changements.
-                  </AlertDescription>
-                </Alert>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
-  );
-};
+                  <div>
+                    <Label htmlFor="background-image" className="block mb-2">
+                      Changer l'image d'arrière-plan
+                    </Label>
+                    <div className="flex items-center gap-4">
+                      <Button 
+                        variant="outline" 
+                        className="relative" 
+                        disabled={uploading}
+                     

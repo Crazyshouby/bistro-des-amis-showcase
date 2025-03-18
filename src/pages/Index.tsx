@@ -6,6 +6,9 @@ import { useParallax } from "@/lib/hooks";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
+import { InPlaceTextEditor } from "@/components/customization/InPlaceTextEditor";
+import { InPlaceImageEditor } from "@/components/customization/InPlaceImageEditor";
+import { useInPlaceEditing } from "@/components/customization/InPlaceEditingProvider";
 
 const Index = () => {
   // Hook personnalisé pour l'effet parallax amélioré - plus prononcé et fluide
@@ -187,6 +190,89 @@ const Index = () => {
     }
   };
 
+  const handleSaveHeroTitle = async (values: { text: string, color?: string, font?: string }) => {
+    try {
+      setUploading(true);
+      
+      await supabase
+        .from('site_config')
+        .upsert([
+          { key: 'hero_title', value: values.text },
+          { key: 'hero_title_color', value: values.color || "#F5E9D7" },
+          { key: 'hero_title_font', value: values.font || "Playfair Display" }
+        ]);
+      
+      await refreshTheme();
+      
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error saving hero title:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder le titre",
+        variant: "destructive"
+      });
+      throw error;
+    } finally {
+      setUploading(false);
+    }
+  };
+  
+  const handleSaveHeroSubtitle = async (values: { text: string, color?: string }) => {
+    try {
+      setUploading(true);
+      
+      await supabase
+        .from('site_config')
+        .upsert([
+          { key: 'hero_subtitle', value: values.text },
+          { key: 'hero_subtitle_color', value: values.color || "#F5E9D7" }
+        ]);
+      
+      await refreshTheme();
+      
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error saving hero subtitle:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder le sous-titre",
+        variant: "destructive"
+      });
+      throw error;
+    } finally {
+      setUploading(false);
+    }
+  };
+  
+  const handleSaveHomeImage = async (newImageUrl: string) => {
+    try {
+      setUploading(true);
+      
+      await supabase
+        .from('site_config')
+        .upsert([
+          { key: 'home_image_url', value: newImageUrl }
+        ]);
+      
+      await refreshTheme();
+      
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error saving home image:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder l'image",
+        variant: "destructive"
+      });
+      throw error;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const { isEditingEnabled } = useInPlaceEditing();
+
   return (
     <div className="bg-texture">
       <div className="relative h-screen overflow-hidden">
@@ -211,10 +297,30 @@ const Index = () => {
             delay={300}
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-playfair font-bold text-bistro-sand mb-6">
-              {textContent?.heroTitle || "Bienvenue au Bistro des Amis"}
+              {isEditingEnabled ? (
+                <InPlaceTextEditor
+                  initialText={textContent?.heroTitle || "Bienvenue au Bistro des Amis"}
+                  initialColor={textContent?.heroTitleColor || "#F5E9D7"}
+                  initialFont={textContent?.heroTitleFont || "Playfair Display"}
+                  initialSize="text-4xl md:text-5xl lg:text-6xl"
+                  initialWeight="font-bold"
+                  onSave={handleSaveHeroTitle}
+                />
+              ) : (
+                textContent?.heroTitle || "Bienvenue au Bistro des Amis"
+              )}
             </h1>
             <p className="text-xl md:text-2xl text-bistro-sand/90 mb-8">
-              {textContent?.heroSubtitle || "Votre pause gourmande à Verdun"}
+              {isEditingEnabled ? (
+                <InPlaceTextEditor
+                  initialText={textContent?.heroSubtitle || "Votre pause gourmande à Verdun"}
+                  initialColor={textContent?.heroSubtitleColor || "#F5E9D7"}
+                  initialSize="text-xl md:text-2xl"
+                  onSave={handleSaveHeroSubtitle}
+                />
+              ) : (
+                textContent?.heroSubtitle || "Votre pause gourmande à Verdun"
+              )}
             </p>
             <Link to="/menu">
               <Button 

@@ -15,6 +15,7 @@ import { HomeSection4 } from "../customization/home/HomeSection4";
 import { MenuCustomization } from "../customization/menu/MenuCustomization";
 import { EventsCustomization } from "../customization/events/EventsCustomization";
 import { ContactCustomization } from "../customization/contact/ContactCustomization";
+import { InPlaceEditingProvider, InPlaceEditingToggle } from "../customization/InPlaceEditingProvider";
 
 export const CustomizationTab = () => {
   const { isLoading, refreshTheme } = useTheme();
@@ -46,74 +47,77 @@ export const CustomizationTab = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
-        <div>
-          <h2 className="text-2xl font-playfair font-bold mb-1">Personnalisation du site</h2>
-          <p className="text-muted-foreground">
-            Personnalisez l'apparence de votre site en modifiant les couleurs, images et textes.
-          </p>
+    <InPlaceEditingProvider>
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
+          <div>
+            <h2 className="text-2xl font-playfair font-bold mb-1">Personnalisation du site</h2>
+            <p className="text-muted-foreground">
+              Personnalisez l'apparence de votre site en modifiant les couleurs, images et textes.
+            </p>
+          </div>
+          <div className="flex gap-3 flex-wrap">
+            <InPlaceEditingToggle />
+            <Button onClick={handleSaveChanges} className="gap-2">
+              Sauvegarder
+            </Button>
+            <Button asChild variant="outline" className="gap-2">
+              <Link to="/" target="_blank">
+                <span>Voir le site</span>
+                <ExternalLink size={16} />
+              </Link>
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-3">
-          <Button onClick={handleSaveChanges} className="gap-2">
-            Sauvegarder
-          </Button>
-          <Button asChild variant="outline" className="gap-2">
-            <Link to="/" target="_blank">
-              <span>Voir le site</span>
-              <ExternalLink size={16} />
-            </Link>
-          </Button>
-        </div>
-      </div>
 
-      <Tabs defaultValue="accueil" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="accueil">Accueil</TabsTrigger>
-          <TabsTrigger value="menu">Menu</TabsTrigger>
-          <TabsTrigger value="evenements">Événements</TabsTrigger>
-          <TabsTrigger value="contact">Contact</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="accueil" className="space-y-4">
-          <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
-            <TabsList className="mb-6 w-full justify-start">
-              <TabsTrigger value="section1">Section Hero</TabsTrigger>
-              <TabsTrigger value="section2">Section Histoire</TabsTrigger>
-              <TabsTrigger value="section3">Section Points Forts</TabsTrigger>
-              <TabsTrigger value="section4">Galerie Photos</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="section1" className="space-y-4">
-              <HomeSection1 />
-            </TabsContent>
-            
-            <TabsContent value="section2" className="space-y-4">
-              <HomeSection2 />
-            </TabsContent>
-            
-            <TabsContent value="section3" className="space-y-4">
-              <HomeSection3 />
-            </TabsContent>
-            
-            <TabsContent value="section4" className="space-y-4">
-              <HomeSection4 />
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
-        
-        <TabsContent value="menu" className="space-y-4">
-          <MenuCustomization />
-        </TabsContent>
-        
-        <TabsContent value="evenements" className="space-y-4">
-          <EventsCustomization />
-        </TabsContent>
-        
-        <TabsContent value="contact" className="space-y-4">
-          <ContactCustomization />
-        </TabsContent>
-      </Tabs>
-    </div>
+        <Tabs defaultValue="accueil" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="accueil">Accueil</TabsTrigger>
+            <TabsTrigger value="menu">Menu</TabsTrigger>
+            <TabsTrigger value="evenements">Événements</TabsTrigger>
+            <TabsTrigger value="contact">Contact</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="accueil" className="space-y-4">
+            <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
+              <TabsList className="mb-6 w-full justify-start">
+                <TabsTrigger value="section1">Section Hero</TabsTrigger>
+                <TabsTrigger value="section2">Section Histoire</TabsTrigger>
+                <TabsTrigger value="section3">Section Points Forts</TabsTrigger>
+                <TabsTrigger value="section4">Galerie Photos</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="section1" className="space-y-4">
+                <HomeSection1 />
+              </TabsContent>
+              
+              <TabsContent value="section2" className="space-y-4">
+                <HomeSection2 />
+              </TabsContent>
+              
+              <TabsContent value="section3" className="space-y-4">
+                <HomeSection3 />
+              </TabsContent>
+              
+              <TabsContent value="section4" className="space-y-4">
+                <HomeSection4 />
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+          
+          <TabsContent value="menu" className="space-y-4">
+            <MenuCustomization />
+          </TabsContent>
+          
+          <TabsContent value="evenements" className="space-y-4">
+            <EventsCustomization />
+          </TabsContent>
+          
+          <TabsContent value="contact" className="space-y-4">
+            <ContactCustomization />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </InPlaceEditingProvider>
   );
 };
