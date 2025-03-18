@@ -65,23 +65,44 @@ export const useIntersectionObserver = (options = {}) => {
   return [ref, isIntersecting] as const;
 };
 
-// Hook pour l'effet parallax
-export const useParallax = (speed = 0.3) => {
+// Hook amélioré pour l'effet parallax - plus fluide et prononcé
+export const useParallax = (speed = 0.3, smooth = true) => {
   const ref = useRef<HTMLDivElement>(null);
-
+  const requestRef = useRef<number>();
+  const previousScrollY = useRef<number>(window.scrollY);
+  const currentOffset = useRef<number>(0);
+  
   useEffect(() => {
-    const handleScroll = () => {
+    const animateParallax = () => {
       if (ref.current) {
-        const scrollY = window.scrollY;
-        const yPos = -scrollY * speed;
-        ref.current.style.transform = `translate3d(0, ${yPos}px, 0) scale(1.1)`;
+        const targetY = -window.scrollY * speed;
+        
+        // Animation fluide avec interpolation
+        if (smooth) {
+          // Interpolation pour un mouvement plus fluide
+          currentOffset.current += (targetY - currentOffset.current) * 0.1;
+        } else {
+          currentOffset.current = targetY;
+        }
+        
+        // Appliquer la transformation
+        ref.current.style.transform = `translate3d(0, ${currentOffset.current}px, 0) scale(1.35)`;
+      }
+      
+      previousScrollY.current = window.scrollY;
+      requestRef.current = requestAnimationFrame(animateParallax);
+    };
+    
+    // Initialiser l'animation
+    requestRef.current = requestAnimationFrame(animateParallax);
+    
+    return () => {
+      if (requestRef.current) {
+        cancelAnimationFrame(requestRef.current);
       }
     };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [speed]);
-
+  }, [speed, smooth]);
+  
   return ref;
 };
 
