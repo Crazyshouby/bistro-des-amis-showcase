@@ -7,9 +7,9 @@ import './index.css'
 document.head.innerHTML += `
   <meta property="og:site_name" content="Bistro des Amis" />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="/lovable-uploads/bf89ee9a-96c9-4013-9f71-93f91dbff5d5.png" />
+  <meta property="og:image" content="/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png" />
   <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:image" content="/lovable-uploads/bf89ee9a-96c9-4013-9f71-93f91dbff5d5.png" />
+  <meta property="twitter:image" content="/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png" />
 `;
 
 createRoot(document.getElementById("root")!).render(<App />);

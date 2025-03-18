@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ const Index = () => {
       '/lovable-uploads/714769f0-6cd7-4831-bece-5bd87d46c6b1.png', // interior with people
       '/lovable-uploads/17ae501f-c21a-4f1e-964e-ffdff257c0cb.png', // man with apron
       '/lovable-uploads/bf89ee9a-96c9-4013-9f71-93f91dbff5d5.png', // new bistro facade
+      '/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png', // new bistro image
     ];
     
     images.forEach(src => {
@@ -28,7 +30,7 @@ const Index = () => {
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{ 
-            backgroundImage: "url('/lovable-uploads/bf89ee9a-96c9-4013-9f71-93f91dbff5d5.png')"
+            backgroundImage: "url('/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png')"
           }}
         />
         <div className="absolute inset-0 bg-black bg-opacity-30" />
