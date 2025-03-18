@@ -16,10 +16,10 @@ export interface ColorSettings {
 
 export const ColorSettings = () => {
   const [colors, setColors] = useState<ColorSettings>({
-    backgroundColor: "#E5E7EB",
-    textColor: "#374151",
-    buttonColor: "#2DD4BF",
-    headerFooterColor: "#6B7280"
+    backgroundColor: "#F5E9D7", // bistro-sand
+    textColor: "#3A2E1F", // bistro-wood
+    buttonColor: "#4A5E3A", // bistro-olive
+    headerFooterColor: "#6B2D2D" // bistro-brick
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -80,26 +80,58 @@ export const ColorSettings = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const updates = [
-        { key: 'background_color', value: colors.backgroundColor },
-        { key: 'text_color', value: colors.textColor },
-        { key: 'button_color', value: colors.buttonColor },
-        { key: 'header_footer_color', value: colors.headerFooterColor }
+      const mappings = [
+        { dbKey: 'background_color', value: colors.backgroundColor },
+        { dbKey: 'text_color', value: colors.textColor },
+        { dbKey: 'button_color', value: colors.buttonColor },
+        { dbKey: 'header_footer_color', value: colors.headerFooterColor }
       ];
 
-      for (const update of updates) {
-        const { error } = await supabase
+      for (const { dbKey, value } of mappings) {
+        // Vérifier si l'entrée existe déjà
+        const { data: existingData, error: checkError } = await supabase
           .from('site_config')
-          .update({ value: update.value })
-          .eq('key', update.key);
+          .select('id')
+          .eq('key', dbKey);
 
-        if (error) throw error;
+        if (checkError) {
+          console.error(`Error checking if ${dbKey} exists:`, checkError);
+          continue;
+        }
+
+        if (existingData && existingData.length > 0) {
+          // Mettre à jour l'entrée existante
+          const { error: updateError } = await supabase
+            .from('site_config')
+            .update({ value })
+            .eq('key', dbKey);
+
+          if (updateError) {
+            console.error(`Error updating ${dbKey}:`, updateError);
+          }
+        } else {
+          // Créer une nouvelle entrée
+          const { error: insertError } = await supabase
+            .from('site_config')
+            .insert([{ key: dbKey, value }]);
+
+          if (insertError) {
+            console.error(`Error inserting ${dbKey}:`, insertError);
+          }
+        }
       }
 
       toast({
         title: "Succès",
         description: "Les couleurs ont été mises à jour",
       });
+      
+      // Application immédiate des couleurs
+      document.documentElement.style.setProperty('--dynamic-background', colors.backgroundColor);
+      document.documentElement.style.setProperty('--dynamic-text', colors.textColor);
+      document.documentElement.style.setProperty('--dynamic-button', colors.buttonColor);
+      document.documentElement.style.setProperty('--dynamic-header-footer', colors.headerFooterColor);
+      
     } catch (error) {
       console.error('Error saving colors:', error);
       toast({
@@ -115,7 +147,7 @@ export const ColorSettings = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-40">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#2DD4BF]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-bistro-olive"></div>
       </div>
     );
   }
@@ -216,7 +248,11 @@ export const ColorSettings = () => {
           <h3 className="text-[#374151] font-medium mb-3">Aperçu</h3>
           <div
             className="border rounded-md p-6 mb-4"
-            style={{ backgroundColor: colors.backgroundColor }}
+            style={{ 
+              backgroundColor: colors.backgroundColor,
+              color: colors.textColor,
+              borderColor: colors.textColor
+            }}
           >
             <h4 className="font-medium mb-2" style={{ color: colors.textColor }}>
               Exemple de texte
@@ -226,7 +262,7 @@ export const ColorSettings = () => {
             </p>
             <button
               className="px-4 py-2 rounded-md"
-              style={{ backgroundColor: colors.buttonColor, color: "#FFFFFF" }}
+              style={{ backgroundColor: colors.buttonColor, color: colors.backgroundColor }}
             >
               Bouton d'exemple
             </button>
@@ -237,7 +273,8 @@ export const ColorSettings = () => {
           <Button 
             onClick={handleSave} 
             disabled={saving}
-            className="bg-[#2DD4BF] text-white hover:bg-[#6B7280]"
+            className="text-white"
+            style={{ backgroundColor: colors.buttonColor }}
           >
             {saving ? "Enregistrement..." : "Enregistrer les couleurs"}
           </Button>

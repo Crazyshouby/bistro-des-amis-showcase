@@ -9,16 +9,24 @@ interface EventsFilterProps {
 const EventsFilter = ({ showPast, handleTogglePast }: EventsFilterProps) => {
   return (
     <div className="flex justify-center mb-6">
-      <div className="inline-flex bg-bistro-sand-light rounded-lg p-1">
+      <div className="inline-flex rounded-lg p-1" style={{ backgroundColor: 'var(--dynamic-background)' }}>
         <button 
-          className={`px-4 py-2 rounded-md ${!showPast ? 'bg-bistro-olive text-white' : 'text-bistro-wood hover:bg-bistro-sand/50'}`}
+          className={`px-4 py-2 rounded-md ${!showPast ? 'text-white' : ''}`}
           onClick={() => handleTogglePast(false)}
+          style={{ 
+            backgroundColor: !showPast ? 'var(--dynamic-button)' : 'transparent',
+            color: !showPast ? 'var(--dynamic-background)' : 'var(--dynamic-text)',
+          }}
         >
           À venir
         </button>
         <button 
-          className={`px-4 py-2 rounded-md ${showPast ? 'bg-bistro-olive text-white' : 'text-bistro-wood hover:bg-bistro-sand/50'}`}
+          className={`px-4 py-2 rounded-md ${showPast ? 'text-white' : ''}`}
           onClick={() => handleTogglePast(true)}
+          style={{ 
+            backgroundColor: showPast ? 'var(--dynamic-button)' : 'transparent',
+            color: showPast ? 'var(--dynamic-background)' : 'var(--dynamic-text)',
+          }}
         >
           Passés
         </button>

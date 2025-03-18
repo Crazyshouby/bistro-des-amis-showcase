@@ -8,6 +8,12 @@
 
 @layer base {
   :root {
+    /* Variables dynamiques pour les couleurs personnalisables */
+    --dynamic-background: #F5E9D7;
+    --dynamic-text: #3A2E1F;
+    --dynamic-button: #4A5E3A;
+    --dynamic-header-footer: #6B2D2D;
+    
     /* Updated color palette based on specifications */
     --background: 39 40% 91%; /* Beige crème doux #F5E9D7 */
     --foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
@@ -62,6 +68,9 @@
 
   body {
     @apply bg-background text-foreground font-montserrat antialiased;
+    /* Utilisation des variables dynamiques */
+    background-color: var(--dynamic-background);
+    color: var(--dynamic-text);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -77,12 +86,16 @@
   }
   
   .btn-primary {
-    @apply bg-bistro-olive hover:bg-bistro-olive-light text-bistro-sand font-medium py-2 px-6 rounded-md transition-all duration-300 shadow-sm hover:shadow-md inline-block;
+    @apply font-medium py-2 px-6 rounded-md transition-all duration-300 shadow-sm hover:shadow-md inline-block;
+    background-color: var(--dynamic-button);
+    color: var(--dynamic-background);
   }
   
   .btn-secondary {
     @apply bg-secondary hover:bg-secondary/80 text-bistro-wood font-medium py-2 px-6 rounded-md transition-all duration-300 shadow-sm hover:shadow-md inline-block;
   }
+  
+  /* ... keep existing code (parallax-container, parallax-bg, parallax-content, shine-effect, animations, etc) */
   
   .parallax-container {
     @apply relative min-h-screen overflow-hidden;
@@ -123,11 +136,14 @@
   }
   
   .menu-item-card {
-    @apply bg-bistro-sand-light border border-bistro-sand rounded-md p-4 shadow-sm hover:shadow-md transition-all duration-300;
+    @apply border rounded-md p-4 shadow-sm hover:shadow-md transition-all duration-300;
+    background-color: var(--dynamic-background);
+    border-color: var(--dynamic-text);
   }
   
   .menu-item-price {
-    @apply text-bistro-olive font-bold;
+    color: var(--dynamic-button);
+    @apply font-bold;
   }
   
   .menu-section {
@@ -135,13 +151,36 @@
   }
   
   .section-title {
-    @apply text-3xl lg:text-4xl font-playfair font-bold mb-6 text-secondary relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-1/2 after:h-[3px] after:bg-bistro-olive-light pb-2;
+    @apply text-3xl lg:text-4xl font-playfair font-bold mb-6 text-secondary relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-1/2 after:h-[3px] pb-2;
+    color: var(--dynamic-button);
   }
-  
-  /* Social sharing button styles - removed */
+  .section-title::after {
+    background-color: var(--dynamic-button);
+  }
   
   /* Filter button styles - updated to be darker with high-contrast text */
   .filter-button {
-    @apply bg-bistro-wood text-white hover:bg-secondary hover:text-secondary-foreground px-4 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 text-sm font-medium font-bold;
+    @apply px-4 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 text-sm font-medium font-bold;
+    background-color: var(--dynamic-header-footer);
+    color: var(--dynamic-background);
   }
+  .filter-button:hover {
+    background-color: var(--dynamic-button);
+  }
+}
+
+/* Styles spécifiques pour utiliser les couleurs dynamiques */
+.dynamic-bg {
+  background-color: var(--dynamic-background);
+}
+.dynamic-text {
+  color: var(--dynamic-text);
+}
+.dynamic-button {
+  background-color: var(--dynamic-button);
+  color: var(--dynamic-background);
+}
+.dynamic-header-footer {
+  background-color: var(--dynamic-header-footer);
+  color: var(--dynamic-background);
 }

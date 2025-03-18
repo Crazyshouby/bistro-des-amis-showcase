@@ -19,12 +19,19 @@ export const AdminTabs = ({ tabs, defaultTab }: AdminTabsProps) => {
   
   return (
     <Tabs defaultValue={defaultTab || tabs[0].id} className="w-full">
-      <TabsList className={`bg-bistro-sand w-full ${isMobile ? 'justify-between' : 'justify-start'} mb-6 md:mb-8 py-2 h-auto`}>
+      <TabsList 
+        className={`w-full ${isMobile ? 'justify-between' : 'justify-start'} mb-6 md:mb-8 py-2 h-auto`}
+        style={{ backgroundColor: 'var(--dynamic-background)' }}
+      >
         {tabs.map((tab) => (
           <TabsTrigger 
             key={tab.id}
             value={tab.id}
-            className="data-[state=active]:bg-bistro-olive data-[state=active]:text-white flex-1 md:flex-none text-sm md:text-base py-1.5"
+            className="data-[state=active]:text-white flex-1 md:flex-none text-sm md:text-base py-1.5"
+            style={{ 
+              backgroundColor: 'var(--state=active, --dynamic-button, transparent)',
+              color: 'var(--state=active, var(--dynamic-background), var(--dynamic-text))'
+            }}
           >
             {tab.label}
           </TabsTrigger>

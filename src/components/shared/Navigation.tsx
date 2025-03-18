@@ -29,13 +29,16 @@ const Navigation = () => {
     <header
       className={cn(
         "fixed w-full z-50 transition-all duration-300",
-        isScrolled ? "bg-bistro-brick shadow-md py-2" : "bg-transparent py-4"
+        isScrolled ? "shadow-md py-2" : "bg-transparent py-4"
       )}
+      style={{ 
+        backgroundColor: isScrolled ? 'var(--dynamic-header-footer)' : 'transparent'
+      }}
     >
       <div className="content-container">
         <nav className="flex justify-between items-center">
           {/* Logo */}
-          <Link to="/" className="font-playfair text-2xl md:text-3xl font-bold text-bistro-sand">
+          <Link to="/" className="font-playfair text-2xl md:text-3xl font-bold" style={{ color: 'var(--dynamic-background)' }}>
             Bar Bistro
           </Link>
 
@@ -46,9 +49,12 @@ const Navigation = () => {
                 key={link.path}
                 to={link.path}
                 className={cn(
-                  "font-medium text-bistro-sand hover:text-secondary transition-colors",
-                  location.pathname === link.path && "text-secondary"
+                  "font-medium transition-colors",
+                  location.pathname === link.path ? "text-secondary" : ""
                 )}
+                style={{ 
+                  color: location.pathname === link.path ? '#D4A017' : 'var(--dynamic-background)'
+                }}
               >
                 {link.name}
               </Link>
@@ -58,7 +64,8 @@ const Navigation = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-bistro-sand hover:text-secondary"
+            className="md:hidden hover:text-secondary"
+            style={{ color: 'var(--dynamic-background)' }}
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
             <svg
@@ -89,15 +96,20 @@ const Navigation = () => {
 
         {/* Mobile Navigation - Dark background */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 flex flex-col space-y-3 bg-bistro-brick rounded-md p-4 shadow-lg">
+          <div className="md:hidden mt-4 pb-4 flex flex-col space-y-3 rounded-md p-4 shadow-lg"
+            style={{ backgroundColor: 'var(--dynamic-header-footer)' }}
+          >
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={cn(
-                  "font-medium text-bistro-sand hover:text-secondary transition-colors",
-                  location.pathname === link.path && "text-secondary"
+                  "font-medium transition-colors",
+                  location.pathname === link.path ? "text-secondary" : ""
                 )}
+                style={{ 
+                  color: location.pathname === link.path ? '#D4A017' : 'var(--dynamic-background)'
+                }}
               >
                 {link.name}
               </Link>
