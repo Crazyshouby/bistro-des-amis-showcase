@@ -9,10 +9,12 @@ import { useTheme } from "@/components/theme/ThemeProvider";
 const Index = () => {
   // Hook personnalisé pour l'effet parallax amélioré - plus prononcé et fluide
   const parallaxRef = useParallax(0.25, true); // Augmentation de la vitesse pour un effet plus prononcé
-  const { images } = useTheme();
+  const { images, textContent } = useTheme();
   
   // Default image as fallback if homeImageUrl is not available
   const homeImageUrl = images.homeImageUrl || "/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png";
+  // Utiliser l'image d'histoire depuis le ThemeProvider
+  const historyImageUrl = images.historyImageUrl || "/lovable-uploads/124dcbfa-dac8-4b14-ab31-905afc4085d6.png";
   
   useEffect(() => {
     const images = [
@@ -57,10 +59,10 @@ const Index = () => {
             delay={300}
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-playfair font-bold text-bistro-sand mb-6">
-              Bienvenue au Bistro des Amis
+              {textContent?.heroTitle || "Bienvenue au Bistro des Amis"}
             </h1>
             <p className="text-xl md:text-2xl text-bistro-sand/90 mb-8">
-              Votre pause gourmande à Verdun
+              {textContent?.heroSubtitle || "Votre pause gourmande à Verdun"}
             </p>
             <Link to="/menu">
               <Button 
@@ -77,12 +79,21 @@ const Index = () => {
         <div className="content-container">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <AnimatedSection className="order-2 md:order-1">
-              <h2 className="section-title">Notre Histoire</h2>
-              <p className="text-lg mb-6">
-                Un bistro rustique au cœur de Verdun, où bonne cuisine et ambiance conviviale se rencontrent. Ouvert depuis 1930, le Bistro des Amis perpétue la tradition d'une cuisine authentique dans un cadre chaleureux.
+              <h2 className="section-title" style={{
+                color: textContent?.historyTitleColor || "#3A2E1F",
+                fontFamily: textContent?.historyTitleFont || "Playfair Display"
+              }}>
+                {textContent?.historyTitle || "Notre Histoire"}
+              </h2>
+              <p className="text-lg mb-6" style={{
+                color: textContent?.historyTextColor || "#3A2E1F"
+              }}>
+                {textContent?.historyText || "Un bistro rustique au cœur de Verdun, où bonne cuisine et ambiance conviviale se rencontrent. Ouvert depuis 1930, le Bistro des Amis perpétue la tradition d'une cuisine authentique dans un cadre chaleureux."}
               </p>
-              <p className="text-lg mb-6">
-                Notre philosophie est simple : des produits frais, des plats savoureux et un service attentionné. Que ce soit pour un déjeuner rapide, un dîner en famille ou un souper entre amis, notre équipe vous accueille avec le sourire.
+              <p className="text-lg mb-6" style={{
+                color: textContent?.historyTextColor || "#3A2E1F"
+              }}>
+                {textContent?.historyText2 || "Notre philosophie est simple : des produits frais, des plats savoureux et un service attentionné. Que ce soit pour un déjeuner rapide, un dîner en famille ou un souper entre amis, notre équipe vous accueille avec le sourire."}
               </p>
               <div className="flex space-x-4 mt-8">
                 <Link to="/menu">
@@ -101,7 +112,7 @@ const Index = () => {
             <AnimatedSection className="order-1 md:order-2" delay={300} direction="right">
               <div className="relative rounded-lg overflow-hidden shadow-xl transform hover:scale-[1.02] transition-transform duration-500 shine-effect">
                 <img 
-                  src="/lovable-uploads/124dcbfa-dac8-4b14-ab31-905afc4085d6.png" 
+                  src={historyImageUrl} 
                   alt="Extérieur du Bistro des Amis" 
                   className="w-full h-auto object-cover"
                 />

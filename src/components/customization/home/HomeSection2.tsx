@@ -28,6 +28,7 @@ export const HomeSection2 = () => {
   const [textColor, setTextColor] = useState(textContent?.historyTextColor || "#3A2E1F");
   const [titleFont, setTitleFont] = useState(textContent?.historyTitleFont || "Playfair Display");
   const [uploading, setUploading] = useState(false);
+  const [imageChanged, setImageChanged] = useState(false);
   const [fontOptions] = useState([
     { value: "Playfair Display", label: "Playfair Display" },
     { value: "Roboto", label: "Roboto" },
@@ -44,6 +45,7 @@ export const HomeSection2 = () => {
     setTitleColor(textContent?.historyTitleColor || "#3A2E1F");
     setTextColor(textContent?.historyTextColor || "#3A2E1F");
     setTitleFont(textContent?.historyTitleFont || "Playfair Display");
+    setImageChanged(false);
   }, [images, textContent]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,14 +76,11 @@ export const HomeSection2 = () => {
       if (data) {
         const imageUrl = data.publicUrl;
         setHistoryImage(imageUrl);
-        
-        updateTheme({ 
-          images: { historyImageUrl: imageUrl } 
-        });
+        setImageChanged(true);
         
         toast({
-          title: "Succès",
-          description: "L'image de la section histoire a été mise à jour"
+          title: "Image téléchargée",
+          description: "N'oubliez pas de cliquer sur 'Enregistrer les modifications' pour appliquer le changement"
         });
       }
     } catch (error) {
@@ -93,6 +92,28 @@ export const HomeSection2 = () => {
       });
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleApplyImage = async () => {
+    try {
+      await updateTheme({ 
+        images: { historyImageUrl: historyImage } 
+      });
+      
+      setImageChanged(false);
+      
+      toast({
+        title: "Succès",
+        description: "L'image de la section histoire a été mise à jour"
+      });
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde de l\'image:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder l'image",
+        variant: "destructive"
+      });
     }
   };
 
@@ -163,7 +184,23 @@ export const HomeSection2 = () => {
                     <Upload className="h-4 w-4 mr-2" />
                     {uploading ? "Téléchargement..." : "Télécharger une image"}
                   </Button>
+                  
+                  {imageChanged && (
+                    <Button 
+                      onClick={handleApplyImage}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      Appliquer l'image
+                    </Button>
+                  )}
                 </div>
+                
+                {imageChanged && (
+                  <p className="text-sm text-red-500 font-semibold mt-2">
+                    ⚠️ N'oubliez pas de cliquer sur "Appliquer l'image" pour sauvegarder votre changement!
+                  </p>
+                )}
+                
                 <p className="text-sm text-muted-foreground mt-2">
                   Utilisez une image illustrant l'histoire ou l'ambiance de votre établissement.
                 </p>
@@ -204,7 +241,7 @@ export const HomeSection2 = () => {
                 />
               </div>
               
-              <Button onClick={handleSaveTexts}>
+              <Button onClick={handleSaveTexts} className="bg-green-600 hover:bg-green-700 text-white">
                 Enregistrer les textes
               </Button>
             </div>
@@ -270,7 +307,7 @@ export const HomeSection2 = () => {
                 </div>
               </div>
               
-              <Button onClick={handleSaveTexts}>
+              <Button onClick={handleSaveTexts} className="bg-green-600 hover:bg-green-700 text-white">
                 Enregistrer les styles
               </Button>
             </div>
