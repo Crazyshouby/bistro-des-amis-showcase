@@ -1,5 +1,6 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
 import { MenuItem, Event } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,35 +11,36 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const Admin = () => {
   const { signOut, user } = useAuth();
-  const [dataLoading, setDataLoading] = useState(true);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const isMobile = useIsMobile();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setDataLoading(true);
+  // Utiliser React Query pour charger les données
+  const { isLoading: dataLoading } = useQuery({
+    queryKey: ['adminData'],
+    queryFn: async () => {
       try {
+        // Charger les éléments du menu
         const { data: menuData, error: menuError } = await supabase
           .from('menu_items')
           .select('*')
           .order('categorie');
         
-        if (menuError) {
-          throw menuError;
-        }
+        if (menuError) throw menuError;
         
+        // Charger les événements
         const { data: eventData, error: eventError } = await supabase
           .from('events')
           .select('*')
           .order('date');
         
-        if (eventError) {
-          throw eventError;
-        }
+        if (eventError) throw eventError;
         
+        // Mettre à jour les états
         setMenuItems(menuData as MenuItem[]);
         setEvents(eventData as Event[]);
+        
+        return { menuData, eventData };
       } catch (error) {
         console.error('Error fetching data:', error);
         toast({
@@ -46,13 +48,11 @@ const Admin = () => {
           description: "Impossible de charger les données depuis la base de données.",
           variant: "destructive",
         });
-      } finally {
-        setDataLoading(false);
+        throw error;
       }
-    };
-    
-    fetchData();
-  }, []);
+    },
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <AdminLayout title={isMobile ? "Administration" : "Espace Propriétaire"}>

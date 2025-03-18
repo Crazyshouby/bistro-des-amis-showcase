@@ -33,6 +33,36 @@ export type Database = {
         }
         Relationships: []
       }
+      editable_elements: {
+        Row: {
+          content: string
+          created_at: string | null
+          element_id: string
+          element_type: string
+          id: string
+          page_path: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          element_id: string
+          element_type: string
+          id?: string
+          page_path: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          element_id?: string
+          element_type?: string
+          id?: string
+          page_path?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           created_at: string

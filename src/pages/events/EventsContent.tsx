@@ -1,6 +1,7 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { parseISO } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import AnimatedSection from "@/components/shared/AnimatedSection";
@@ -14,37 +15,31 @@ interface EventsContentProps {
 }
 
 const EventsContent = ({ viewMode, showPast }: EventsContentProps) => {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   
-  // Fetch events from Supabase
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('events')
-          .select('*')
-          .order('date');
-        
-        if (error) throw error;
-        
-        setEvents(data as Event[]);
-      } catch (error) {
+  // Utiliser React Query pour gérer l'état de chargement et les données
+  const { data: events = [], isLoading: loading } = useQuery({
+    queryKey: ['events'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('date');
+      
+      if (error) {
         console.error('Error fetching events:', error);
         toast({
           title: "Erreur",
           description: "Impossible de charger les événements. Veuillez réessayer plus tard.",
           variant: "destructive",
         });
-      } finally {
-        setLoading(false);
+        throw error;
       }
-    };
-    
-    fetchEvents();
-  }, []);
+      
+      return data as Event[];
+    },
+    refetchOnWindowFocus: false,
+  });
 
   // Filter events based on date
   const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
@@ -67,7 +62,7 @@ const EventsContent = ({ viewMode, showPast }: EventsContentProps) => {
   const eventDates = events.map(event => parseISO(event.date));
   
   // Reset selectedDate when toggling between past and future events
-  useEffect(() => {
+  React.useEffect(() => {
     setSelectedDate(undefined);
   }, [showPast]);
 
