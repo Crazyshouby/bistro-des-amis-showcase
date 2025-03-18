@@ -24,17 +24,19 @@ export const MenuItemDialog = ({
   onClose
 }: MenuItemDialogProps) => {
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleSubmit = async (data: MenuItemFormValues, selectedImage: File | null) => {
     try {
       if (selectedImage) {
         setUploadingImage(true);
+        setUploadProgress(0);
       }
       
       let imageUrl = data.image_url || null;
       
       if (selectedImage) {
-        const uploadedUrl = await uploadImage(selectedImage);
+        const uploadedUrl = await uploadImage(selectedImage, setUploadProgress);
         if (uploadedUrl) {
           imageUrl = uploadedUrl;
         }
@@ -127,6 +129,7 @@ export const MenuItemDialog = ({
       });
     } finally {
       setUploadingImage(false);
+      setUploadProgress(0);
     }
   };
 
@@ -150,6 +153,7 @@ export const MenuItemDialog = ({
             onClose();
           }}
           uploadingImage={uploadingImage}
+          uploadProgress={uploadProgress}
         />
       </DialogContent>
     </Dialog>

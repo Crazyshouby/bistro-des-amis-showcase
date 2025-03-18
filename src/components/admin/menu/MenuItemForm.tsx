@@ -17,13 +17,15 @@ interface MenuItemFormProps {
   onSubmit: (data: MenuItemFormValues, selectedImage: File | null) => Promise<void>;
   onCancel: () => void;
   uploadingImage: boolean;
+  uploadProgress?: number;
 }
 
 export const MenuItemForm = ({
   editingMenuItem,
   onSubmit,
   onCancel,
-  uploadingImage
+  uploadingImage,
+  uploadProgress = 0
 }: MenuItemFormProps) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -154,6 +156,7 @@ export const MenuItemForm = ({
           initialImageUrl={editingMenuItem?.image_url || null}
           onImageChange={handleImageChange}
           uploadingImage={uploadingImage}
+          uploadProgress={uploadProgress}
         />
         
         <div className="space-y-4">

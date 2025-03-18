@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Upload } from "lucide-react";
 import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -12,16 +12,19 @@ interface MenuItemImageUploadProps {
   initialImageUrl?: string | null;
   onImageChange: (imageFile: File | null, imagePreview: string | null) => void;
   uploadingImage: boolean;
+  setUploadProgress?: (progress: number) => void;
+  uploadProgress?: number;
 }
 
 export const MenuItemImageUpload = ({ 
   initialImageUrl, 
   onImageChange,
-  uploadingImage
+  uploadingImage,
+  setUploadProgress,
+  uploadProgress = 0
 }: MenuItemImageUploadProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(initialImageUrl || null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -96,19 +99,20 @@ export const MenuItemImageUpload = ({
   );
 };
 
-export const uploadImage = async (file: File): Promise<string | null> => {
+export const uploadImage = async (file: File, setProgress?: (progress: number) => void): Promise<string | null> => {
   try {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `menu_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-    
-    // Start simulating progress in the context of the caller
+    // Simuler la progression de l'upload
     let progress = 0;
     const progressInterval = setInterval(() => {
       progress += 10;
       if (progress >= 90) {
         clearInterval(progressInterval);
       }
+      if (setProgress) setProgress(progress);
     }, 200);
+    
+    const fileExt = file.name.split('.').pop();
+    const fileName = `menu_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
     
     const { data, error } = await supabase.storage
       .from('site_images')
@@ -122,7 +126,7 @@ export const uploadImage = async (file: File): Promise<string | null> => {
     if (error) throw error;
     
     // Set progress to 100%
-    progress = 100;
+    if (setProgress) setProgress(100);
     
     const { data: { publicUrl } } = supabase.storage
       .from('site_images')
