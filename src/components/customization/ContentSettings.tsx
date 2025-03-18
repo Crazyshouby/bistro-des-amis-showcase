@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Image, Save } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 
 export const ContentSettings = () => {
   const [homeImageUrl, setHomeImageUrl] = useState("");
@@ -18,7 +17,6 @@ export const ContentSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [floatingEffect, setFloatingEffect] = useState(false);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -26,7 +24,7 @@ export const ContentSettings = () => {
         const { data, error } = await supabase
           .from('site_config')
           .select('key, value')
-          .in('key', ['home_image_url', 'home_text', 'home_image_float']);
+          .in('key', ['home_image_url', 'home_text']);
 
         if (error) {
           throw error;
@@ -41,8 +39,6 @@ export const ContentSettings = () => {
               }
             } else if (item.key === 'home_text') {
               setHomeText(item.value);
-            } else if (item.key === 'home_image_float') {
-              setFloatingEffect(item.value === 'true');
             }
           });
         }
@@ -181,16 +177,6 @@ export const ContentSettings = () => {
       
       if (textError) throw textError;
 
-      // Update home_image_float in site_config
-      const { error: floatError } = await supabase
-        .from('site_config')
-        .upsert({ 
-          key: 'home_image_float',
-          value: floatingEffect.toString()
-        });
-      
-      if (floatError) throw floatError;
-
       // Update state with saved values
       setHomeImageUrl(imageUrl);
       toast({
@@ -294,15 +280,6 @@ export const ContentSettings = () => {
                 </p>
               </div>
             )}
-
-            <div className="flex items-center space-x-2 pt-2">
-              <Switch 
-                id="home-image-float" 
-                checked={floatingEffect}
-                onCheckedChange={setFloatingEffect}
-              />
-              <Label htmlFor="home-image-float">Effet de flottement de l'image</Label>
-            </div>
           </div>
         </div>
 

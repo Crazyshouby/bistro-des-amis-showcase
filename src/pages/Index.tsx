@@ -9,11 +9,10 @@ import { useTheme } from "@/components/theme/ThemeProvider";
 const Index = () => {
   // Hook personnalisé pour l'effet parallax amélioré - plus prononcé et fluide
   const parallaxRef = useParallax(0.25, true); // Augmentation de la vitesse pour un effet plus prononcé
-  const { images, settings } = useTheme();
+  const { images } = useTheme();
   
   // Default image as fallback if homeImageUrl is not available
   const homeImageUrl = images.homeImageUrl || "/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png";
-  const floatingEnabled = settings?.floatingEffect === true;
   
   useEffect(() => {
     const images = [
@@ -40,7 +39,7 @@ const Index = () => {
         {/* Image avec effet parallax amélioré - plus prononcé et fluide */}
         <div 
           ref={parallaxRef}
-          className={`absolute inset-0 bg-cover bg-center filter blur-[3px] ${floatingEnabled ? 'animate-floating' : ''}`}
+          className="absolute inset-0 bg-cover bg-center filter blur-[3px]"
           style={{ 
             backgroundImage: `url('${homeImageUrl}')`,
             transformOrigin: "center center",
