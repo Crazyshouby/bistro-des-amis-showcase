@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,7 +10,7 @@ import { HistoryImageUploader } from "./HistoryImageUploader";
 import { toast } from "@/components/ui/use-toast";
 
 export const HomeSection2 = () => {
-  const { textContent, updateTheme } = useTheme();
+  const { textContent, updateTheme, refreshTheme } = useTheme();
   
   const [historyTitle, setHistoryTitle] = useState(textContent.historyTitle || "");
   const [historyText, setHistoryText] = useState(textContent.historyText || "");
@@ -18,6 +18,16 @@ export const HomeSection2 = () => {
   const [historyTitleColor, setHistoryTitleColor] = useState(textContent.historyTitleColor || "#3A2E1F");
   const [historyTextColor, setHistoryTextColor] = useState(textContent.historyTextColor || "#3A2E1F");
   const [historyTitleFont, setHistoryTitleFont] = useState(textContent.historyTitleFont || "Playfair Display");
+  
+  // Update local state when theme changes
+  useEffect(() => {
+    setHistoryTitle(textContent.historyTitle || "");
+    setHistoryText(textContent.historyText || "");
+    setHistoryText2(textContent.historyText2 || "");
+    setHistoryTitleColor(textContent.historyTitleColor || "#3A2E1F");
+    setHistoryTextColor(textContent.historyTextColor || "#3A2E1F");
+    setHistoryTitleFont(textContent.historyTitleFont || "Playfair Display");
+  }, [textContent]);
   
   const handleSave = async () => {
     try {
@@ -31,6 +41,9 @@ export const HomeSection2 = () => {
           historyTitleFont
         }
       });
+      
+      // Refresh theme after update to ensure all components have latest data
+      await refreshTheme();
       
       toast({
         title: "Succès",

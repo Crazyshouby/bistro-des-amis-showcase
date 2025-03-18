@@ -6,11 +6,11 @@ import { Label } from "@/components/ui/label";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
-import { AlertCircle, Upload } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const HistoryImageUploader = () => {
-  const { images, updateTheme } = useTheme();
+  const { images, refreshTheme } = useTheme();
   const [tempImageUrl, setTempImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [changed, setChanged] = useState(false);
@@ -18,6 +18,7 @@ export const HistoryImageUploader = () => {
   useEffect(() => {
     // Synchronize with ThemeProvider
     setTempImageUrl(images.historyImageUrl || "");
+    setChanged(false); // Reset changed state when image is updated from ThemeProvider
   }, [images.historyImageUrl]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,14 +56,19 @@ export const HistoryImageUploader = () => {
       const fileName = `history-image-${timestamp}.${fileExt}`;
       const filePath = `site_images/${fileName}`;
       
+      console.log("Uploading file:", filePath);
+      
       // Upload image to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('site_images')
         .upload(filePath, file);
         
       if (uploadError) {
+        console.error("Upload error:", uploadError);
         throw uploadError;
       }
+      
+      console.log("File uploaded successfully");
       
       // Get public URL
       const { data } = supabase.storage
@@ -71,6 +77,8 @@ export const HistoryImageUploader = () => {
         
       if (data) {
         const imageUrl = data.publicUrl;
+        console.log("Image URL obtained:", imageUrl);
+        
         // Update temporary URL for preview
         setTempImageUrl(imageUrl);
         setChanged(true);
@@ -93,40 +101,38 @@ export const HistoryImageUploader = () => {
   };
   
   const handleApplyImage = async () => {
+    if (!tempImageUrl) {
+      toast({
+        title: "Erreur",
+        description: "Aucune image à appliquer",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
       setUploading(true);
+      console.log("Applying image URL:", tempImageUrl);
       
-      // First check if the history_image_url record exists in the database
-      const { data: existingRecord, error: checkError } = await supabase
+      // Direct Supabase upsert operation to avoid conflicts
+      const { error } = await supabase
         .from('site_config')
-        .select('id')
-        .eq('key', 'history_image_url')
-        .maybeSingle();
+        .upsert({ 
+          key: 'history_image_url', 
+          value: tempImageUrl 
+        }, { 
+          onConflict: 'key'  // Explicitly specify the conflict resolution
+        });
       
-      if (checkError) {
-        throw checkError;
+      if (error) {
+        console.error("Database error during upsert:", error);
+        throw error;
       }
       
-      // If the record exists, update it; otherwise, insert a new one
-      if (existingRecord) {
-        const { error: updateError } = await supabase
-          .from('site_config')
-          .update({ value: tempImageUrl })
-          .eq('key', 'history_image_url');
-        
-        if (updateError) throw updateError;
-      } else {
-        const { error: insertError } = await supabase
-          .from('site_config')
-          .insert({ key: 'history_image_url', value: tempImageUrl });
-        
-        if (insertError) throw insertError;
-      }
+      console.log("Database updated successfully");
       
-      // Update in ThemeProvider
-      await updateTheme({ 
-        images: { historyImageUrl: tempImageUrl } 
-      });
+      // Refresh the theme to get the updated values from the database
+      await refreshTheme();
       
       setChanged(false);
       
