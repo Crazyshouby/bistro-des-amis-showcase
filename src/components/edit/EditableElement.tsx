@@ -12,6 +12,7 @@ interface EditableElementProps {
   children: React.ReactNode;
   defaultContent?: string;
   className?: string;
+  style?: React.CSSProperties; // Add style prop support
 }
 
 export const EditableElement: React.FC<EditableElementProps> = ({
@@ -20,6 +21,7 @@ export const EditableElement: React.FC<EditableElementProps> = ({
   children,
   defaultContent,
   className = "",
+  style = {},
 }) => {
   const { isEditMode } = useEditMode();
   const location = useLocation();
@@ -128,7 +130,7 @@ export const EditableElement: React.FC<EditableElementProps> = ({
   };
 
   if (isLoading) {
-    return <div className={className}>{children}</div>;
+    return <div className={className} style={style}>{children}</div>;
   }
 
   if (isEditing) {
@@ -139,6 +141,7 @@ export const EditableElement: React.FC<EditableElementProps> = ({
         onSave={handleEditSave}
         onCancel={handleEditCancel}
         className={className}
+        style={style}
       />
     );
   }
@@ -150,13 +153,13 @@ export const EditableElement: React.FC<EditableElementProps> = ({
     if (type === "text") {
       renderedContent = content;
     } else if (type === "image" && content) {
-      renderedContent = <img src={content} alt="Editable content" className={className} />;
+      renderedContent = <img src={content} alt="Editable content" className={className} style={style} />;
     } else if (type === "html") {
-      renderedContent = <div dangerouslySetInnerHTML={{ __html: content }} />;
+      renderedContent = <div dangerouslySetInnerHTML={{ __html: content }} style={style} />;
     } else if (type === "link") {
       // Pour un lien, on suppose que le contenu est une URL et on garde le texte des enfants
       renderedContent = (
-        <a href={content} className={className}>
+        <a href={content} className={className} style={style}>
           {children}
         </a>
       );
@@ -169,6 +172,7 @@ export const EditableElement: React.FC<EditableElementProps> = ({
         isEditMode ? "cursor-pointer hover:outline hover:outline-2 hover:outline-offset-2 hover:outline-blue-500" : ""
       }`}
       onClick={isEditMode ? handleEditStart : undefined}
+      style={style}
     >
       {renderedContent}
     </div>

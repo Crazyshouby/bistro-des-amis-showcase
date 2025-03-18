@@ -16,6 +16,7 @@ interface EditPopoverProps {
   onSave: (content: string) => void;
   onCancel: () => void;
   className?: string;
+  style?: React.CSSProperties; // Add style prop
 }
 
 export const EditPopover: React.FC<EditPopoverProps> = ({
@@ -24,6 +25,7 @@ export const EditPopover: React.FC<EditPopoverProps> = ({
   onSave,
   onCancel,
   className,
+  style = {},
 }) => {
   const [editedContent, setEditedContent] = useState(content);
   const [isOpen, setIsOpen] = useState(true);
@@ -41,9 +43,9 @@ export const EditPopover: React.FC<EditPopoverProps> = ({
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <div className={`${className} outline outline-2 outline-blue-500 outline-offset-2`}>
+        <div className={`${className} outline outline-2 outline-blue-500 outline-offset-2`} style={style}>
           {type === "image" ? (
-            <img src={content} alt="Editable content" className={className} />
+            <img src={content} alt="Editable content" className={className} style={style} />
           ) : (
             content
           )}
