@@ -140,8 +140,8 @@
   
   /* Social sharing button styles - removed */
   
-  /* Filter button styles - updated to be darker */
+  /* Filter button styles - updated to be darker with high-contrast text */
   .filter-button {
-    @apply bg-bistro-wood text-bistro-sand hover:bg-secondary hover:text-secondary-foreground px-4 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 text-sm font-medium;
+    @apply bg-bistro-wood text-white hover:bg-secondary hover:text-secondary-foreground px-4 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 text-sm font-medium font-bold;
   }
 }
