@@ -169,8 +169,8 @@ export const ContentSettings = () => {
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#2DD4BF]"></div>
       </div>;
   }
-  return <Card className="border border-[#6B7280] bg-slate-800">
-      <CardHeader className="border-b border-[#6B7280] bg-slate-800">
+  return <Card className="border border-[#6B7280] bg-gray-900">
+      <CardHeader className="border-b border-[#6B7280] bg-gray-900">
         <CardTitle className="text-gray-50">Personnalisation de la page d'accueil</CardTitle>
       </CardHeader>
       <CardContent className="space-y-8 pt-6 bg-gray-900">
