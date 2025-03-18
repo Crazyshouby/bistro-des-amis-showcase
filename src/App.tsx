@@ -18,6 +18,7 @@ import { AuthProvider } from "./components/auth/AuthProvider";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import SuperAdmin from "./pages/SuperAdmin";
 import SuperAdminLogin from "./pages/SuperAdminLogin";
+import { SuperAdminRoute } from "./components/superadmin/SuperAdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -44,7 +45,11 @@ const App = () => (
                     </ProtectedRoute>
                   } />
                   {/* SuperAdmin Routes */}
-                  <Route path="/superadmin" element={<SuperAdmin />} />
+                  <Route path="/superadmin" element={
+                    <SuperAdminRoute>
+                      <SuperAdmin />
+                    </SuperAdminRoute>
+                  } />
                   <Route path="/superadmin/login" element={<SuperAdminLogin />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

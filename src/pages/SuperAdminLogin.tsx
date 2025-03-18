@@ -22,6 +22,7 @@ const SuperAdminLogin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -33,7 +34,11 @@ const SuperAdminLogin = () => {
 
   const handleLogin = async (data: z.infer<typeof loginSchema>) => {
     setLoading(true);
+    setLoginError("");
+    
     try {
+      console.log("Tentative de connexion avec l'email:", data.email);
+      
       // Get the super admin with the provided email
       const { data: superAdmin, error } = await supabase
         .from('super_admins')
@@ -41,7 +46,9 @@ const SuperAdminLogin = () => {
         .eq('email', data.email)
         .single();
 
-      if (error || !superAdmin) {
+      if (error) {
+        console.error("Erreur lors de la recherche du superadmin:", error);
+        setLoginError("Email ou mot de passe incorrect");
         toast({
           title: "Échec de l'authentification",
           description: "Email ou mot de passe incorrect",
@@ -51,10 +58,27 @@ const SuperAdminLogin = () => {
         return;
       }
 
+      if (!superAdmin) {
+        console.error("Aucun superadmin trouvé avec cet email");
+        setLoginError("Email ou mot de passe incorrect");
+        toast({
+          title: "Échec de l'authentification",
+          description: "Email ou mot de passe incorrect",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      console.log("Superadmin trouvé, vérification du mot de passe");
+      
       // Compare the provided password with the hashed password
       const isPasswordValid = await bcrypt.compare(data.password, superAdmin.password);
+      console.log("Résultat de la vérification du mot de passe:", isPasswordValid);
 
       if (!isPasswordValid) {
+        console.error("Mot de passe incorrect");
+        setLoginError("Email ou mot de passe incorrect");
         toast({
           title: "Échec de l'authentification",
           description: "Email ou mot de passe incorrect",
@@ -81,6 +105,7 @@ const SuperAdminLogin = () => {
       navigate('/superadmin');
     } catch (err) {
       console.error('Login error:', err);
+      setLoginError("Une erreur s'est produite lors de la connexion");
       toast({
         title: "Erreur de connexion",
         description: "Une erreur s'est produite lors de la connexion",
@@ -146,6 +171,18 @@ const SuperAdminLogin = () => {
                   </FormItem>
                 )}
               />
+
+              {loginError && (
+                <div className="text-red-500 text-sm p-2 bg-red-50 border border-red-200 rounded">
+                  {loginError}
+                </div>
+              )}
+
+              <div className="text-sm text-[#6B7280]">
+                <p className="mb-1">Identifiants de démonstration:</p>
+                <p>Email: superadmin@bistrodesamis.com</p>
+                <p>Mot de passe: SuperAdmin2025!</p>
+              </div>
 
               <Button 
                 type="submit" 
