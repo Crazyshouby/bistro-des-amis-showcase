@@ -9,8 +9,16 @@ interface ThemeColors {
   headerFooterColor: string;
 }
 
+interface ThemeImages {
+  homeImageUrl: string;
+  menuHeaderImage: string;
+  eventsHeaderImage: string;
+  contactHeaderImage: string;
+}
+
 interface ThemeContextType {
   colors: ThemeColors;
+  images: ThemeImages;
   isLoading: boolean;
 }
 
@@ -21,8 +29,16 @@ const defaultColors: ThemeColors = {
   headerFooterColor: "#6B2D2D" // bistro-brick
 };
 
+const defaultImages: ThemeImages = {
+  homeImageUrl: "/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png",
+  menuHeaderImage: "",
+  eventsHeaderImage: "",
+  contactHeaderImage: ""
+};
+
 const ThemeContext = createContext<ThemeContextType>({
   colors: defaultColors,
+  images: defaultImages,
   isLoading: true
 });
 
@@ -30,19 +46,19 @@ export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [colors, setColors] = useState<ThemeColors>(defaultColors);
+  const [images, setImages] = useState<ThemeImages>(defaultImages);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchColors = async () => {
+    const fetchThemeData = async () => {
       try {
-        console.log("Fetching theme colors from Supabase...");
+        console.log("Fetching theme data from Supabase...");
         const { data, error } = await supabase
           .from('site_config')
-          .select('key, value')
-          .in('key', ['background_color', 'text_color', 'button_color', 'header_footer_color']);
+          .select('key, value');
 
         if (error) {
-          console.error('Error fetching theme colors:', error);
+          console.error('Error fetching theme data:', error);
           return;
         }
 
@@ -50,9 +66,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         
         if (data && data.length > 0) {
           const newColors = { ...defaultColors };
+          const newImages = { ...defaultImages };
           
           data.forEach(item => {
             switch (item.key) {
+              // Colors
               case 'background_color':
                 newColors.backgroundColor = item.value;
                 break;
@@ -65,16 +83,32 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               case 'header_footer_color':
                 newColors.headerFooterColor = item.value;
                 break;
+              
+              // Images
+              case 'home_image_url':
+                if (item.value) newImages.homeImageUrl = item.value;
+                break;
+              case 'menu_header_image':
+                if (item.value) newImages.menuHeaderImage = item.value;
+                break;
+              case 'events_header_image':
+                if (item.value) newImages.eventsHeaderImage = item.value;
+                break;
+              case 'contact_header_image':
+                if (item.value) newImages.contactHeaderImage = item.value;
+                break;
             }
           });
           
           setColors(newColors);
+          setImages(newImages);
           console.log("Applied theme colors:", newColors);
+          console.log("Applied theme images:", newImages);
           
           // Appliquer les couleurs au document
           applyColors(newColors);
         } else {
-          console.log("No theme colors found, using defaults");
+          console.log("No theme data found, using defaults");
           applyColors(defaultColors);
         }
       } catch (error) {
@@ -92,7 +126,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       document.documentElement.style.setProperty('--dynamic-header-footer', colors.headerFooterColor);
     };
     
-    fetchColors();
+    fetchThemeData();
     
     // Configurer un écouteur temps réel pour les changements de configuration
     const subscription = supabase
@@ -100,14 +134,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
+          event: '*',
           schema: 'public',
-          table: 'site_config',
-          filter: `key=in.(background_color,text_color,button_color,header_footer_color)`
+          table: 'site_config'
         },
         async (payload) => {
           console.log('Theme config changed:', payload);
-          await fetchColors();
+          await fetchThemeData();
         }
       )
       .subscribe();
@@ -118,7 +151,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ colors, isLoading }}>
+    <ThemeContext.Provider value={{ colors, images, isLoading }}>
       {children}
     </ThemeContext.Provider>
   );

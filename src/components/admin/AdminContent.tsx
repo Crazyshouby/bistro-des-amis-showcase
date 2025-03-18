@@ -9,6 +9,7 @@ import { AdminTabs } from "./AdminTabs";
 import { MenuTab } from "./MenuTab";
 import { EventsTab } from "./EventsTab";
 import { AccountTab } from "./AccountTab";
+import { CustomizationTab } from "./CustomizationTab";
 import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -146,6 +147,11 @@ export const AdminContent = ({
           onDeleteRequest={confirmDeleteItem} 
         />
       )
+    },
+    {
+      id: "customization",
+      label: "Personnalisation",
+      content: <CustomizationTab />
     },
     {
       id: "account",
