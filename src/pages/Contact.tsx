@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import AnimatedSection from "@/components/shared/AnimatedSection";
 import { ContactFormData } from "@/types";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 // Schéma de validation du formulaire
 const formSchema = z.object({
@@ -21,6 +22,10 @@ const formSchema = z.object({
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { images } = useTheme();
+  
+  // Utiliser l'image d'en-tête du contact depuis le ThemeProvider ou une image par défaut
+  const backgroundImage = images.contactHeaderImage || "/lovable-uploads/00ac4d79-14ae-4287-8ca4-c2b40d004275.png";
   
   // Configuration du formulaire avec React Hook Form et Zod
   const form = useForm<z.infer<typeof formSchema>>({
@@ -71,7 +76,7 @@ const Contact = () => {
       {/* Banner */}
       <div 
         className="relative h-64 bg-cover bg-center"
-        style={{ backgroundImage: "url('/lovable-uploads/00ac4d79-14ae-4287-8ca4-c2b40d004275.png')" }}
+        style={{ backgroundImage: `url('${backgroundImage}')` }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
         <div className="relative h-full flex items-center justify-center">
