@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
@@ -36,7 +35,9 @@ export const EventDialog = ({
       let imageUrl = data.image_url || null;
       
       if (selectedImage) {
+        console.log("Uploading image...");
         const uploadedUrl = await uploadEventImage(selectedImage, setUploadProgress);
+        console.log("Upload result:", uploadedUrl);
         if (uploadedUrl) {
           imageUrl = uploadedUrl;
         }
@@ -79,7 +80,7 @@ export const EventDialog = ({
         
         toast({
           title: "Événement mis à jour",
-          description: `"${data.titre}" a été mis à jour avec succès.`,
+          description: `"${data.titre}" a été mis à jour avec succès.",
         });
       } else {
         const { data: newEvent, error } = await supabase
@@ -99,7 +100,7 @@ export const EventDialog = ({
         
         toast({
           title: "Événement ajouté",
-          description: `"${data.titre}" a été ajouté au calendrier.`,
+          description: `"${data.titre}" a été ajouté au calendrier.",
         });
       }
       

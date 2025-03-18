@@ -114,9 +114,12 @@ export const uploadEventImage = async (file: File, setProgress?: (progress: numb
     const fileExt = file.name.split('.').pop();
     const fileName = `event_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
     
-    // Créer le bucket s'il n'existe pas déjà
-    const { data: bucketExists } = await supabase.storage.getBucket('event_images');
+    // Vérifier si le bucket existe et s'assurer que nous avons les permissions
+    const { data: buckets } = await supabase.storage.listBuckets();
+    const bucketExists = buckets?.some(bucket => bucket.name === 'event_images');
+    
     if (!bucketExists) {
+      console.log('Bucket does not exist, creating...');
       await supabase.storage.createBucket('event_images', {
         public: true,
         fileSizeLimit: 5242880, // 5MB
@@ -135,6 +138,12 @@ export const uploadEventImage = async (file: File, setProgress?: (progress: numb
     
     if (error) {
       console.error('Error uploading image:', error);
+      // Enregistrer les détails de l'erreur pour faciliter le débogage
+      toast({
+        title: "Erreur",
+        description: `Erreur lors de l'upload: ${error.message}`,
+        variant: "destructive",
+      });
       throw error;
     }
     
@@ -145,7 +154,7 @@ export const uploadEventImage = async (file: File, setProgress?: (progress: numb
     const { data: { publicUrl } } = supabase.storage
       .from('event_images')
       .getPublicUrl(fileName);
-      
+    
     return publicUrl;
   } catch (error) {
     console.error('Error uploading image:', error);
