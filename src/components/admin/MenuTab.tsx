@@ -10,14 +10,14 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { CategorySelector } from "./menu/CategorySelector";
 import { MenuCategoryContent } from "./menu/MenuCategoryContent";
 
+// Fixed category order
+const CATEGORY_ORDER = ["Apéritifs", "Entrées", "Plats", "Desserts", "Boissons"];
+
 interface MenuTabProps {
   menuItems: MenuItem[];
   setMenuItems: React.Dispatch<React.SetStateAction<MenuItem[]>>;
   onDeleteRequest: (type: 'menu' | 'event', id: string) => void;
 }
-
-// Fixed category order
-const CATEGORY_ORDER = ["Apéritifs", "Entrées", "Plats", "Desserts", "Boissons"];
 
 export const MenuTab = ({ menuItems, setMenuItems, onDeleteRequest }: MenuTabProps) => {
   const [isMenuItemDialogOpen, setIsMenuItemDialogOpen] = useState(false);
