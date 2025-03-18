@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { X, Filter } from "lucide-react";
+import { SlidersHorizontal, X } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -67,11 +67,21 @@ export const MenuFilter = ({ onFilterChange, activeFilters }: MenuFilterProps) =
     <div>
       <Button 
         onClick={() => setOpen(true)}
-        className="filter-button relative"
+        className="relative flex items-center gap-2 border border-bistro-wood/20 bg-background text-foreground hover:bg-muted"
         variant="outline"
       >
-        <Filter size={16} />
-        Filtrer
+        <div className="flex flex-col space-y-1">
+          <div className="h-1 w-8 bg-foreground relative">
+            <div className="absolute -top-1 -left-1 w-3 h-3 bg-foreground rounded-full border-2 border-background"></div>
+          </div>
+          <div className="h-1 w-8 bg-foreground relative">
+            <div className="absolute -top-1 left-2 w-3 h-3 bg-foreground rounded-full border-2 border-background"></div>
+          </div>
+          <div className="h-1 w-8 bg-foreground relative">
+            <div className="absolute -top-1 -left-1 w-3 h-3 bg-foreground rounded-full border-2 border-background"></div>
+          </div>
+        </div>
+        <span className="ml-1">Filtrer</span>
         {hasActiveFilters && (
           <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground rounded-full w-4 h-4 text-xs flex items-center justify-center">
             {Object.values(activeFilters).filter(Boolean).length}

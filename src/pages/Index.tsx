@@ -1,14 +1,9 @@
-
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useParallax } from "@/lib/hooks";
 import AnimatedSection from "@/components/shared/AnimatedSection";
 
 const Index = () => {
-  const heroParallaxRef = useParallax(0.4);
-  
-  // Prefetch images
   useEffect(() => {
     const images = [
       '/lovable-uploads/19408610-7939-4299-999c-208a2355a264.png', // barista
@@ -29,14 +24,11 @@ const Index = () => {
 
   return (
     <div className="bg-texture">
-      {/* Hero Section with Parallax - Updated with new image */}
       <div className="relative h-screen overflow-hidden">
         <div 
-          ref={heroParallaxRef}
-          className="absolute inset-0 bg-cover bg-center transform scale-110 transition-transform duration-300 ease-out"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ 
-            backgroundImage: "url('/lovable-uploads/bf89ee9a-96c9-4013-9f71-93f91dbff5d5.png')",
-            willChange: "transform"
+            backgroundImage: "url('/lovable-uploads/bf89ee9a-96c9-4013-9f71-93f91dbff5d5.png')"
           }}
         />
         <div className="absolute inset-0 bg-black bg-opacity-30" />
@@ -63,7 +55,6 @@ const Index = () => {
         </div>
       </div>
       
-      {/* About Section */}
       <section className="py-16 md:py-24">
         <div className="content-container">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
@@ -102,7 +93,6 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Features Section */}
       <section className="bg-bistro-sand py-16 md:py-24">
         <div className="content-container">
           <AnimatedSection className="text-center mb-16">
@@ -138,7 +128,6 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Image Gallery */}
       <section className="py-16 md:py-24">
         <div className="content-container">
           <AnimatedSection className="text-center mb-16">
@@ -195,7 +184,6 @@ const Index = () => {
         </div>
       </section>
       
-      {/* CTA Section */}
       <section 
         className="relative py-20 md:py-32 bg-cover bg-center"
         style={{ backgroundImage: "url('/lovable-uploads/00ac4d79-14ae-4287-8ca4-c2b40d004275.png')" }}
@@ -214,7 +202,7 @@ const Index = () => {
                 </Button>
               </Link>
               <Link to="/events">
-                <Button variant="outline" className="w-full sm:w-auto border-bistro-sand text-bistro-sand hover:bg-bistro-sand/20 transition-colors duration-300 text-lg px-6 py-3">
+                <Button className="w-full sm:w-auto bg-bistro-sand text-bistro-wood hover:bg-secondary hover:text-secondary-foreground transition-colors duration-300 text-lg px-6 py-3">
                   Voir nos événements
                 </Button>
               </Link>
