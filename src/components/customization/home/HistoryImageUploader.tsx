@@ -1,21 +1,22 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/components/ui/use-toast";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Save, AlertTriangle } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+import { AlertCircle, Upload } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const HistoryImageUploader = () => {
   const { images, updateTheme } = useTheme();
-  const [historyImage, setHistoryImage] = useState(images.historyImageUrl || "");
   const [tempImageUrl, setTempImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
-
+  const [changed, setChanged] = useState(false);
+  
   useEffect(() => {
-    setHistoryImage(images.historyImageUrl || "");
+    // Synchroniser avec le ThemeProvider
     setTempImageUrl(images.historyImageUrl || "");
   }, [images.historyImageUrl]);
 
@@ -50,8 +51,9 @@ export const HistoryImageUploader = () => {
       
       // Générer un nom de fichier unique
       const fileExt = file.name.split('.').pop();
-      const fileName = `history_image_${Math.random().toString(36).substring(2, 11)}.${fileExt}`;
-      const filePath = `site-images/${fileName}`;
+      const timestamp = Date.now();
+      const fileName = `history-image-${timestamp}.${fileExt}`;
+      const filePath = `site_images/${fileName}`;
       
       // Upload de l'image vers Supabase Storage
       const { error: uploadError } = await supabase.storage
@@ -69,13 +71,13 @@ export const HistoryImageUploader = () => {
         
       if (data) {
         const imageUrl = data.publicUrl;
+        // Mise à jour de l'URL temporaire pour l'aperçu
         setTempImageUrl(imageUrl);
-        setHasChanges(true);
+        setChanged(true);
         
         toast({
           title: "Image téléchargée",
-          description: "Cliquez sur Appliquer pour sauvegarder les changements",
-          duration: 5000
+          description: "Cliquez sur Appliquer pour sauvegarder les changements"
         });
       }
     } catch (error) {
@@ -90,24 +92,20 @@ export const HistoryImageUploader = () => {
     }
   };
   
-  const handleApplyChanges = async () => {
+  const handleApplyImage = async () => {
     try {
       setUploading(true);
-      
-      console.log("Applying history image change:", tempImageUrl);
       
       // Mise à jour dans le ThemeProvider et la base de données
       await updateTheme({ 
         images: { historyImageUrl: tempImageUrl } 
       });
       
-      // Mise à jour de l'état local après sauvegarde
-      setHistoryImage(tempImageUrl);
-      setHasChanges(false);
+      setChanged(false);
       
       toast({
         title: "Succès",
-        description: "L'image d'histoire a été appliquée et sauvegardée"
+        description: "L'image a été appliquée et sauvegardée"
       });
       
     } catch (error) {
@@ -124,67 +122,53 @@ export const HistoryImageUploader = () => {
 
   return (
     <div className="space-y-4">
-      <div className="aspect-video bg-gray-100 rounded-md overflow-hidden relative">
-        {tempImageUrl ? (
-          <img 
-            src={tempImageUrl} 
-            alt="Aperçu de l'image d'histoire" 
-            className="w-full h-full object-cover"
+      <div className="flex items-center space-x-4">
+        <div className="flex-1">
+          <Label htmlFor="history-image" className="block mb-2">
+            Image de la section
+          </Label>
+          <Input
+            id="history-image"
+            type="file"
+            onChange={handleImageUpload}
+            accept="image/jpeg, image/png, image/gif, image/webp"
+            disabled={uploading}
+            className="cursor-pointer"
           />
-        ) : (
-          <div className="flex items-center justify-center h-full bg-gray-200">
-            <p className="text-gray-500">Aucune image</p>
-          </div>
+        </div>
+        
+        {changed && (
+          <Button 
+            onClick={handleApplyImage} 
+            disabled={uploading || !changed}
+            className="mt-8"
+          >
+            {uploading ? "Application..." : "Appliquer l'image"}
+          </Button>
         )}
       </div>
       
-      <div className="space-y-2">
-        <Label htmlFor="history-image" className="block font-medium">
-          Image de la section "Notre Histoire"
-        </Label>
-        
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
-            className="relative" 
-            disabled={uploading}
-          >
-            <input
-              type="file"
-              id="history-image"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      {tempImageUrl && (
+        <div className="mt-4">
+          <Label className="block mb-2">Aperçu de l'image</Label>
+          <div className="border rounded-md overflow-hidden">
+            <img 
+              src={tempImageUrl} 
+              alt="Aperçu de l'image" 
+              className="w-full h-auto max-h-64 object-cover"
             />
-            <Upload className="h-4 w-4 mr-2" />
-            {uploading ? "Téléchargement..." : "Télécharger une image"}
-          </Button>
-          
-          {hasChanges && (
-            <Button 
-              onClick={handleApplyChanges}
-              disabled={uploading}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              Appliquer
-            </Button>
-          )}
-        </div>
-        
-        {hasChanges && (
-          <div className="flex items-start mt-2 p-2 bg-amber-50 border border-amber-200 rounded-md">
-            <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-amber-700">
-              <strong>N'oubliez pas de cliquer sur "Appliquer"</strong> pour enregistrer définitivement l'image.
-            </p>
           </div>
-        )}
-        
-        <p className="text-sm text-muted-foreground mt-2">
-          Pour de meilleurs résultats, utilisez une image au format paysage d'au moins 1200x800 pixels.
-        </p>
-      </div>
+        </div>
+      )}
+      
+      {changed && (
+        <Alert className="bg-yellow-50 border-yellow-200 text-yellow-800 mt-2">
+          <AlertCircle className="h-4 w-4 mr-2" />
+          <AlertDescription>
+            N'oubliez pas de cliquer sur "Appliquer l'image" pour sauvegarder vos changements.
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 };

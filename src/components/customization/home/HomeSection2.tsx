@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { HistoryImageUploader } from "./HistoryImageUploader";
+import { toast } from "@/components/ui/use-toast";
 
 export const HomeSection2 = () => {
   const { textContent, updateTheme } = useTheme();
@@ -30,8 +31,18 @@ export const HomeSection2 = () => {
           historyTitleFont
         }
       });
+      
+      toast({
+        title: "Succès",
+        description: "Les modifications ont été enregistrées"
+      });
     } catch (error) {
       console.error("Erreur lors de la sauvegarde:", error);
+      toast({
+        title: "Erreur", 
+        description: "Impossible de sauvegarder les modifications",
+        variant: "destructive"
+      });
     }
   };
   
