@@ -4,6 +4,7 @@ import { Trash, CalendarDays } from "lucide-react";
 import { Event } from "@/types";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface EventGridProps {
   events: Event[];
@@ -19,21 +20,23 @@ export const EventGrid = ({ events, onEditEvent, onDeleteEvent }: EventGridProps
     return (
       <div 
         key={event.id} 
-        className="bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer border border-gray-200 overflow-hidden"
+        className="bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer border border-gray-200 overflow-hidden flex flex-col h-full"
         onClick={() => onEditEvent(event)}
       >
-        <div className="relative h-40 bg-gray-100">
-          {event.image_url ? (
-            <img 
-              src={event.image_url} 
-              alt={event.titre}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full bg-gray-200">
-              <span className="text-gray-400">Aucune image</span>
-            </div>
-          )}
+        <div className="relative">
+          <AspectRatio ratio={16/9}>
+            {event.image_url ? (
+              <img 
+                src={event.image_url} 
+                alt={event.titre}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full bg-gray-200">
+                <span className="text-gray-400">Aucune image</span>
+              </div>
+            )}
+          </AspectRatio>
           <div className="absolute top-2 right-2 flex gap-1">
             <Button 
               variant="outline" 
@@ -48,7 +51,7 @@ export const EventGrid = ({ events, onEditEvent, onDeleteEvent }: EventGridProps
             </Button>
           </div>
         </div>
-        <div className="p-3">
+        <div className="p-3 flex-grow flex flex-col">
           <div className="flex justify-between items-start mb-1">
             <h3 className="font-medium text-bistro-wood truncate" title={event.titre}>
               {event.titre}
@@ -58,7 +61,7 @@ export const EventGrid = ({ events, onEditEvent, onDeleteEvent }: EventGridProps
             <CalendarDays size={16} className="mr-1" />
             <span className="text-sm">{formattedDate}</span>
           </div>
-          <p className="text-sm text-gray-600 line-clamp-2 h-10 overflow-hidden" title={event.description}>
+          <p className="text-sm text-gray-600 line-clamp-3 overflow-hidden" title={event.description}>
             {event.description}
           </p>
         </div>
