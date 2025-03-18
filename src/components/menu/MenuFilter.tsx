@@ -70,17 +70,7 @@ export const MenuFilter = ({ onFilterChange, activeFilters }: MenuFilterProps) =
         className="relative flex items-center gap-2 border border-bistro-wood/20 bg-background text-foreground hover:bg-muted"
         variant="outline"
       >
-        <div className="flex flex-col space-y-1">
-          <div className="h-1 w-8 bg-foreground relative">
-            <div className="absolute -top-1 -left-1 w-3 h-3 bg-foreground rounded-full border-2 border-background"></div>
-          </div>
-          <div className="h-1 w-8 bg-foreground relative">
-            <div className="absolute -top-1 left-2 w-3 h-3 bg-foreground rounded-full border-2 border-background"></div>
-          </div>
-          <div className="h-1 w-8 bg-foreground relative">
-            <div className="absolute -top-1 -left-1 w-3 h-3 bg-foreground rounded-full border-2 border-background"></div>
-          </div>
-        </div>
+        <SlidersHorizontal className="h-4 w-4 stroke-[1.5px]" />
         <span className="ml-1">Filtrer</span>
         {hasActiveFilters && (
           <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground rounded-full w-4 h-4 text-xs flex items-center justify-center">
