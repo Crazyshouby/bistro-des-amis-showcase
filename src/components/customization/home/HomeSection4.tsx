@@ -200,15 +200,64 @@ export const HomeSection4 = () => {
       console.log("Saving gallery with images:", galleryImages);
       setUploading(true);
       
-      // Update theme with new gallery settings
-      await updateTheme({
-        textContent: {
-          galleryTitle: sectionTitle,
-          galleryImages: JSON.stringify(galleryImages),
-          galleryTitleColor: titleColor,
-          galleryTitleFont: titleFont
+      // Prepare the data to update
+      const galleryData = {
+        galleryTitle: sectionTitle,
+        galleryImages: JSON.stringify(galleryImages),
+        galleryTitleColor: titleColor,
+        galleryTitleFont: titleFont
+      };
+      
+      // Check if gallery settings already exist
+      const { data: existingConfig, error: checkError } = await supabase
+        .from('site_config')
+        .select('key')
+        .in('key', ['gallery_title', 'gallery_images', 'gallery_title_color', 'gallery_title_font']);
+      
+      if (checkError) {
+        console.error("Error checking existing config:", checkError);
+        throw checkError;
+      }
+      
+      console.log("Existing config:", existingConfig);
+      
+      const existingKeys = existingConfig?.map(item => item.key) || [];
+      
+      // Prepare data for upsert operation
+      const upsertData = [
+        { key: 'gallery_title', value: galleryData.galleryTitle },
+        { key: 'gallery_images', value: galleryData.galleryImages },
+        { key: 'gallery_title_color', value: galleryData.galleryTitleColor },
+        { key: 'gallery_title_font', value: galleryData.galleryTitleFont }
+      ];
+      
+      // For each key, update or insert
+      for (const item of upsertData) {
+        if (existingKeys.includes(item.key)) {
+          // Update existing record
+          const { error: updateError } = await supabase
+            .from('site_config')
+            .update({ value: item.value })
+            .eq('key', item.key);
+            
+          if (updateError) {
+            console.error(`Error updating ${item.key}:`, updateError);
+            throw updateError;
+          }
+          console.log(`Updated ${item.key} successfully`);
+        } else {
+          // Insert new record
+          const { error: insertError } = await supabase
+            .from('site_config')
+            .insert({ key: item.key, value: item.value });
+            
+          if (insertError) {
+            console.error(`Error inserting ${item.key}:`, insertError);
+            throw insertError;
+          }
+          console.log(`Inserted ${item.key} successfully`);
         }
-      });
+      }
       
       // Explicitly refresh the theme to get the latest data
       await refreshTheme();
