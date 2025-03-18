@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { ProfileView } from "./ProfileView";
 import { ProfileForm } from "./ProfileForm";
-import { ProfileData, loadUserProfile, hasProfileData } from "./profileUtils";
+import { ProfileData, loadUserProfile, saveUserProfile, hasProfileData } from "./profileUtils";
 import { User } from "@supabase/supabase-js";
 
 interface ProfileManagerProps {
@@ -37,16 +37,30 @@ export const ProfileManager = ({ user }: ProfileManagerProps) => {
 
   const hasProfile = hasProfileData(profileData);
 
+  const handleSaveProfile = async (data: ProfileData) => {
+    if (user) {
+      const success = await saveUserProfile(data, user);
+      if (success) {
+        setProfileData(data);
+        setIsEditing(false);
+      }
+    }
+  };
+
   if (isEditing || !hasProfile) {
     return (
       <ProfileForm 
-        initialData={profileData}
-        user={user}
-        onSuccess={(data) => {
-          setProfileData(data);
-          setIsEditing(false);
+        initialData={profileData || {
+          fullName: "",
+          phone: "",
+          email: "",
+          address: "",
+          facebookUrl: "",
+          instagramUrl: "",
+          twitterUrl: "",
+          youtubeUrl: ""
         }}
-        onCancel={() => setIsEditing(hasProfile)}
+        onSubmit={handleSaveProfile}
       />
     );
   }
@@ -54,7 +68,7 @@ export const ProfileManager = ({ user }: ProfileManagerProps) => {
   return (
     <ProfileView 
       profileData={profileData} 
-      onEdit={() => setIsEditing(true)} 
+      onEditClick={() => setIsEditing(true)} 
     />
   );
 };

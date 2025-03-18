@@ -88,6 +88,16 @@ export const ProfileView = ({ profileData, onEditClick }: ProfileViewProps) => {
             />
           </div>
         </div>
+
+        <div className="flex justify-end">
+          <Button 
+            onClick={onEditClick} 
+            className="bg-bistro-olive hover:bg-bistro-olive-light text-white"
+          >
+            <Edit className="mr-2 h-4 w-4" />
+            Modifier
+          </Button>
+        </div>
       </div>
     </CardContent>
   );

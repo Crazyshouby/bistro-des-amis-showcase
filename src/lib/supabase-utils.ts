@@ -1,6 +1,10 @@
 
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Database } from "@/integrations/supabase/types";
+
+// Define the allowed table names
+type TableNames = keyof Database['public']['Tables'];
 
 // Fonction utilitaire pour gérer les erreurs Supabase
 export const handleSupabaseError = (error: any, customMessage?: string) => {
@@ -14,7 +18,7 @@ export const handleSupabaseError = (error: any, customMessage?: string) => {
 
 // Fonction utilitaire pour les requêtes de chargement de données
 export const fetchData = async <T>(
-  tableName: string,
+  tableName: TableNames,
   query?: { 
     select?: string,
     eq?: [string, any][], 
@@ -56,7 +60,7 @@ export const fetchData = async <T>(
 
 // Fonction utilitaire pour les insertions
 export const insertData = async <T>(
-  tableName: string,
+  tableName: TableNames,
   data: any
 ): Promise<T | null> => {
   try {
@@ -80,7 +84,7 @@ export const insertData = async <T>(
 
 // Fonction utilitaire pour les mises à jour
 export const updateData = async <T>(
-  tableName: string,
+  tableName: TableNames,
   id: string | number,
   data: any,
   idColumn: string = 'id'
@@ -107,7 +111,7 @@ export const updateData = async <T>(
 
 // Fonction utilitaire pour les suppressions
 export const deleteData = async (
-  tableName: string,
+  tableName: TableNames,
   id: string | number,
   idColumn: string = 'id'
 ): Promise<boolean> => {
