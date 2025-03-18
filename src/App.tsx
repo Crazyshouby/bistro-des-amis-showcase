@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { NavigationProvider } from "./lib/hooks";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 import Index from "./pages/Index";
@@ -23,6 +23,22 @@ import { SuperAdminRoute } from "./components/superadmin/SuperAdminRoute";
 
 const queryClient = new QueryClient();
 
+// Composant qui conditionne l'affichage de la navigation et du footer
+const AppLayout = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+  const isSuperAdminPage = location.pathname.startsWith('/superadmin');
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      {!isSuperAdminPage && <Navigation />}
+      <main className="flex-grow">
+        {children}
+      </main>
+      {!isSuperAdminPage && <Footer />}
+    </div>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -32,32 +48,52 @@ const App = () => (
         <AuthProvider>
           <NavigationProvider>
             <ThemeProvider>
-              <div className="flex flex-col min-h-screen">
-                <Navigation />
-                <main className="flex-grow">
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/menu" element={<Menu />} />
-                    <Route path="/events" element={<Events />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/admin" element={
-                      <ProtectedRoute>
-                        <Admin />
-                      </ProtectedRoute>
-                    } />
-                    {/* SuperAdmin Routes */}
-                    <Route path="/superadmin" element={
-                      <SuperAdminRoute>
-                        <SuperAdmin />
-                      </SuperAdminRoute>
-                    } />
-                    <Route path="/superadmin/login" element={<SuperAdminLogin />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </main>
-                <Footer />
-              </div>
+              <Routes>
+                <Route path="/" element={
+                  <AppLayout>
+                    <Index />
+                  </AppLayout>
+                } />
+                <Route path="/menu" element={
+                  <AppLayout>
+                    <Menu />
+                  </AppLayout>
+                } />
+                <Route path="/events" element={
+                  <AppLayout>
+                    <Events />
+                  </AppLayout>
+                } />
+                <Route path="/contact" element={
+                  <AppLayout>
+                    <Contact />
+                  </AppLayout>
+                } />
+                <Route path="/auth" element={
+                  <AppLayout>
+                    <Auth />
+                  </AppLayout>
+                } />
+                <Route path="/admin" element={
+                  <AppLayout>
+                    <ProtectedRoute>
+                      <Admin />
+                    </ProtectedRoute>
+                  </AppLayout>
+                } />
+                {/* SuperAdmin Routes sans navigation ni footer */}
+                <Route path="/superadmin" element={
+                  <SuperAdminRoute>
+                    <SuperAdmin />
+                  </SuperAdminRoute>
+                } />
+                <Route path="/superadmin/login" element={<SuperAdminLogin />} />
+                <Route path="*" element={
+                  <AppLayout>
+                    <NotFound />
+                  </AppLayout>
+                } />
+              </Routes>
             </ThemeProvider>
           </NavigationProvider>
         </AuthProvider>
