@@ -23,13 +23,15 @@ const Events = () => {
             </p>
           </div>
           
-          {/* Controls Container */}
-          <div className="flex flex-col items-center mb-6">
-            {/* View Toggle (Liste/Calendrier) */}
-            <EventsViewToggle viewMode={viewMode} setViewMode={setViewMode} />
+          {/* Controls Container - Reorganized */}
+          <div className="flex justify-between items-center mb-6">
+            {/* View Toggle (Liste/Calendrier) on the left */}
+            <div className="flex-shrink-0">
+              <EventsViewToggle viewMode={viewMode} setViewMode={setViewMode} />
+            </div>
             
-            {/* Filter (À venir/Passés) */}
-            <div className="mt-4">
+            {/* Filter (À venir/Passés) on the right */}
+            <div className="flex-shrink-0">
               <EventsFilter showPast={showPast} handleTogglePast={setShowPast} />
             </div>
           </div>

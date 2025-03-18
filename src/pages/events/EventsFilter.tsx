@@ -11,27 +11,34 @@ const EventsFilter = ({
   handleTogglePast
 }: EventsFilterProps) => {
   return (
-    <div className="flex space-x-2">
-      <button 
-        className={`px-4 py-2 rounded-md transition-all duration-200 ${
-          !showPast 
-            ? 'bg-[#4A5E3A] text-white' 
-            : 'bg-bistro-sand-light text-bistro-wood border border-[#4A5E3A]/20'
-        }`} 
-        onClick={() => handleTogglePast(false)}
+    <div className="bg-transparent">
+      <div
+        style={{
+          backgroundColor: 'var(--dynamic-background)'
+        }}
+        className="inline-flex rounded-lg p-1 bg-orange-200"
       >
-        À venir
-      </button>
-      <button 
-        className={`px-4 py-2 rounded-md transition-all duration-200 ${
-          showPast 
-            ? 'bg-[#4A5E3A] text-white' 
-            : 'bg-bistro-sand-light text-bistro-wood border border-[#4A5E3A]/20'
-        }`} 
-        onClick={() => handleTogglePast(true)}
-      >
-        Passés
-      </button>
+        <button 
+          className={`px-4 py-2 rounded-md transition-all duration-200`}
+          style={{
+            backgroundColor: !showPast ? 'var(--dynamic-button)' : 'transparent',
+            color: !showPast ? 'var(--dynamic-background)' : 'var(--dynamic-text)'
+          }}
+          onClick={() => handleTogglePast(false)}
+        >
+          À venir
+        </button>
+        <button 
+          className={`px-4 py-2 rounded-md transition-all duration-200`}
+          style={{
+            backgroundColor: showPast ? 'var(--dynamic-button)' : 'transparent',
+            color: showPast ? 'var(--dynamic-background)' : 'var(--dynamic-text)'
+          }}
+          onClick={() => handleTogglePast(true)}
+        >
+          Passés
+        </button>
+      </div>
     </div>
   );
 };
