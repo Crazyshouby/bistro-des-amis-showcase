@@ -27,7 +27,10 @@ export const MenuItemDialog = ({
 
   const handleSubmit = async (data: MenuItemFormValues, selectedImage: File | null) => {
     try {
-      setUploadingImage(true);
+      if (selectedImage) {
+        setUploadingImage(true);
+      }
+      
       let imageUrl = data.image_url || null;
       
       if (selectedImage) {
@@ -42,7 +45,7 @@ export const MenuItemDialog = ({
           const oldImagePath = editingMenuItem.image_url.split('/').pop();
           if (oldImagePath) {
             await supabase.storage
-              .from('event_images')
+              .from('site_images')
               .remove([oldImagePath]);
           }
         }

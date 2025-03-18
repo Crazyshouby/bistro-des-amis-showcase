@@ -4,6 +4,7 @@ import { X, Upload } from "lucide-react";
 import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -20,6 +21,7 @@ export const MenuItemImageUpload = ({
 }: MenuItemImageUploadProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(initialImageUrl || null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -62,7 +64,7 @@ export const MenuItemImageUpload = ({
           </div>
         )}
         
-        <div>
+        <div className="flex-1">
           <Input
             type="file"
             id="image"
@@ -79,6 +81,15 @@ export const MenuItemImageUpload = ({
             <Upload className="mr-2 h-4 w-4" />
             {uploadingImage ? "Chargement..." : "Choisir une image"}
           </Button>
+          
+          {uploadingImage && (
+            <div className="mt-3">
+              <Progress value={uploadProgress} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-1">
+                {uploadProgress < 100 ? "Téléchargement en cours..." : "Téléchargement terminé"}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -90,14 +101,31 @@ export const uploadImage = async (file: File): Promise<string | null> => {
     const fileExt = file.name.split('.').pop();
     const fileName = `menu_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
     
+    // Start simulating progress in the context of the caller
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+      progress += 10;
+      if (progress >= 90) {
+        clearInterval(progressInterval);
+      }
+    }, 200);
+    
     const { data, error } = await supabase.storage
-      .from('event_images')
-      .upload(fileName, file);
+      .from('site_images')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: true
+      });
+    
+    clearInterval(progressInterval);
     
     if (error) throw error;
     
+    // Set progress to 100%
+    progress = 100;
+    
     const { data: { publicUrl } } = supabase.storage
-      .from('event_images')
+      .from('site_images')
       .getPublicUrl(fileName);
       
     return publicUrl;
