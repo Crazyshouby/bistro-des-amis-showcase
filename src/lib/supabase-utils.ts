@@ -83,13 +83,12 @@ export const insertData = async <T>(
 };
 
 // Fonction utilitaire pour les mises à jour
-// Explicitly specify the return type to avoid excessive type instantiation
-export const updateData = async <T = any>(
+export const updateData = async (
   tableName: TableNames,
   id: string | number,
   data: any,
   idColumn: string = 'id'
-): Promise<T | null> => {
+): Promise<any | null> => {
   try {
     const { data: updatedData, error } = await supabase
       .from(tableName)
@@ -103,7 +102,7 @@ export const updateData = async <T = any>(
       return null;
     }
     
-    return updatedData as T;
+    return updatedData;
   } catch (error) {
     handleSupabaseError(error, `Erreur lors de la mise à jour dans ${tableName}`);
     return null;
