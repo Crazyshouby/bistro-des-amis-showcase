@@ -1,157 +1,150 @@
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-interface ThemeColors {
-  backgroundColor: string;
-  textColor: string;
-  buttonColor: string;
-  headerFooterColor: string;
-}
+// Types for the theme context
+type ThemeImages = {
+  homeImageUrl?: string;
+  menuImageUrl?: string;
+  eventsImageUrl?: string;
+  contactImageUrl?: string;
+};
 
-interface ThemeImages {
-  homeImageUrl: string;
-  menuHeaderImage: string;
-  eventsHeaderImage: string;
-  contactHeaderImage: string;
-}
+type ThemeSettings = {
+  floatingEffect?: boolean;
+};
 
-interface ThemeContextType {
-  colors: ThemeColors;
+type ThemeContextType = {
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    text: string;
+  };
   images: ThemeImages;
+  settings: ThemeSettings;
   isLoading: boolean;
-}
-
-const defaultColors: ThemeColors = {
-  backgroundColor: "#F5E9D7", // bistro-sand
-  textColor: "#3A2E1F", // bistro-wood
-  buttonColor: "#4A5E3A", // bistro-olive
-  headerFooterColor: "#6B2D2D" // bistro-brick
+  setColors: (colors: { [key: string]: string }) => void;
+  setImages: (images: ThemeImages) => void;
+  setSettings: (settings: ThemeSettings) => void;
 };
 
-const defaultImages: ThemeImages = {
-  homeImageUrl: "/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png",
-  menuHeaderImage: "",
-  eventsHeaderImage: "",
-  contactHeaderImage: ""
+const defaultContext: ThemeContextType = {
+  colors: {
+    primary: "#85714D",
+    secondary: "#7C3238",
+    accent: "#5A5E62",
+    background: "#F5F2ED",
+    text: "#2A2A2A",
+  },
+  images: {},
+  settings: {},
+  isLoading: true,
+  setColors: () => {},
+  setImages: () => {},
+  setSettings: () => {},
 };
 
-const ThemeContext = createContext<ThemeContextType>({
-  colors: defaultColors,
-  images: defaultImages,
-  isLoading: true
-});
+const ThemeContext = createContext<ThemeContextType>(defaultContext);
 
 export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [colors, setColors] = useState<ThemeColors>(defaultColors);
-  const [images, setImages] = useState<ThemeImages>(defaultImages);
+  const [colors, setColorsState] = useState(defaultContext.colors);
+  const [images, setImagesState] = useState<ThemeImages>({});
+  const [settings, setSettingsState] = useState<ThemeSettings>({});
   const [isLoading, setIsLoading] = useState(true);
 
+  const setColors = (newColors: { [key: string]: string }) => {
+    setColorsState((prevColors) => ({
+      ...prevColors,
+      ...newColors,
+    }));
+  };
+
+  const setImages = (newImages: ThemeImages) => {
+    setImagesState((prevImages) => ({
+      ...prevImages,
+      ...newImages,
+    }));
+  };
+
+  const setSettings = (newSettings: ThemeSettings) => {
+    setSettingsState((prevSettings) => ({
+      ...prevSettings,
+      ...newSettings,
+    }));
+  };
+
   useEffect(() => {
-    const fetchThemeData = async () => {
+    const fetchThemeSettings = async () => {
       try {
-        console.log("Fetching theme data from Supabase...");
+        // Fetch all site_config entries
         const { data, error } = await supabase
           .from('site_config')
-          .select('key, value');
+          .select('*');
 
         if (error) {
-          console.error('Error fetching theme data:', error);
+          console.error("Error fetching theme settings:", error);
           return;
         }
 
-        console.log("Theme data received:", data);
-        
-        if (data && data.length > 0) {
-          const newColors = { ...defaultColors };
-          const newImages = { ...defaultImages };
-          
-          data.forEach(item => {
-            switch (item.key) {
-              // Colors
-              case 'background_color':
-                newColors.backgroundColor = item.value;
-                break;
-              case 'text_color':
-                newColors.textColor = item.value;
-                break;
-              case 'button_color':
-                newColors.buttonColor = item.value;
-                break;
-              case 'header_footer_color':
-                newColors.headerFooterColor = item.value;
-                break;
-              
-              // Images
-              case 'home_image_url':
-                if (item.value) newImages.homeImageUrl = item.value;
-                break;
-              case 'menu_header_image':
-                if (item.value) newImages.menuHeaderImage = item.value;
-                break;
-              case 'events_header_image':
-                if (item.value) newImages.eventsHeaderImage = item.value;
-                break;
-              case 'contact_header_image':
-                if (item.value) newImages.contactHeaderImage = item.value;
-                break;
-            }
-          });
-          
-          setColors(newColors);
-          setImages(newImages);
-          console.log("Applied theme colors:", newColors);
-          console.log("Applied theme images:", newImages);
-          
-          // Appliquer les couleurs au document
-          applyColors(newColors);
-        } else {
-          console.log("No theme data found, using defaults");
-          applyColors(defaultColors);
-        }
+        // Process color settings
+        const newColors = { ...colors };
+        const newImages: ThemeImages = { ...images };
+        const newSettings: ThemeSettings = { ...settings };
+
+        data.forEach((item) => {
+          // Handle color settings
+          if (item.key.startsWith('color_')) {
+            const colorKey = item.key.replace('color_', '');
+            newColors[colorKey as keyof typeof newColors] = item.value;
+          }
+          // Handle image settings
+          else if (item.key === 'home_image_url') {
+            newImages.homeImageUrl = item.value;
+          }
+          else if (item.key === 'menu_image_url') {
+            newImages.menuImageUrl = item.value;
+          }
+          else if (item.key === 'events_image_url') {
+            newImages.eventsImageUrl = item.value;
+          }
+          else if (item.key === 'contact_image_url') {
+            newImages.contactImageUrl = item.value;
+          }
+          // Handle floating effect setting
+          else if (item.key === 'home_image_float') {
+            newSettings.floatingEffect = item.value === 'true';
+          }
+        });
+
+        setColorsState(newColors);
+        setImagesState(newImages);
+        setSettingsState(newSettings);
       } catch (error) {
-        console.error('Error in theme loading:', error);
+        console.error("Error in fetchThemeSettings:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    // Fonction pour appliquer les couleurs dynamiquement
-    const applyColors = (colors: ThemeColors) => {
-      document.documentElement.style.setProperty('--dynamic-background', colors.backgroundColor);
-      document.documentElement.style.setProperty('--dynamic-text', colors.textColor);
-      document.documentElement.style.setProperty('--dynamic-button', colors.buttonColor);
-      document.documentElement.style.setProperty('--dynamic-header-footer', colors.headerFooterColor);
-    };
-    
-    fetchThemeData();
-    
-    // Configurer un écouteur temps réel pour les changements de configuration
-    const subscription = supabase
-      .channel('site_config_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'site_config'
-        },
-        async (payload) => {
-          console.log('Theme config changed:', payload);
-          await fetchThemeData();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    fetchThemeSettings();
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ colors, images, isLoading }}>
+    <ThemeContext.Provider
+      value={{
+        colors,
+        images,
+        settings,
+        isLoading,
+        setColors,
+        setImages,
+        setSettings,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

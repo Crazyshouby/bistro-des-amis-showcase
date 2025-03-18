@@ -1,186 +1,137 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Variables dynamiques pour les couleurs personnalisables */
-    --dynamic-background: #F5E9D7;
-    --dynamic-text: #3A2E1F;
-    --dynamic-button: #4A5E3A;
-    --dynamic-header-footer: #6B2D2D;
-    
-    /* Updated color palette based on specifications */
-    --background: 39 40% 91%; /* Beige crème doux #F5E9D7 */
-    --foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
+    --background: 34 27% 96%;
+    --foreground: 0 0% 17%;
 
-    --card: 34 32% 92%; /* Blanc cassé légèrement grisé #EDE4D8 */
-    --card-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
+    --card: 34 27% 96%;
+    --card-foreground: 0 0% 17%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 17%;
+ 
+    --primary: 41 26% 41%;
+    --primary-foreground: 34 27% 96%;
+ 
+    --secondary: 350 43% 34%;
+    --secondary-foreground: 0 0% 98%;
+ 
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 50%;
+ 
+    --accent: 213 3% 37%;
+    --accent-foreground: 0 0% 98%;
+ 
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --popover: 34 32% 92%; /* Blanc cassé #EDE4D8 */
-    --popover-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
-
-    --primary: 95 21% 30%; /* Vert olive profond #4A5E3A */
-    --primary-foreground: 39 40% 91%; /* Beige crème #F5E9D7 */
-
-    --secondary: 41 78% 46%; /* Ocre doré #D4A017 */
-    --secondary-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
-
-    --muted: 34 32% 92%; /* Blanc cassé #EDE4D8 */
-    --muted-foreground: 220 0% 36%; /* Gris anthracite #5A5A5A */
-
-    --accent: 41 78% 46%; /* Ocre doré #D4A017 */
-    --accent-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 39 40% 91%; /* Beige crème #F5E9D7 */
-
-    --border: 220 0% 36%; /* Gris anthracite #5A5A5A */
-    --input: 220 0% 36%; /* Gris anthracite #5A5A5A */
-    --ring: 41 78% 46%; /* Ocre doré #D4A017 */
-
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    --ring: 41 26% 41%;
+ 
     --radius: 0.5rem;
-    
-    /* Bistro colors for direct usage */
-    --bistro-brick: #6B2D2D; /* Bordeaux chaleureux */
-    --bistro-brick-light: #823636;
-    --bistro-sand: #F5E9D7; /* Beige crème */
-    --bistro-sand-light: #FFF8E7;
-    --bistro-wood: #3A2E1F; /* Marron foncé */
-    --bistro-wood-light: #5A4B37;
-    --bistro-olive: #4A5E3A; /* Vert olive profond */
-    --bistro-olive-light: #5F7946;
+  }
+
+  .dark {
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
+ 
+    --card: 0 0% 13%;
+    --card-foreground: 0 0% 95%;
+ 
+    --popover: 0 0% 13%;
+    --popover-foreground: 0 0% 95%;
+ 
+    --primary: 40 47% 43%;
+    --primary-foreground: 0 0% 93%;
+ 
+    --secondary: 350 43% 34%;
+    --secondary-foreground: 0 0% 95%;
+ 
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 60%;
+ 
+    --accent: 213 3% 37%;
+    --accent-foreground: 0 0% 95%;
+ 
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 95%;
+ 
+    --border: 0 0% 30%;
+    --input: 0 0% 30%;
+    --ring: 40 47% 43%;
   }
 }
-
+ 
 @layer base {
   * {
     @apply border-border;
   }
-  
-  html {
-    @apply scroll-smooth;
-  }
-
   body {
-    @apply bg-background text-foreground font-montserrat antialiased;
-    /* Utilisation des variables dynamiques */
-    background-color: var(--dynamic-background);
-    color: var(--dynamic-text);
+    @apply bg-background text-foreground;
   }
+}
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-playfair font-bold text-secondary;
-  }
-
+@layer utilities {
   .bg-texture {
-    @apply bg-texture-light bg-fixed bg-repeat;
+    background-color: hsl(var(--background));
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
   }
-  
+
+  .section-title {
+    @apply text-2xl md:text-3xl font-playfair font-bold text-primary mb-4 md:mb-6 max-w-xl;
+  }
+
   .content-container {
-    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
-  
+
   .btn-primary {
-    @apply font-medium py-2 px-6 rounded-md transition-all duration-300 shadow-sm hover:shadow-md inline-block;
-    background-color: var(--dynamic-button);
-    color: var(--dynamic-background);
+    @apply bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded;
   }
-  
-  .btn-secondary {
-    @apply bg-secondary hover:bg-secondary/80 text-bistro-wood font-medium py-2 px-6 rounded-md transition-all duration-300 shadow-sm hover:shadow-md inline-block;
-  }
-  
-  /* ... keep existing code (parallax-container, parallax-bg, parallax-content, shine-effect, animations, etc) */
-  
-  .parallax-container {
-    @apply relative min-h-screen overflow-hidden;
-  }
-  
-  .parallax-bg {
-    @apply absolute inset-0 w-full h-full bg-cover bg-center transform scale-110;
-    will-change: transform;
-  }
-  
-  .parallax-content {
-    @apply relative z-10 flex flex-col items-center justify-center min-h-screen;
-  }
-  
+
   .shine-effect {
     @apply relative overflow-hidden;
   }
   
   .shine-effect::after {
     content: '';
-    @apply absolute top-0 left-0 h-full w-[200%] bg-gradient-to-r from-transparent via-white/20 to-transparent animate-image-shine;
+    @apply absolute top-0 left-[-100%] w-[50%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform skew-x-[-20deg];
+    animation: shine 2.5s infinite;
   }
   
-  .fade-in-up {
-    @apply opacity-0;
-    animation: fadeInUp 0.6s ease-out forwards;
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+  @keyframes shine {
+    100% {
+      left: 150%;
     }
   }
-  
-  .menu-item-card {
-    @apply border rounded-md p-4 shadow-sm hover:shadow-md transition-all duration-300;
-    background-color: var(--dynamic-background);
-    border-color: var(--dynamic-text);
+
+  @keyframes floating {
+    0% {
+      transform: translateY(0) scale(1.45);
+    }
+    50% {
+      transform: translateY(-8px) scale(1.45);
+    }
+    100% {
+      transform: translateY(0) scale(1.45);
+    }
   }
-  
-  .menu-item-price {
-    color: var(--dynamic-button);
-    @apply font-bold;
-  }
-  
-  .menu-section {
-    @apply mb-12;
-  }
-  
-  .section-title {
-    @apply text-3xl lg:text-4xl font-playfair font-bold mb-6 text-secondary relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-1/2 after:h-[3px] pb-2;
-    color: var(--dynamic-button);
-  }
-  .section-title::after {
-    background-color: var(--dynamic-button);
-  }
-  
-  /* Filter button styles - updated to be darker with high-contrast text */
-  .filter-button {
-    @apply px-4 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 text-sm font-medium font-bold;
-    background-color: var(--dynamic-header-footer);
-    color: var(--dynamic-background);
-  }
-  .filter-button:hover {
-    background-color: var(--dynamic-button);
+
+  .animate-floating {
+    animation: floating 6s ease-in-out infinite;
   }
 }
 
-/* Styles spécifiques pour utiliser les couleurs dynamiques */
-.dynamic-bg {
-  background-color: var(--dynamic-background);
-}
-.dynamic-text {
-  color: var(--dynamic-text);
-}
-.dynamic-button {
-  background-color: var(--dynamic-button);
-  color: var(--dynamic-background);
-}
-.dynamic-header-footer {
-  background-color: var(--dynamic-header-footer);
-  color: var(--dynamic-background);
+/* Styles pour les polices personnalisées */
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/playfair-display-variablefont.woff2') format('woff2-variations');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
 }

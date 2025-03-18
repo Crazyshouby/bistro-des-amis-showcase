@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Image, Save } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+
 export const ContentSettings = () => {
   const [homeImageUrl, setHomeImageUrl] = useState("");
   const [homeText, setHomeText] = useState("");
@@ -15,13 +17,15 @@ export const ContentSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [floatingEffect, setFloatingEffect] = useState(false);
+
   useEffect(() => {
     const fetchContent = async () => {
       try {
         const {
           data,
           error
-        } = await supabase.from('site_config').select('key, value').in('key', ['home_image_url', 'home_text']);
+        } = await supabase.from('site_config').select('key, value').in('key', ['home_image_url', 'home_text', 'home_image_float']);
         if (error) {
           throw error;
         }
@@ -34,6 +38,8 @@ export const ContentSettings = () => {
               }
             } else if (item.key === 'home_text') {
               setHomeText(item.value);
+            } else if (item.key === 'home_image_float') {
+              setFloatingEffect(item.value === 'true');
             }
           });
         }
@@ -50,6 +56,7 @@ export const ContentSettings = () => {
     };
     fetchContent();
   }, []);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) {
@@ -80,6 +87,7 @@ export const ContentSettings = () => {
     setFile(selectedFile);
     setPreviewUrl(URL.createObjectURL(selectedFile));
   };
+
   const uploadImage = async () => {
     if (!file) return null;
     try {
@@ -118,6 +126,7 @@ export const ContentSettings = () => {
       setUploadProgress(0);
     }
   };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -147,6 +156,16 @@ export const ContentSettings = () => {
       }).eq('key', 'home_text');
       if (textError) throw textError;
 
+      // Update home_image_float in site_config
+      const { error: floatError } = await supabase
+        .from('site_config')
+        .upsert({ 
+          key: 'home_image_float',
+          value: floatingEffect.toString()
+        });
+      
+      if (floatError) throw floatError;
+
       // Update state with saved values
       setHomeImageUrl(imageUrl);
       toast({
@@ -164,11 +183,13 @@ export const ContentSettings = () => {
       setSaving(false);
     }
   };
+
   if (loading) {
     return <div className="flex justify-center items-center h-40">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#2DD4BF]"></div>
       </div>;
   }
+
   return <Card className="border border-[#6B7280] bg-gray-900">
       <CardHeader className="border-b border-[#6B7280] bg-gray-900">
         <CardTitle className="text-gray-50">Personnalisation de la page d'accueil</CardTitle>
@@ -216,6 +237,18 @@ export const ContentSettings = () => {
                   Upload en cours... {uploadProgress}%
                 </p>
               </div>}
+
+            <div className="flex items-center space-x-2 pt-2">
+              <Switch 
+                id="home-image-float-admin" 
+                checked={floatingEffect}
+                onCheckedChange={setFloatingEffect}
+                className="data-[state=checked]:bg-[#2DD4BF]"
+              />
+              <Label htmlFor="home-image-float-admin" className="text-gray-50">
+                Effet de flottement de l'image
+              </Label>
+            </div>
           </div>
         </div>
 
