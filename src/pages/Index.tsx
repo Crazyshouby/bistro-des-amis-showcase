@@ -3,8 +3,12 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import AnimatedSection from "@/components/shared/AnimatedSection";
+import { useParallax } from "@/lib/hooks";
 
 const Index = () => {
+  // Hook personnalisé pour l'effet parallax
+  const parallaxRef = useParallax(0.15);
+  
   useEffect(() => {
     const images = [
       '/lovable-uploads/19408610-7939-4299-999c-208a2355a264.png', // barista
@@ -27,12 +31,15 @@ const Index = () => {
   return (
     <div className="bg-texture">
       <div className="relative h-screen overflow-hidden">
+        {/* Image avec effet parallax et léger flou */}
         <div 
-          className="absolute inset-0 bg-cover bg-center"
+          ref={parallaxRef}
+          className="absolute inset-0 bg-cover bg-center scale-110 filter blur-[2px]"
           style={{ 
             backgroundImage: "url('/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png')"
           }}
         />
+        {/* Superposition semi-transparente pour améliorer la lisibilité du texte */}
         <div className="absolute inset-0 bg-black bg-opacity-30" />
         
         <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
