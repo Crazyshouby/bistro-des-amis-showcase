@@ -42,10 +42,10 @@ export const EventsTab = ({ events, setEvents, onDeleteRequest }: EventsTabProps
           <CardTitle className="text-2xl font-playfair text-bistro-wood">Événements</CardTitle>
           <Button 
             onClick={handleAddEvent}
-            className="bg-bistro-olive hover:bg-bistro-olive-light text-white"
+            className="bg-[#4A5E3A] hover:bg-[#D4A017] text-white rounded-full w-10 h-10 p-0 flex items-center justify-center"
+            aria-label="Ajouter un événement"
           >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Ajouter un événement
+            <PlusCircle className="h-5 w-5 text-[#5A5A5A] group-hover:text-[#D4A017]" />
           </Button>
         </CardHeader>
         <CardContent>

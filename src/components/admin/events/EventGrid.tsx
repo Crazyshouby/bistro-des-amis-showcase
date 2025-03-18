@@ -58,7 +58,7 @@ export const EventGrid = ({ events, onEditEvent, onDeleteEvent }: EventGridProps
             <CalendarDays size={16} className="mr-1" />
             <span className="text-sm">{formattedDate}</span>
           </div>
-          <p className="text-sm text-gray-600 line-clamp-2 h-10" title={event.description}>
+          <p className="text-sm text-gray-600 line-clamp-2 h-10 overflow-hidden" title={event.description}>
             {event.description}
           </p>
         </div>
@@ -67,10 +67,10 @@ export const EventGrid = ({ events, onEditEvent, onDeleteEvent }: EventGridProps
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-full">
       {events.length === 0 ? (
         <div className="col-span-full text-center py-8">
-          <p className="text-bistro-wood/50">Aucun événement programmé. Cliquez sur "Ajouter un événement" pour commencer.</p>
+          <p className="text-bistro-wood/50">Aucun événement programmé. Cliquez sur l'icône + pour commencer.</p>
         </div>
       ) : (
         events.map(event => renderEventCard(event))

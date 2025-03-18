@@ -1,10 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/types";
 
@@ -21,6 +21,21 @@ const EventCard = ({ event, className, compact = false }: EventCardProps) => {
   const formattedDate = format(eventDate, "d MMMM yyyy", { locale: fr });
   const dayOfWeek = format(eventDate, "EEEE", { locale: fr });
   const capitalizedDay = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
+  
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
+  }, []);
+  
+  useEffect(() => {
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, handleKeyDown]);
   
   return (
     <>
@@ -68,7 +83,7 @@ const EventCard = ({ event, className, compact = false }: EventCardProps) => {
                   <CalendarDays size={16} className="mr-1" />
                   <span className="text-sm">{capitalizedDay} {formattedDate}</span>
                 </div>
-                <p className="text-sm text-bistro-wood/80 line-clamp-2">{event.description}</p>
+                <p className="text-sm text-bistro-wood/80 line-clamp-2 overflow-hidden">{event.description}</p>
               </div>
               <Button 
                 variant="link" 
@@ -86,16 +101,25 @@ const EventCard = ({ event, className, compact = false }: EventCardProps) => {
       </div>
       
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="bg-bistro-sand-light border-bistro-sand max-w-3xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-playfair text-bistro-wood">{event.titre}</DialogTitle>
+        <DialogContent className="bg-[#EDE4D8] border-bistro-sand max-w-md max-h-[80vh] overflow-hidden">
+          <DialogHeader className="relative">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsOpen(false)}
+              className="absolute right-0 top-0 text-[#5A5A5A] hover:text-[#3A2E1F] hover:bg-transparent"
+              aria-label="Fermer le pop-up"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+            <DialogTitle className="text-2xl font-playfair text-[#3A2E1F] pr-8">{event.titre}</DialogTitle>
             <DialogDescription className="text-bistro-olive font-medium">
               {capitalizedDay} {formattedDate}
             </DialogDescription>
           </DialogHeader>
-          <div className="mt-4 flex flex-col md:flex-row gap-6">
+          <div className="mt-4 flex flex-col gap-6 overflow-auto pr-1" style={{ maxHeight: "calc(80vh - 180px)" }}>
             {event.image_url && (
-              <div className="w-full md:w-1/2">
+              <div className="w-full">
                 <img 
                   src={event.image_url} 
                   alt={event.titre}
@@ -103,8 +127,8 @@ const EventCard = ({ event, className, compact = false }: EventCardProps) => {
                 />
               </div>
             )}
-            <div className={event.image_url ? "w-full md:w-1/2" : "w-full"}>
-              <p className="text-bistro-wood/90 whitespace-pre-line">{event.description}</p>
+            <div className="w-full overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-[#5A5A5A] scrollbar-track-transparent">
+              <p className="text-[#3A2E1F] whitespace-pre-line">{event.description}</p>
             </div>
           </div>
         </DialogContent>
