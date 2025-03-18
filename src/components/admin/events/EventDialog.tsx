@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
@@ -80,7 +81,7 @@ export const EventDialog = ({
         
         toast({
           title: "Événement mis à jour",
-          description: `"${data.titre}" a été mis à jour avec succès.",
+          description: `"${data.titre}" a été mis à jour avec succès.`
         });
       } else {
         const { data: newEvent, error } = await supabase
@@ -100,7 +101,7 @@ export const EventDialog = ({
         
         toast({
           title: "Événement ajouté",
-          description: `"${data.titre}" a été ajouté au calendrier.",
+          description: `"${data.titre}" a été ajouté au calendrier.`
         });
       }
       
