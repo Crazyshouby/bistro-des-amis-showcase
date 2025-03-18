@@ -16,13 +16,15 @@ interface EventFormProps {
   onSubmit: (data: EventFormValues, selectedImage: File | null) => Promise<void>;
   onCancel: () => void;
   uploadingImage: boolean;
+  uploadProgress?: number;
 }
 
 export const EventForm = ({
   editingEvent,
   onSubmit,
   onCancel,
-  uploadingImage
+  uploadingImage,
+  uploadProgress = 0
 }: EventFormProps) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -119,6 +121,7 @@ export const EventForm = ({
           initialImageUrl={editingEvent?.image_url || null}
           onImageChange={handleImageChange}
           uploadingImage={uploadingImage}
+          uploadProgress={uploadProgress}
         />
         
         <DialogFooter>

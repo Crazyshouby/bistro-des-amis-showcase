@@ -4,6 +4,7 @@ import { X, Upload } from "lucide-react";
 import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -11,12 +12,16 @@ interface EventImageUploadProps {
   initialImageUrl?: string | null;
   onImageChange: (imageFile: File | null, imagePreview: string | null) => void;
   uploadingImage: boolean;
+  setUploadProgress?: (progress: number) => void;
+  uploadProgress?: number;
 }
 
 export const EventImageUpload = ({ 
   initialImageUrl, 
   onImageChange,
-  uploadingImage
+  uploadingImage,
+  setUploadProgress,
+  uploadProgress = 0
 }: EventImageUploadProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(initialImageUrl || null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -62,7 +67,7 @@ export const EventImageUpload = ({
           </div>
         )}
         
-        <div>
+        <div className="flex-1">
           <Input
             type="file"
             id="event-image"
@@ -79,14 +84,33 @@ export const EventImageUpload = ({
             <Upload className="mr-2 h-4 w-4" />
             {uploadingImage ? "Chargement..." : "Choisir une image"}
           </Button>
+          
+          {uploadingImage && (
+            <div className="mt-3">
+              <Progress value={uploadProgress} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-1">
+                {uploadProgress < 100 ? "Téléchargement en cours..." : "Téléchargement terminé"}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export const uploadEventImage = async (file: File): Promise<string | null> => {
+export const uploadEventImage = async (file: File, setProgress?: (progress: number) => void): Promise<string | null> => {
   try {
+    // Simuler la progression de l'upload
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+      progress += 10;
+      if (progress >= 90) {
+        clearInterval(progressInterval);
+      }
+      if (setProgress) setProgress(progress);
+    }, 200);
+    
     const fileExt = file.name.split('.').pop();
     const fileName = `event_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
     
@@ -107,10 +131,15 @@ export const uploadEventImage = async (file: File): Promise<string | null> => {
         cacheControl: '3600',
       });
     
+    clearInterval(progressInterval);
+    
     if (error) {
       console.error('Error uploading image:', error);
       throw error;
     }
+    
+    // Set progress to 100%
+    if (setProgress) setProgress(100);
     
     // Obtenir l'URL publique du fichier
     const { data: { publicUrl } } = supabase.storage

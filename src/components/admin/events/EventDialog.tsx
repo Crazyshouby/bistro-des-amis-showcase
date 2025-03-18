@@ -24,14 +24,19 @@ export const EventDialog = ({
   onClose
 }: EventDialogProps) => {
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleSubmit = async (data: EventFormValues, selectedImage: File | null) => {
     try {
-      setUploadingImage(true);
+      if (selectedImage) {
+        setUploadingImage(true);
+        setUploadProgress(0);
+      }
+      
       let imageUrl = data.image_url || null;
       
       if (selectedImage) {
-        const uploadedUrl = await uploadEventImage(selectedImage);
+        const uploadedUrl = await uploadEventImage(selectedImage, setUploadProgress);
         if (uploadedUrl) {
           imageUrl = uploadedUrl;
         }
@@ -109,6 +114,7 @@ export const EventDialog = ({
       });
     } finally {
       setUploadingImage(false);
+      setUploadProgress(0);
     }
   };
 
@@ -135,6 +141,7 @@ export const EventDialog = ({
             onClose();
           }}
           uploadingImage={uploadingImage}
+          uploadProgress={uploadProgress}
         />
       </DialogContent>
     </Dialog>
