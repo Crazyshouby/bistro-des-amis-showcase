@@ -1,29 +1,39 @@
+
 import React from "react";
+
 interface EventsFilterProps {
   showPast: boolean;
   handleTogglePast: (value: boolean) => void;
 }
+
 const EventsFilter = ({
   showPast,
   handleTogglePast
 }: EventsFilterProps) => {
-  return <div className="flex justify-center mb-6 bg-transparent">
-      <div style={{
-      backgroundColor: 'var(--dynamic-background)'
-    }} className="inline-flex rounded-lg p-1 bg-orange-200">
-        <button className={`px-4 py-2 rounded-md ${!showPast ? 'text-white' : ''}`} onClick={() => handleTogglePast(false)} style={{
-        backgroundColor: !showPast ? 'var(--dynamic-button)' : 'transparent',
-        color: !showPast ? 'var(--dynamic-background)' : 'var(--dynamic-text)'
-      }}>
-          À venir
-        </button>
-        <button className={`px-4 py-2 rounded-md ${showPast ? 'text-white' : ''}`} onClick={() => handleTogglePast(true)} style={{
-        backgroundColor: showPast ? 'var(--dynamic-button)' : 'transparent',
-        color: showPast ? 'var(--dynamic-background)' : 'var(--dynamic-text)'
-      }}>
-          Passés
-        </button>
-      </div>
-    </div>;
+  return (
+    <div className="flex space-x-2">
+      <button 
+        className={`px-4 py-2 rounded-md transition-all duration-200 ${
+          !showPast 
+            ? 'bg-[#4A5E3A] text-white' 
+            : 'bg-bistro-sand-light text-bistro-wood border border-[#4A5E3A]/20'
+        }`} 
+        onClick={() => handleTogglePast(false)}
+      >
+        À venir
+      </button>
+      <button 
+        className={`px-4 py-2 rounded-md transition-all duration-200 ${
+          showPast 
+            ? 'bg-[#4A5E3A] text-white' 
+            : 'bg-bistro-sand-light text-bistro-wood border border-[#4A5E3A]/20'
+        }`} 
+        onClick={() => handleTogglePast(true)}
+      >
+        Passés
+      </button>
+    </div>
+  );
 };
+
 export default EventsFilter;
