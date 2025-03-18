@@ -8,10 +8,10 @@ const EventsViewToggle = ({
   viewMode,
   setViewMode
 }: EventsViewToggleProps) => {
-  return <div className="flex justify-center mb-6">
-      <div style={{
+  return <div className="flex justify-center mb-6 bg-orange-200">
+      <div className="inline-flex rounded-lg p-1" style={{
       backgroundColor: 'var(--dynamic-background)'
-    }} className="inline-flex rounded-lg p-1 bg-orange-200">
+    }}>
         <button className={`px-4 py-2 rounded-md flex items-center`} onClick={() => setViewMode('list')} style={{
         backgroundColor: viewMode === 'list' ? 'var(--dynamic-button)' : 'transparent',
         color: viewMode === 'list' ? 'var(--dynamic-background)' : 'var(--dynamic-text)'
