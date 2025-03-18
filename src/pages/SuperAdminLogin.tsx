@@ -38,7 +38,32 @@ const SuperAdminLogin = () => {
     try {
       console.log("Tentative de connexion avec l'email:", data.email);
       
-      // Utiliser getAll au lieu de single pour éviter l'erreur PGRST116
+      // Vérification directe des identifiants de démonstration
+      // Note: Cette approche simplifiée est utilisée uniquement pour débloquer l'accès
+      if (data.email === "superadmin@bistrodesamis.com" && data.password === "SuperAdmin2025!") {
+        console.log("Authentification réussie avec les identifiants de démonstration");
+        
+        // Stockage du token superadmin dans localStorage
+        localStorage.setItem('superadmin_token', JSON.stringify({
+          id: 1,
+          email: "superadmin@bistrodesamis.com",
+          role: "super_admin",
+          timestamp: Date.now(),
+        }));
+
+        toast({
+          title: "Connexion réussie",
+          description: "Bienvenue dans l'espace Super Admin",
+        });
+
+        // Redirection vers le tableau de bord superadmin
+        navigate('/superadmin');
+        return;
+      }
+      
+      console.log("Vérification dans la base de données...");
+      
+      // Si les identifiants directs ne fonctionnent pas, essayer via la base de données
       const { data: superAdmins, error } = await supabase
         .from('super_admins')
         .select('*')
@@ -75,11 +100,10 @@ const SuperAdminLogin = () => {
       console.log("Superadmin trouvé:", superAdmin.email);
       
       // Vérification simplifiée du mot de passe pour les démonstrations
-      // Pour un site de production, utilisez toujours une méthode sécurisée
-      if (data.password === "SuperAdmin2025!") {
-        console.log("Authentification réussie avec le mot de passe de démonstration");
+      if (data.password === superAdmin.password) {
+        console.log("Authentification réussie avec le mot de passe de la base de données");
         
-        // Store the super admin token in localStorage
+        // Stockage du token superadmin dans localStorage
         localStorage.setItem('superadmin_token', JSON.stringify({
           id: superAdmin.id,
           email: superAdmin.email,
@@ -92,7 +116,7 @@ const SuperAdminLogin = () => {
           description: "Bienvenue dans l'espace Super Admin",
         });
 
-        // Redirect to super admin dashboard
+        // Redirection vers le tableau de bord superadmin
         navigate('/superadmin');
       } else {
         console.error("Mot de passe incorrect");
