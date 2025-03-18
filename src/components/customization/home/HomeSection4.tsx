@@ -9,7 +9,8 @@ import { useTheme } from "@/components/theme/ThemeProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Edit, Trash, Upload, ImageIcon } from "lucide-react";
+import { Plus, Edit, Trash, Upload, ImageIcon, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -27,7 +28,7 @@ interface GalleryImage {
 }
 
 export const HomeSection4 = () => {
-  const { textContent, images, updateTheme } = useTheme();
+  const { textContent, images, updateTheme, refreshTheme } = useTheme();
   const [sectionTitle, setSectionTitle] = useState(textContent?.galleryTitle || "Notre univers");
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([
     { id: "1", url: "/lovable-uploads/a801663d-ec08-448a-a543-cfeccd30346d.png", alt: "Le bar du Bistro des Amis" },
@@ -42,6 +43,7 @@ export const HomeSection4 = () => {
   const [editingImage, setEditingImage] = useState<GalleryImage | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [changed, setChanged] = useState(false);
   const [fontOptions] = useState([
     { value: "Playfair Display", label: "Playfair Display" },
     { value: "Roboto", label: "Roboto" },
@@ -66,6 +68,7 @@ export const HomeSection4 = () => {
     setSectionTitle(textContent?.galleryTitle || "Notre univers");
     setTitleColor(textContent?.galleryTitleColor || "#3A2E1F");
     setTitleFont(textContent?.galleryTitleFont || "Playfair Display");
+    setChanged(false); // Reset changed state when gallery is updated from ThemeProvider
   }, [textContent]);
 
   const handleAddImage = () => {
@@ -84,6 +87,7 @@ export const HomeSection4 = () => {
 
   const handleDeleteImage = (id: string) => {
     setGalleryImages(galleryImages.filter(img => img.id !== id));
+    setChanged(true);
   };
 
   const handleSaveImage = () => {
@@ -110,6 +114,7 @@ export const HomeSection4 = () => {
     
     setIsDialogOpen(false);
     setEditingImage(null);
+    setChanged(true);
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,26 +124,55 @@ export const HomeSection4 = () => {
       }
       
       const file = e.target.files[0];
+      
+      // Size and type validation
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Erreur",
+          description: "L'image doit faire moins de 5Mo",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (!file.type.match('image/(jpeg|jpg|png|gif|webp)')) {
+        toast({
+          title: "Erreur",
+          description: "Seuls les formats JPEG, PNG, GIF et WEBP sont acceptés",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       const fileExt = file.name.split('.').pop();
       const fileName = `gallery-image-${Date.now()}.${fileExt}`;
       const filePath = `site_images/${fileName}`;
       
       setUploading(true);
       
+      console.log("Uploading gallery image:", filePath);
+      
+      // Upload image to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('site_images')
         .upload(filePath, file);
         
       if (uploadError) {
+        console.error("Gallery upload error:", uploadError);
         throw uploadError;
       }
       
+      console.log("Gallery image uploaded successfully");
+      
+      // Get public URL
       const { data } = supabase.storage
         .from('site_images')
         .getPublicUrl(filePath);
         
       if (data) {
         const imageUrl = data.publicUrl;
+        console.log("Gallery image URL obtained:", imageUrl);
+        
         setEditingImage({
           ...editingImage,
           url: imageUrl
@@ -161,20 +195,40 @@ export const HomeSection4 = () => {
     }
   };
 
-  const handleSaveGallery = () => {
-    updateTheme({
-      textContent: {
-        galleryTitle: sectionTitle,
-        galleryImages: JSON.stringify(galleryImages),
-        galleryTitleColor: titleColor,
-        galleryTitleFont: titleFont
-      }
-    });
-    
-    toast({
-      title: "Succès",
-      description: "La galerie a été mise à jour"
-    });
+  const handleSaveGallery = async () => {
+    try {
+      console.log("Saving gallery with images:", galleryImages);
+      setUploading(true);
+      
+      // Update theme with new gallery settings
+      await updateTheme({
+        textContent: {
+          galleryTitle: sectionTitle,
+          galleryImages: JSON.stringify(galleryImages),
+          galleryTitleColor: titleColor,
+          galleryTitleFont: titleFont
+        }
+      });
+      
+      // Explicitly refresh the theme to get the latest data
+      await refreshTheme();
+      
+      setChanged(false);
+      
+      toast({
+        title: "Succès",
+        description: "La galerie a été mise à jour"
+      });
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde de la galerie:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les modifications",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -196,7 +250,10 @@ export const HomeSection4 = () => {
                 <Input 
                   id="gallery-title" 
                   value={sectionTitle}
-                  onChange={(e) => setSectionTitle(e.target.value)}
+                  onChange={(e) => {
+                    setSectionTitle(e.target.value);
+                    setChanged(true);
+                  }}
                 />
               </div>
               
@@ -253,9 +310,21 @@ export const HomeSection4 = () => {
                 </div>
               </div>
               
-              <Button onClick={handleSaveGallery}>
-                Enregistrer la galerie
+              <Button 
+                onClick={handleSaveGallery}
+                disabled={uploading || !changed}
+              >
+                {uploading ? "Enregistrement..." : "Enregistrer la galerie"}
               </Button>
+              
+              {changed && (
+                <Alert className="bg-yellow-50 border-yellow-200 text-yellow-800 mt-2">
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  <AlertDescription>
+                    N'oubliez pas de cliquer sur "Enregistrer la galerie" pour sauvegarder vos changements.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
           </TabsContent>
           
@@ -264,7 +333,13 @@ export const HomeSection4 = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="title-font">Police du titre</Label>
-                  <Select value={titleFont} onValueChange={setTitleFont}>
+                  <Select 
+                    value={titleFont} 
+                    onValueChange={(value) => {
+                      setTitleFont(value);
+                      setChanged(true);
+                    }}
+                  >
                     <SelectTrigger id="title-font">
                       <SelectValue placeholder="Choisir une police" />
                     </SelectTrigger>
@@ -286,22 +361,40 @@ export const HomeSection4 = () => {
                         type="color"
                         id="title-color"
                         value={titleColor}
-                        onChange={(e) => setTitleColor(e.target.value)}
+                        onChange={(e) => {
+                          setTitleColor(e.target.value);
+                          setChanged(true);
+                        }}
                         className="w-full h-full cursor-pointer bg-transparent border-0"
                       />
                     </div>
                     <Input 
                       value={titleColor}
-                      onChange={(e) => setTitleColor(e.target.value)}
+                      onChange={(e) => {
+                        setTitleColor(e.target.value);
+                        setChanged(true);
+                      }}
                       className="flex-1"
                     />
                   </div>
                 </div>
               </div>
               
-              <Button onClick={handleSaveGallery}>
-                Enregistrer les styles
+              <Button 
+                onClick={handleSaveGallery}
+                disabled={uploading || !changed}
+              >
+                {uploading ? "Enregistrement..." : "Enregistrer les styles"}
               </Button>
+              
+              {changed && (
+                <Alert className="bg-yellow-50 border-yellow-200 text-yellow-800 mt-2">
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  <AlertDescription>
+                    N'oubliez pas de cliquer sur "Enregistrer les styles" pour sauvegarder vos changements.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
           </TabsContent>
         </Tabs>
