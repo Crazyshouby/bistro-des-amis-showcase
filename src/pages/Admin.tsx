@@ -7,6 +7,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminContent } from "@/components/admin/AdminContent";
 import { useIsMobile } from "@/hooks/use-mobile"; 
+import { EditModeProvider } from "@/components/edit/EditModeProvider";
 
 const Admin = () => {
   const { signOut, user } = useAuth();
@@ -55,17 +56,19 @@ const Admin = () => {
   }, []);
 
   return (
-    <AdminLayout title={isMobile ? "Administration" : "Espace Propriétaire"}>
-      <AdminContent
-        user={user}
-        signOut={signOut}
-        menuItems={menuItems}
-        setMenuItems={setMenuItems}
-        events={events}
-        setEvents={setEvents}
-        isLoading={dataLoading}
-      />
-    </AdminLayout>
+    <EditModeProvider>
+      <AdminLayout title={isMobile ? "Administration" : "Espace Propriétaire"}>
+        <AdminContent
+          user={user}
+          signOut={signOut}
+          menuItems={menuItems}
+          setMenuItems={setMenuItems}
+          events={events}
+          setEvents={setEvents}
+          isLoading={dataLoading}
+        />
+      </AdminLayout>
+    </EditModeProvider>
   );
 };
 
