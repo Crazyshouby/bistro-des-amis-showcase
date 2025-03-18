@@ -8,15 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Save } from "lucide-react";
+import { Json } from "@/integrations/supabase/types";
 
 interface ClientConfigData {
   id: number;
   client_name: string;
-  config_json: {
-    address?: string;
-    phone?: string;
-    [key: string]: any;
-  };
+  config_json: Record<string, any>; // Changed from specific shape to more generic Record type
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const ClientConfig = () => {
@@ -41,8 +40,19 @@ export const ClientConfig = () => {
         }
 
         if (data) {
-          setConfig(data);
-          setJsonString(JSON.stringify(data.config_json, null, 2));
+          // Ensure data conforms to ClientConfigData
+          const configData: ClientConfigData = {
+            id: data.id,
+            client_name: data.client_name,
+            config_json: typeof data.config_json === 'string' 
+              ? JSON.parse(data.config_json) 
+              : data.config_json as Record<string, any>,
+            created_at: data.created_at,
+            updated_at: data.updated_at
+          };
+          
+          setConfig(configData);
+          setJsonString(JSON.stringify(configData.config_json, null, 2));
         }
       } catch (error) {
         console.error('Error fetching client config:', error);
