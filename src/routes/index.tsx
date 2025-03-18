@@ -1,8 +1,8 @@
 
 import { Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import SuperAdminRoute from "@/components/superadmin/SuperAdminRoute";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { SuperAdminRoute } from "@/components/superadmin/SuperAdminRoute";
 
 // Lazy load pages for better performance
 const IndexPage = lazy(() => import("@/pages/Index"));
