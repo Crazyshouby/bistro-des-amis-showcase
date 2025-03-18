@@ -29,7 +29,7 @@ export const AdminTabs = ({ tabs, defaultTab }: AdminTabsProps) => {
             value={tab.id}
             className="data-[state=active]:text-white flex-1 md:flex-none text-sm md:text-base py-1.5"
             style={{ 
-              backgroundColor: 'var(--state=active, --dynamic-button, transparent)',
+              backgroundColor: 'var(--state=active, #4A5E3A, transparent)',
               color: 'var(--state=active, var(--dynamic-background), var(--dynamic-text))'
             }}
           >
