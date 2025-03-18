@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      client_configs: {
+        Row: {
+          client_name: string
+          config_json: Json
+          created_at: string
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          client_name: string
+          config_json?: Json
+          created_at?: string
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          client_name?: string
+          config_json?: Json
+          created_at?: string
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           created_at: string
@@ -35,6 +59,33 @@ export type Database = {
           id?: string
           image_url?: string | null
           titre?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      features: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          id: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: number
+          name?: string
           updated_at?: string
         }
         Relationships: []
@@ -120,6 +171,30 @@ export type Database = {
         }
         Relationships: []
       }
+      site_config: {
+        Row: {
+          created_at: string
+          id: number
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string
@@ -150,6 +225,33 @@ export type Database = {
           type?: string
           updated_at?: string
           value?: string
+        }
+        Relationships: []
+      }
+      super_admins: {
+        Row: {
+          created_at: string
+          email: string
+          id: number
+          password: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: number
+          password: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: number
+          password?: string
+          role?: string
+          updated_at?: string
         }
         Relationships: []
       }

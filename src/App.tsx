@@ -16,6 +16,8 @@ import Footer from "./components/shared/Footer";
 import Navigation from "./components/shared/Navigation";
 import { AuthProvider } from "./components/auth/AuthProvider";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import SuperAdmin from "./pages/SuperAdmin";
+import SuperAdminLogin from "./pages/SuperAdminLogin";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,9 @@ const App = () => (
                       <Admin />
                     </ProtectedRoute>
                   } />
+                  {/* SuperAdmin Routes */}
+                  <Route path="/superadmin" element={<SuperAdmin />} />
+                  <Route path="/superadmin/login" element={<SuperAdminLogin />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>
