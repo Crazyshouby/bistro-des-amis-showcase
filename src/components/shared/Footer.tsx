@@ -3,7 +3,6 @@ import { Facebook, Instagram, Twitter, MapPin, Clock, Phone, Mail, Youtube } fro
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { EditableElement } from "@/components/edit/EditableElement";
 
 const Footer = () => {
   const [socialLinks, setSocialLinks] = useState({
@@ -76,21 +75,15 @@ const Footer = () => {
             <h3 className="text-xl md:text-2xl font-playfair font-bold mb-4" style={{ color: 'var(--dynamic-background)' }}>Contact</h3>
             <div className="flex items-start space-x-2 mb-2">
               <MapPin size={18} className="mt-1 flex-shrink-0" style={{ color: 'var(--dynamic-background)' }} />
-              <EditableElement id="footer-address" type="text" className="text-wrap" style={{ color: 'var(--dynamic-background)' }}>
-                12 Rue Wellington, Verdun, QC H4G 1N1
-              </EditableElement>
+              <span style={{ color: 'var(--dynamic-background)' }}>12 Rue Wellington, Verdun, QC H4G 1N1</span>
             </div>
             <div className="flex items-center space-x-2 mb-2">
               <Phone size={18} className="flex-shrink-0" style={{ color: 'var(--dynamic-background)' }} />
-              <EditableElement id="footer-phone" type="text" style={{ color: 'var(--dynamic-background)' }}>
-                (418) 555-1234
-              </EditableElement>
+              <span style={{ color: 'var(--dynamic-background)' }}>(418) 555-1234</span>
             </div>
             <div className="flex items-center space-x-2">
               <Mail size={18} className="flex-shrink-0" style={{ color: 'var(--dynamic-background)' }} />
-              <EditableElement id="footer-email" type="text" style={{ color: 'var(--dynamic-background)' }}>
-                info@bistrodesamis.com
-              </EditableElement>
+              <span style={{ color: 'var(--dynamic-background)' }}>info@bistrodesamis.com</span>
             </div>
           </div>
           
@@ -100,18 +93,8 @@ const Footer = () => {
             <div className="flex items-start space-x-2 mb-2">
               <Clock size={18} className="mt-1 flex-shrink-0" style={{ color: 'var(--dynamic-background)' }} />
               <div>
-                <p className="mb-1">
-                  <span className="font-medium" style={{ color: 'var(--dynamic-background)' }}>Lun-Ven:</span> 
-                  <EditableElement id="footer-weekday-hours" type="text" className="inline ml-2" style={{ color: 'var(--dynamic-background)' }}>
-                    16h-23h
-                  </EditableElement>
-                </p>
-                <p>
-                  <span className="font-medium" style={{ color: 'var(--dynamic-background)' }}>Sam-Dim:</span> 
-                  <EditableElement id="footer-weekend-hours" type="text" className="inline ml-2" style={{ color: 'var(--dynamic-background)' }}>
-                    11h-23h
-                  </EditableElement>
-                </p>
+                <p className="mb-1"><span className="font-medium" style={{ color: 'var(--dynamic-background)' }}>Lun-Ven:</span> <span style={{ color: 'var(--dynamic-background)' }}>16h-23h</span></p>
+                <p><span className="font-medium" style={{ color: 'var(--dynamic-background)' }}>Sam-Dim:</span> <span style={{ color: 'var(--dynamic-background)' }}>11h-23h</span></p>
               </div>
             </div>
           </div>
@@ -185,9 +168,7 @@ const Footer = () => {
         </div>
         
         <div className="mt-8 pt-4 text-center text-sm" style={{ borderTopColor: 'rgba(255,255,255,0.2)', borderTopWidth: '1px' }}>
-          <EditableElement id="footer-copyright" type="text" style={{ color: 'var(--dynamic-background)' }}>
-            &copy; {new Date().getFullYear()} Bistro des Amis. Tous droits réservés.
-          </EditableElement>
+          <p style={{ color: 'var(--dynamic-background)' }}>&copy; {new Date().getFullYear()} Bistro des Amis. Tous droits réservés.</p>
         </div>
       </div>
     </footer>
