@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -88,7 +87,6 @@ export const ColorSettings = () => {
       ];
 
       for (const { dbKey, value } of mappings) {
-        // Vérifier si l'entrée existe déjà
         const { data: existingData, error: checkError } = await supabase
           .from('site_config')
           .select('id')
@@ -100,7 +98,6 @@ export const ColorSettings = () => {
         }
 
         if (existingData && existingData.length > 0) {
-          // Mettre à jour l'entrée existante
           const { error: updateError } = await supabase
             .from('site_config')
             .update({ value })
@@ -110,7 +107,6 @@ export const ColorSettings = () => {
             console.error(`Error updating ${dbKey}:`, updateError);
           }
         } else {
-          // Créer une nouvelle entrée
           const { error: insertError } = await supabase
             .from('site_config')
             .insert([{ key: dbKey, value }]);
@@ -126,7 +122,6 @@ export const ColorSettings = () => {
         description: "Les couleurs ont été mises à jour",
       });
       
-      // Application immédiate des couleurs
       document.documentElement.style.setProperty('--dynamic-background', colors.backgroundColor);
       document.documentElement.style.setProperty('--dynamic-text', colors.textColor);
       document.documentElement.style.setProperty('--dynamic-button', colors.buttonColor);
@@ -147,20 +142,20 @@ export const ColorSettings = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-40">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-bistro-olive"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#2DD4BF]"></div>
       </div>
     );
   }
 
   return (
-    <Card className="border border-[#6B7280]">
-      <CardHeader className="bg-[#F3F4F6] border-b border-[#6B7280]">
-        <CardTitle className="text-[#374151]">Personnalisation des couleurs</CardTitle>
+    <Card className="border border-[#2A2A2A] bg-[#1A1F2C]">
+      <CardHeader className="border-b border-[#2A2A2A]">
+        <CardTitle className="text-[#E5E7EB]">Personnalisation des couleurs</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 pt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="backgroundColor" className="text-[#374151]">Couleur de fond</Label>
+            <Label htmlFor="backgroundColor" className="text-[#E5E7EB]">Couleur de fond</Label>
             <div className="flex space-x-2">
               <Input
                 type="color"
@@ -168,20 +163,20 @@ export const ColorSettings = () => {
                 name="backgroundColor"
                 value={colors.backgroundColor}
                 onChange={handleColorChange}
-                className="w-12 h-10 p-1 cursor-pointer"
+                className="w-12 h-10 p-1 cursor-pointer bg-[#2A2A2A] border-[#3A3A3A]"
               />
               <Input
                 type="text"
                 value={colors.backgroundColor}
                 name="backgroundColor"
                 onChange={handleColorChange}
-                className="flex-grow border-[#6B7280]"
+                className="flex-grow bg-[#2A2A2A] text-[#E5E7EB] border-[#3A3A3A]"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="textColor" className="text-[#374151]">Couleur du texte</Label>
+            <Label htmlFor="textColor" className="text-[#E5E7EB]">Couleur du texte</Label>
             <div className="flex space-x-2">
               <Input
                 type="color"
@@ -189,20 +184,20 @@ export const ColorSettings = () => {
                 name="textColor"
                 value={colors.textColor}
                 onChange={handleColorChange}
-                className="w-12 h-10 p-1 cursor-pointer"
+                className="w-12 h-10 p-1 cursor-pointer bg-[#2A2A2A] border-[#3A3A3A]"
               />
               <Input
                 type="text"
                 value={colors.textColor}
                 name="textColor"
                 onChange={handleColorChange}
-                className="flex-grow border-[#6B7280]"
+                className="flex-grow bg-[#2A2A2A] text-[#E5E7EB] border-[#3A3A3A]"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="buttonColor" className="text-[#374151]">Couleur des boutons</Label>
+            <Label htmlFor="buttonColor" className="text-[#E5E7EB]">Couleur des boutons</Label>
             <div className="flex space-x-2">
               <Input
                 type="color"
@@ -210,20 +205,20 @@ export const ColorSettings = () => {
                 name="buttonColor"
                 value={colors.buttonColor}
                 onChange={handleColorChange}
-                className="w-12 h-10 p-1 cursor-pointer"
+                className="w-12 h-10 p-1 cursor-pointer bg-[#2A2A2A] border-[#3A3A3A]"
               />
               <Input
                 type="text"
                 value={colors.buttonColor}
                 name="buttonColor"
                 onChange={handleColorChange}
-                className="flex-grow border-[#6B7280]"
+                className="flex-grow bg-[#2A2A2A] text-[#E5E7EB] border-[#3A3A3A]"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="headerFooterColor" className="text-[#374151]">Couleur d'en-tête/pied de page</Label>
+            <Label htmlFor="headerFooterColor" className="text-[#E5E7EB]">Couleur d'en-tête/pied de page</Label>
             <div className="flex space-x-2">
               <Input
                 type="color"
@@ -231,21 +226,21 @@ export const ColorSettings = () => {
                 name="headerFooterColor"
                 value={colors.headerFooterColor}
                 onChange={handleColorChange}
-                className="w-12 h-10 p-1 cursor-pointer"
+                className="w-12 h-10 p-1 cursor-pointer bg-[#2A2A2A] border-[#3A3A3A]"
               />
               <Input
                 type="text"
                 value={colors.headerFooterColor}
                 name="headerFooterColor"
                 onChange={handleColorChange}
-                className="flex-grow border-[#6B7280]"
+                className="flex-grow bg-[#2A2A2A] text-[#E5E7EB] border-[#3A3A3A]"
               />
             </div>
           </div>
         </div>
 
         <div className="pt-4">
-          <h3 className="text-[#374151] font-medium mb-3">Aperçu</h3>
+          <h3 className="text-[#E5E7EB] font-medium mb-3">Aperçu</h3>
           <div
             className="border rounded-md p-6 mb-4"
             style={{ 
@@ -273,7 +268,7 @@ export const ColorSettings = () => {
           <Button 
             onClick={handleSave} 
             disabled={saving}
-            className="text-white"
+            className="text-[#121218]"
             style={{ backgroundColor: colors.buttonColor }}
           >
             {saving ? "Enregistrement..." : "Enregistrer les couleurs"}
