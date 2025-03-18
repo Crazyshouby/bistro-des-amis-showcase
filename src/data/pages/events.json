@@ -1,0 +1,13 @@
+
+{
+  "type": "standard",
+  "title": "Événements",
+  "content": "# Nos Événements\n\nRetrouvez ici tous les événements organisés par le Bistro des Amis. Soirées musicales, dégustations, ateliers culinaires... il y en a pour tous les goûts !",
+  "styling": {
+    "h1Color": "#2F2F2F",
+    "h2Color": "#555555",
+    "backgroundColor": "#F5F5F5",
+    "accentColor": "#2DD4BF"
+  },
+  "bannerImage": "/lovable-uploads/00ac4d79-14ae-4287-8ca4-c2b40d004275.png"
+}

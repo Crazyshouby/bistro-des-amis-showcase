@@ -1,186 +1,211 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Variables dynamiques pour les couleurs personnalisables */
-    --dynamic-background: #F5E9D7;
-    --dynamic-text: #3A2E1F;
-    --dynamic-button: #4A5E3A;
-    --dynamic-header-footer: #6B2D2D;
-    
-    /* Updated color palette based on specifications */
-    --background: 39 40% 91%; /* Beige crème doux #F5E9D7 */
-    --foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
-
-    --card: 34 32% 92%; /* Blanc cassé légèrement grisé #EDE4D8 */
-    --card-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
-
-    --popover: 34 32% 92%; /* Blanc cassé #EDE4D8 */
-    --popover-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
-
-    --primary: 95 21% 30%; /* Vert olive profond #4A5E3A */
-    --primary-foreground: 39 40% 91%; /* Beige crème #F5E9D7 */
-
-    --secondary: 41 78% 46%; /* Ocre doré #D4A017 */
-    --secondary-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
-
-    --muted: 34 32% 92%; /* Blanc cassé #EDE4D8 */
-    --muted-foreground: 220 0% 36%; /* Gris anthracite #5A5A5A */
-
-    --accent: 41 78% 46%; /* Ocre doré #D4A017 */
-    --accent-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
-
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 39 40% 91%; /* Beige crème #F5E9D7 */
-
-    --border: 220 0% 36%; /* Gris anthracite #5A5A5A */
-    --input: 220 0% 36%; /* Gris anthracite #5A5A5A */
-    --ring: 41 78% 46%; /* Ocre doré #D4A017 */
-
-    --radius: 0.5rem;
-    
-    /* Bistro colors for direct usage */
-    --bistro-brick: #6B2D2D; /* Bordeaux chaleureux */
-    --bistro-brick-light: #823636;
-    --bistro-sand: #F5E9D7; /* Beige crème */
-    --bistro-sand-light: #FFF8E7;
-    --bistro-wood: #3A2E1F; /* Marron foncé */
-    --bistro-wood-light: #5A4B37;
-    --bistro-olive: #4A5E3A; /* Vert olive profond */
-    --bistro-olive-light: #5F7946;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.75rem;
+  }
+ 
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
   }
 }
-
+ 
 @layer base {
   * {
     @apply border-border;
   }
-  
-  html {
-    @apply scroll-smooth;
-  }
-
   body {
-    @apply bg-background text-foreground font-montserrat antialiased;
-    /* Utilisation des variables dynamiques */
-    background-color: var(--dynamic-background);
-    color: var(--dynamic-text);
+    @apply bg-background text-foreground;
   }
+}
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-playfair font-bold text-secondary;
-  }
-
-  .bg-texture {
-    @apply bg-texture-light bg-fixed bg-repeat;
-  }
+/* Couleurs de base */
+:root {
+  --bistro-olive: #667160;
+  --bistro-olive-light: #7D8977;
+  --bistro-brick: #A1683A;
+  --bistro-wood: #4E3524;
+  --bistro-sand: #F3EDD7;
+  --bistro-sand-light: #FAF7EB;
   
+  --dynamic-background: var(--bistro-sand);
+  --dynamic-button: var(--bistro-olive);
+  --dynamic-text: var(--bistro-wood);
+}
+
+/* Styles pour la mise en page */
+@layer components {
   .content-container {
-    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply container max-w-7xl mx-auto px-4 md:px-8;
   }
   
   .btn-primary {
-    @apply font-medium py-2 px-6 rounded-md transition-all duration-300 shadow-sm hover:shadow-md inline-block;
-    background-color: var(--dynamic-button);
-    color: var(--dynamic-background);
+    @apply bg-bistro-olive text-bistro-sand hover:bg-bistro-olive-light hover:text-white transition-colors duration-300;
   }
   
-  .btn-secondary {
-    @apply bg-secondary hover:bg-secondary/80 text-bistro-wood font-medium py-2 px-6 rounded-md transition-all duration-300 shadow-sm hover:shadow-md inline-block;
+  .section-title {
+    @apply text-3xl md:text-4xl font-playfair font-bold text-secondary relative pb-3 mb-6 inline-block;
+  }
+
+  .section-title::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-2/3 h-0.5 bg-bistro-olive;
   }
   
-  /* ... keep existing code (parallax-container, parallax-bg, parallax-content, shine-effect, animations, etc) */
-  
-  .parallax-container {
-    @apply relative min-h-screen overflow-hidden;
-  }
-  
-  .parallax-bg {
-    @apply absolute inset-0 w-full h-full bg-cover bg-center transform scale-110;
-    will-change: transform;
-  }
-  
-  .parallax-content {
-    @apply relative z-10 flex flex-col items-center justify-center min-h-screen;
+  .bg-texture {
+    background-color: var(--bistro-sand-light);
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0V0zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm20 0a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM10 37a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm10-17h20v20H20V20zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14z' fill='%23667160' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
   }
   
   .shine-effect {
-    @apply relative overflow-hidden;
+    position: relative;
+    overflow: hidden;
   }
   
   .shine-effect::after {
     content: '';
-    @apply absolute top-0 left-0 h-full w-[200%] bg-gradient-to-r from-transparent via-white/20 to-transparent animate-image-shine;
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(30deg);
+    transition: transform 1s;
   }
   
-  .fade-in-up {
-    @apply opacity-0;
-    animation: fadeInUp 0.6s ease-out forwards;
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .menu-item-card {
-    @apply border rounded-md p-4 shadow-sm hover:shadow-md transition-all duration-300;
-    background-color: var(--dynamic-background);
-    border-color: var(--dynamic-text);
-  }
-  
-  .menu-item-price {
-    color: var(--dynamic-button);
-    @apply font-bold;
-  }
-  
-  .menu-section {
-    @apply mb-12;
-  }
-  
-  .section-title {
-    @apply text-3xl lg:text-4xl font-playfair font-bold mb-6 text-secondary relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-1/2 after:h-[3px] pb-2;
-    color: var(--dynamic-button);
-  }
-  .section-title::after {
-    background-color: var(--dynamic-button);
-  }
-  
-  /* Filter button styles - updated to be darker with high-contrast text */
-  .filter-button {
-    @apply px-4 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 text-sm font-medium font-bold;
-    background-color: var(--dynamic-header-footer);
-    color: var(--dynamic-background);
-  }
-  .filter-button:hover {
-    background-color: var(--dynamic-button);
+  .shine-effect:hover::after {
+    transform: rotate(30deg) translateX(300%);
   }
 }
 
-/* Styles spécifiques pour utiliser les couleurs dynamiques */
-.dynamic-bg {
-  background-color: var(--dynamic-background);
+/* Styles pour le Markdown */
+.markdown-content h1 {
+  color: var(--h1-color);
+  font-family: 'Playfair Display', serif;
+  font-weight: bold;
+  margin-bottom: 1rem;
 }
-.dynamic-text {
-  color: var(--dynamic-text);
+
+.markdown-content h2 {
+  color: var(--h2-color);
+  font-family: 'Playfair Display', serif;
+  font-weight: bold;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
 }
-.dynamic-button {
-  background-color: var(--dynamic-button);
-  color: var(--dynamic-background);
+
+.markdown-content p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
 }
-.dynamic-header-footer {
-  background-color: var(--dynamic-header-footer);
-  color: var(--dynamic-background);
+
+.markdown-content ul, .markdown-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.markdown-content li {
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content a {
+  color: var(--bistro-olive);
+  text-decoration: underline;
+}
+
+.markdown-content a:hover {
+  color: var(--bistro-olive-light);
+}
+
+.markdown-content blockquote {
+  border-left: 4px solid var(--bistro-olive);
+  padding-left: 1rem;
+  margin-left: 0;
+  color: #666;
+  font-style: italic;
+}
+
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.markdown-content code {
+  background-color: #f4f4f4;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+}
+
+.markdown-content pre {
+  background-color: #f4f4f4;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.markdown-content hr {
+  border: 0;
+  border-top: 1px solid #e0e0e0;
+  margin: 2rem 0;
+}
+
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.markdown-content th, .markdown-content td {
+  border: 1px solid #e0e0e0;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.markdown-content th {
+  background-color: #f4f4f4;
 }

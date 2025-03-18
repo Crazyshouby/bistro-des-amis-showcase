@@ -11,8 +11,10 @@ import MenuGrid from "@/components/menu/MenuGrid";
 import MenuItemDetail from "@/components/menu/MenuItemDetail";
 import { FilterOptions } from "@/components/menu/MenuFilter";
 import { CATEGORY_ORDER, filterMenuItems } from "@/lib/menu-utils";
+import { getPageData, isMenuPage } from "@/lib/content-loader";
 
 const Menu = () => {
+  const pageData = getPageData('menu');
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([]);
@@ -24,6 +26,7 @@ const Menu = () => {
     isPeanutFree: false,
     isSpicy: false
   });
+  
   const [ref, isVisible] = useIntersectionObserver({
     threshold: 0.1,
     rootMargin: "-100px 0px",
@@ -47,16 +50,30 @@ const Menu = () => {
         const uniqueCategoriesSet = new Set(data.map((item: MenuItem) => item.categorie));
         
         // Filter the ordered categories to only include ones that exist in our data
-        const orderedCategories = CATEGORY_ORDER.filter(category => 
+        let orderedCategories = CATEGORY_ORDER;
+        
+        // If we have pageData and it's a menu page, use the categories from there
+        if (pageData && isMenuPage(pageData)) {
+          orderedCategories = pageData.filterCategories;
+        }
+        
+        const filteredCategories = orderedCategories.filter(category => 
           uniqueCategoriesSet.has(category)
         );
         
-        setCategories(orderedCategories);
+        setCategories(filteredCategories);
         
-        // Set first category as active by default
-        if (orderedCategories.length > 0 && !activeCategory) {
-          setActiveCategory(orderedCategories[0]);
+        // Set default category as active
+        let defaultCategory = filteredCategories.length > 0 ? filteredCategories[0] : "";
+        
+        // If we have pageData and it's a menu page with a default category, use that
+        if (pageData && isMenuPage(pageData) && pageData.defaultCategory) {
+          if (filteredCategories.includes(pageData.defaultCategory)) {
+            defaultCategory = pageData.defaultCategory;
+          }
         }
+        
+        setActiveCategory(defaultCategory);
       } catch (error) {
         console.error('Error fetching menu items:', error);
         toast({
@@ -70,7 +87,7 @@ const Menu = () => {
     };
     
     fetchMenuItems();
-  }, []);
+  }, [pageData]);
 
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
@@ -81,22 +98,27 @@ const Menu = () => {
   };
 
   const filteredItems = filterMenuItems(menuItems, activeCategory, filters);
+  
+  // Si nous n'avons pas de données de page ou si ce n'est pas une page de menu
+  if (!pageData || !isMenuPage(pageData)) {
+    return <div>Données de page non disponibles</div>;
+  }
 
   return (
     <div className="bg-texture">
       {/* Banner */}
-      <MenuBanner />
+      <MenuBanner bannerImage={pageData.bannerImage} />
       
       {/* Menu Section */}
       <section className="py-16 md:py-24">
         <div className="content-container">
           <AnimatedSection>
             <div className="text-center mb-14">
-              <h2 className="text-3xl md:text-4xl font-playfair font-bold text-secondary mb-4">
-                Saveurs Authentiques
+              <h2 className="text-3xl md:text-4xl font-playfair font-bold mb-4" style={{ color: pageData.styling.h2Color }}>
+                {pageData.title}
               </h2>
               <p className="text-foreground/80 max-w-2xl mx-auto">
-                Une sélection de plats et boissons préparés avec passion, mettant en valeur les produits locaux et les traditions culinaires.
+                {pageData.description}
               </p>
             </div>
           </AnimatedSection>
