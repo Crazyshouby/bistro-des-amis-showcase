@@ -7,7 +7,7 @@ import { useParallax } from "@/lib/hooks";
 
 const Index = () => {
   // Hook personnalisé pour l'effet parallax amélioré - plus prononcé et fluide
-  const parallaxRef = useParallax(0.2, true); // Augmentation de la vitesse et activation du mode fluide
+  const parallaxRef = useParallax(0.25, true); // Augmentation de la vitesse pour un effet plus prononcé
   
   useEffect(() => {
     const images = [
@@ -34,12 +34,12 @@ const Index = () => {
         {/* Image avec effet parallax amélioré - plus prononcé et fluide */}
         <div 
           ref={parallaxRef}
-          className="absolute inset-0 bg-cover bg-center filter blur-[1px]"
+          className="absolute inset-0 bg-cover bg-center filter blur-[3px]"
           style={{ 
             backgroundImage: "url('/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png')",
             transformOrigin: "center center",
-            top: "-20%",
-            height: "140%",  // Augmentation significative de la hauteur pour un effet plus prononcé
+            top: "-25%",
+            height: "150%",  // Augmentation significative de la hauteur pour un effet plus prononcé
             width: "100%"
           }}
         />

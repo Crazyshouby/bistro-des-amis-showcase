@@ -79,14 +79,14 @@ export const useParallax = (speed = 0.3, smooth = true) => {
         
         // Animation fluide avec interpolation
         if (smooth) {
-          // Interpolation pour un mouvement plus fluide
-          currentOffset.current += (targetY - currentOffset.current) * 0.1;
+          // Augmentation du facteur d'interpolation pour un mouvement plus réactif
+          currentOffset.current += (targetY - currentOffset.current) * 0.15;
         } else {
           currentOffset.current = targetY;
         }
         
-        // Appliquer la transformation
-        ref.current.style.transform = `translate3d(0, ${currentOffset.current}px, 0) scale(1.35)`;
+        // Appliquer la transformation avec un scale plus important
+        ref.current.style.transform = `translate3d(0, ${currentOffset.current}px, 0) scale(1.45)`;
       }
       
       previousScrollY.current = window.scrollY;
