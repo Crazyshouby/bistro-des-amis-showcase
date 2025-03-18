@@ -83,7 +83,8 @@ export const insertData = async <T>(
 };
 
 // Fonction utilitaire pour les mises à jour
-export const updateData = async <T>(
+// Explicitly specify the return type to avoid excessive type instantiation
+export const updateData = async <T = any>(
   tableName: TableNames,
   id: string | number,
   data: any,
