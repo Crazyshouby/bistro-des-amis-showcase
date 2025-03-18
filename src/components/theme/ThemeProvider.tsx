@@ -4,6 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface ThemeImages {
   homeImageUrl: string;
+  menuHeaderImage: string;
+  eventsHeaderImage: string;
+  contactHeaderImage: string;
 }
 
 interface ThemeContextType {
@@ -13,6 +16,9 @@ interface ThemeContextType {
 
 const defaultImages: ThemeImages = {
   homeImageUrl: "/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png",
+  menuHeaderImage: "/lovable-uploads/19408610-7939-4299-999c-208a2355a264.png",
+  eventsHeaderImage: "/lovable-uploads/00ac4d79-14ae-4287-8ca4-c2b40d004275.png",
+  contactHeaderImage: "/lovable-uploads/00ac4d79-14ae-4287-8ca4-c2b40d004275.png"
 };
 
 const ThemeContext = createContext<ThemeContextType>({
@@ -65,7 +71,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     fetchThemeData();
     
-    // Configurer un écouteur temps réel pour les changements de configuration
+    // Configure real-time listener for configuration changes
     const subscription = supabase
       .channel('site_config_changes')
       .on(
