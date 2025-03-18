@@ -90,12 +90,29 @@ export const uploadEventImage = async (file: File): Promise<string | null> => {
     const fileExt = file.name.split('.').pop();
     const fileName = `event_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
     
+    // Créer le bucket s'il n'existe pas déjà
+    const { data: bucketExists } = await supabase.storage.getBucket('event_images');
+    if (!bucketExists) {
+      await supabase.storage.createBucket('event_images', {
+        public: true,
+        fileSizeLimit: 5242880, // 5MB
+      });
+    }
+    
+    // Télécharger le fichier
     const { data, error } = await supabase.storage
       .from('event_images')
-      .upload(fileName, file);
+      .upload(fileName, file, {
+        upsert: true,
+        cacheControl: '3600',
+      });
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
     
+    // Obtenir l'URL publique du fichier
     const { data: { publicUrl } } = supabase.storage
       .from('event_images')
       .getPublicUrl(fileName);

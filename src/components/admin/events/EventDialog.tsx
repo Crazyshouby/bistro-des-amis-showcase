@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import { Event } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -122,6 +122,9 @@ export const EventDialog = ({
           <DialogTitle className="text-2xl font-playfair">
             {editingEvent ? "Modifier un événement" : "Ajouter un événement"}
           </DialogTitle>
+          <DialogDescription>
+            Remplissez le formulaire ci-dessous pour {editingEvent ? "modifier" : "ajouter"} un événement.
+          </DialogDescription>
         </DialogHeader>
         
         <EventForm
