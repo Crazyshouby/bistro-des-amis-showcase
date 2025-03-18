@@ -155,7 +155,7 @@ export const MenuCustomization = () => {
                 <Label htmlFor="menu-header-image" className="block mb-2">
                   Image d'en-tête du menu
                 </Label>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap gap-4 mb-2">
                   <Button 
                     variant="outline" 
                     className="relative" 
@@ -176,6 +176,7 @@ export const MenuCustomization = () => {
                     onClick={handleApplyChanges}
                     disabled={!changed || uploading}
                     variant="default"
+                    className="bg-green-600 hover:bg-green-700 text-white"
                   >
                     <Check className="h-4 w-4 mr-2" />
                     Appliquer
@@ -185,7 +186,7 @@ export const MenuCustomization = () => {
                   Pour de meilleurs résultats, utilisez une image au format paysage d'au moins 1920x400 pixels.
                 </p>
                 {changed && (
-                  <p className="text-sm text-amber-600 mt-2">
+                  <p className="text-sm text-amber-600 mt-2 font-bold">
                     N'oubliez pas de cliquer sur "Appliquer" pour sauvegarder vos modifications.
                   </p>
                 )}
