@@ -16,7 +16,7 @@ export const HistoryImageUploader = () => {
   const [changed, setChanged] = useState(false);
   
   useEffect(() => {
-    // Synchroniser avec le ThemeProvider
+    // Synchronize with ThemeProvider
     setTempImageUrl(images.historyImageUrl || "");
   }, [images.historyImageUrl]);
 
@@ -28,7 +28,7 @@ export const HistoryImageUploader = () => {
       
       const file = e.target.files[0];
       
-      // Vérification du type et de la taille
+      // Size and type validation
       if (file.size > 5 * 1024 * 1024) {
         toast({
           title: "Erreur",
@@ -49,13 +49,13 @@ export const HistoryImageUploader = () => {
       
       setUploading(true);
       
-      // Générer un nom de fichier unique
+      // Generate unique filename
       const fileExt = file.name.split('.').pop();
       const timestamp = Date.now();
       const fileName = `history-image-${timestamp}.${fileExt}`;
       const filePath = `site_images/${fileName}`;
       
-      // Upload de l'image vers Supabase Storage
+      // Upload image to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('site_images')
         .upload(filePath, file);
@@ -64,14 +64,14 @@ export const HistoryImageUploader = () => {
         throw uploadError;
       }
       
-      // Récupérer l'URL publique
+      // Get public URL
       const { data } = supabase.storage
         .from('site_images')
         .getPublicUrl(filePath);
         
       if (data) {
         const imageUrl = data.publicUrl;
-        // Mise à jour de l'URL temporaire pour l'aperçu
+        // Update temporary URL for preview
         setTempImageUrl(imageUrl);
         setChanged(true);
         
@@ -96,7 +96,34 @@ export const HistoryImageUploader = () => {
     try {
       setUploading(true);
       
-      // Mise à jour dans le ThemeProvider et la base de données
+      // First check if the history_image_url record exists in the database
+      const { data: existingRecord, error: checkError } = await supabase
+        .from('site_config')
+        .select('id')
+        .eq('key', 'history_image_url')
+        .maybeSingle();
+      
+      if (checkError) {
+        throw checkError;
+      }
+      
+      // If the record exists, update it; otherwise, insert a new one
+      if (existingRecord) {
+        const { error: updateError } = await supabase
+          .from('site_config')
+          .update({ value: tempImageUrl })
+          .eq('key', 'history_image_url');
+        
+        if (updateError) throw updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from('site_config')
+          .insert({ key: 'history_image_url', value: tempImageUrl });
+        
+        if (insertError) throw insertError;
+      }
+      
+      // Update in ThemeProvider
       await updateTheme({ 
         images: { historyImageUrl: tempImageUrl } 
       });
