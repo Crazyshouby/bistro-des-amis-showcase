@@ -29,13 +29,13 @@ const Navigation = () => {
     <header
       className={cn(
         "fixed w-full z-50 transition-all duration-300",
-        isScrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
+        isScrolled ? "bg-bistro-brick shadow-md py-2" : "bg-transparent py-4"
       )}
     >
       <div className="content-container">
         <nav className="flex justify-between items-center">
           {/* Logo */}
-          <Link to="/" className="font-playfair text-2xl md:text-3xl font-bold text-bistro-wood">
+          <Link to="/" className="font-playfair text-2xl md:text-3xl font-bold text-bistro-sand">
             Bar Bistro
           </Link>
 
@@ -46,8 +46,8 @@ const Navigation = () => {
                 key={link.path}
                 to={link.path}
                 className={cn(
-                  "font-medium text-bistro-wood hover:text-bistro-olive transition-colors",
-                  location.pathname === link.path && "text-bistro-olive"
+                  "font-medium text-bistro-sand hover:text-secondary transition-colors",
+                  location.pathname === link.path && "text-secondary"
                 )}
               >
                 {link.name}
@@ -58,7 +58,7 @@ const Navigation = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-bistro-wood hover:text-bistro-olive"
+            className="md:hidden text-bistro-sand hover:text-secondary"
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
             <svg
@@ -87,16 +87,16 @@ const Navigation = () => {
           </button>
         </nav>
 
-        {/* Mobile Navigation - Added dark background */}
+        {/* Mobile Navigation - Dark background */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 flex flex-col space-y-3 bg-bistro-wood rounded-md p-4 shadow-lg">
+          <div className="md:hidden mt-4 pb-4 flex flex-col space-y-3 bg-bistro-brick rounded-md p-4 shadow-lg">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={cn(
-                  "font-medium text-white hover:text-bistro-sand transition-colors",
-                  location.pathname === link.path && "text-bistro-sand"
+                  "font-medium text-bistro-sand hover:text-secondary transition-colors",
+                  location.pathname === link.path && "text-secondary"
                 )}
               >
                 {link.name}

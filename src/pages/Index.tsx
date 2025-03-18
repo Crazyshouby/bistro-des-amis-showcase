@@ -18,6 +18,7 @@ const Index = () => {
       '/lovable-uploads/1cbe3f9b-808e-4c73-8fab-38ffe1369dde.png', // interior dining area
       '/lovable-uploads/714769f0-6cd7-4831-bece-5bd87d46c6b1.png', // interior with people
       '/lovable-uploads/17ae501f-c21a-4f1e-964e-ffdff257c0cb.png', // man with apron
+      '/lovable-uploads/bf89ee9a-96c9-4013-9f71-93f91dbff5d5.png', // new bistro facade
     ];
     
     images.forEach(src => {
@@ -28,32 +29,32 @@ const Index = () => {
 
   return (
     <div className="bg-texture">
-      {/* Hero Section with Parallax */}
+      {/* Hero Section with Parallax - Updated with new image */}
       <div className="relative h-screen overflow-hidden">
         <div 
           ref={heroParallaxRef}
           className="absolute inset-0 bg-cover bg-center transform scale-110 transition-transform duration-300 ease-out"
           style={{ 
-            backgroundImage: "url('/lovable-uploads/714769f0-6cd7-4831-bece-5bd87d46c6b1.png')",
+            backgroundImage: "url('/lovable-uploads/bf89ee9a-96c9-4013-9f71-93f91dbff5d5.png')",
             willChange: "transform"
           }}
         />
-        <div className="absolute inset-0 bg-black bg-opacity-50" />
+        <div className="absolute inset-0 bg-black bg-opacity-30" />
         
         <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
           <AnimatedSection 
             className="max-w-3xl mx-auto"
             delay={300}
           >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-playfair font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-playfair font-bold text-bistro-sand mb-6">
               Bienvenue au Bistro des Amis
             </h1>
-            <p className="text-xl md:text-2xl text-white/90 mb-8">
+            <p className="text-xl md:text-2xl text-bistro-sand/90 mb-8">
               Votre pause gourmande à Verdun
             </p>
             <Link to="/menu">
               <Button 
-                className="bg-bistro-olive hover:bg-bistro-olive-light text-white text-lg px-8 py-6 rounded-md transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="bg-bistro-olive hover:bg-secondary hover:text-secondary-foreground text-bistro-sand text-lg px-8 py-6 rounded-md transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 Découvrir le menu
               </Button>
@@ -81,7 +82,7 @@ const Index = () => {
                   </Button>
                 </Link>
                 <Link to="/contact">
-                  <Button variant="outline" className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-white">
+                  <Button variant="outline" className="border-bistro-olive text-bistro-olive hover:bg-bistro-olive hover:text-bistro-sand">
                     Nous contacter
                   </Button>
                 </Link>
@@ -128,8 +129,8 @@ const Index = () => {
             ].map((feature, index) => (
               <AnimatedSection key={index} delay={feature.delay}>
                 <div className="bg-bistro-sand-light p-6 rounded-lg shadow-md h-full flex flex-col">
-                  <h3 className="text-xl font-playfair font-bold text-bistro-wood mb-4">{feature.title}</h3>
-                  <p className="text-bistro-wood/80 flex-grow">{feature.description}</p>
+                  <h3 className="text-xl font-playfair font-bold text-secondary mb-4">{feature.title}</h3>
+                  <p className="text-foreground/80 flex-grow">{feature.description}</p>
                 </div>
               </AnimatedSection>
             ))}
@@ -172,7 +173,7 @@ const Index = () => {
                 delay: 750
               },
               {
-                src: "/lovable-uploads/124dcbfa-dac8-4b14-ab31-905afc4085d6.png",
+                src: "/lovable-uploads/bf89ee9a-96c9-4013-9f71-93f91dbff5d5.png",
                 alt: "Façade du Bistro des Amis",
                 delay: 900
               }
@@ -199,21 +200,21 @@ const Index = () => {
         className="relative py-20 md:py-32 bg-cover bg-center"
         style={{ backgroundImage: "url('/lovable-uploads/00ac4d79-14ae-4287-8ca4-c2b40d004275.png')" }}
       >
-        <div className="absolute inset-0 bg-bistro-wood/70"></div>
+        <div className="absolute inset-0 bg-bistro-brick/70"></div>
         <div className="content-container relative z-10">
           <AnimatedSection className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-playfair font-bold text-white mb-6">Venez passer un moment convivial</h2>
-            <p className="text-lg text-white/90 mb-8">
+            <h2 className="text-3xl md:text-4xl font-playfair font-bold text-bistro-sand mb-6">Venez passer un moment convivial</h2>
+            <p className="text-lg text-bistro-sand/90 mb-8">
               Réservez dès maintenant pour garantir votre table et profiter de notre ambiance chaleureuse et de notre cuisine savoureuse.
             </p>
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <Link to="/contact">
-                <Button className="w-full sm:w-auto bg-bistro-sand text-bistro-wood hover:bg-bistro-sand-light transition-colors duration-300 text-lg px-6 py-3">
+                <Button className="w-full sm:w-auto bg-bistro-sand text-bistro-wood hover:bg-secondary hover:text-secondary-foreground transition-colors duration-300 text-lg px-6 py-3">
                   Nous contacter
                 </Button>
               </Link>
               <Link to="/events">
-                <Button variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white/20 transition-colors duration-300 text-lg px-6 py-3">
+                <Button variant="outline" className="w-full sm:w-auto border-bistro-sand text-bistro-sand hover:bg-bistro-sand/20 transition-colors duration-300 text-lg px-6 py-3">
                   Voir nos événements
                 </Button>
               </Link>

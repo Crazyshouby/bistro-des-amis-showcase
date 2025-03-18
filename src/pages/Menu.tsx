@@ -13,6 +13,8 @@ import {
   DialogTitle 
 } from "@/components/ui/dialog";
 import { Leaf, Flame, NutOff, WheatOff } from "lucide-react";
+import { MenuFilter, FilterOptions } from "@/components/menu/MenuFilter";
+import { SocialShare } from "@/components/shared/SocialShare";
 
 // Définition de l'ordre fixe des catégories
 const CATEGORY_ORDER = ["Apéritifs", "Entrées", "Plats", "Desserts", "Boissons"];
@@ -23,6 +25,12 @@ const Menu = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [filters, setFilters] = useState<FilterOptions>({
+    isVegan: false,
+    isGlutenFree: false,
+    isPeanutFree: false,
+    isSpicy: false
+  });
   const [ref, isVisible] = useIntersectionObserver({
     threshold: 0.1,
     rootMargin: "-100px 0px",
@@ -71,12 +79,36 @@ const Menu = () => {
     fetchMenuItems();
   }, []);
 
-  const filteredItems = activeCategory
-    ? menuItems.filter((item) => item.categorie === activeCategory)
-    : menuItems;
+  const filterItems = (items: MenuItem[]) => {
+    // First filter by category if one is selected
+    let filtered = activeCategory
+      ? items.filter((item) => item.categorie === activeCategory)
+      : items;
+    
+    // Then apply dietary filters if any are active
+    const hasActiveFilters = Object.values(filters).some(Boolean);
+    
+    if (hasActiveFilters) {
+      filtered = filtered.filter(item => {
+        if (filters.isVegan && !item.is_vegan) return false;
+        if (filters.isGlutenFree && !item.is_gluten_free) return false;
+        if (filters.isPeanutFree && !item.is_peanut_free) return false;
+        if (filters.isSpicy && !item.is_spicy) return false;
+        return true;
+      });
+    }
+    
+    return filtered;
+  };
+
+  const filteredItems = filterItems(menuItems);
 
   const handleItemClick = (item: MenuItem) => {
     setSelectedItem(item);
+  };
+
+  const handleFilterChange = (newFilters: FilterOptions) => {
+    setFilters(newFilters);
   };
 
   return (
@@ -97,10 +129,10 @@ const Menu = () => {
         <div className="content-container">
           <AnimatedSection>
             <div className="text-center mb-14">
-              <h2 className="text-3xl md:text-4xl font-playfair font-bold text-bistro-wood mb-4">
+              <h2 className="text-3xl md:text-4xl font-playfair font-bold text-secondary mb-4">
                 Saveurs Authentiques
               </h2>
-              <p className="text-bistro-wood/80 max-w-2xl mx-auto">
+              <p className="text-foreground/80 max-w-2xl mx-auto">
                 Une sélection de plats et boissons préparés avec passion, mettant en valeur les produits locaux et les traditions culinaires.
               </p>
             </div>
@@ -108,43 +140,95 @@ const Menu = () => {
           
           {loading ? (
             <div className="flex justify-center py-12">
-              <p className="text-bistro-wood">Chargement du menu...</p>
+              <p className="text-foreground">Chargement du menu...</p>
             </div>
           ) : (
             <>
-              {/* Category Filter */}
-              <div className="mb-8 flex justify-center">
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {categories.map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => setActiveCategory(category)}
-                      className={`px-4 py-2 rounded-full text-sm transition-colors ${
-                        activeCategory === category
-                          ? "bg-bistro-olive text-white"
-                          : "bg-bistro-sand-light text-bistro-wood hover:bg-bistro-sand"
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  ))}
+              {/* Filters and Category Selector */}
+              <div className="mb-8">
+                <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
+                  {/* Category Filter Buttons */}
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => setActiveCategory(category)}
+                        className={`px-4 py-2 rounded-full text-sm transition-colors ${
+                          activeCategory === category
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-foreground hover:bg-muted/80"
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Filter Button */}
+                  <MenuFilter 
+                    onFilterChange={handleFilterChange}
+                    activeFilters={filters}
+                  />
                 </div>
+                
+                {/* Active filters summary */}
+                {Object.values(filters).some(Boolean) && (
+                  <div className="mb-4 flex flex-wrap gap-2 text-sm">
+                    <span className="text-muted-foreground">Filtres actifs:</span>
+                    {filters.isVegan && (
+                      <span className="bg-muted px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                        <Leaf size={12} className="text-green-600" />
+                        Végétarien
+                      </span>
+                    )}
+                    {filters.isGlutenFree && (
+                      <span className="bg-muted px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                        <WheatOff size={12} className="text-yellow-600" />
+                        Sans Gluten
+                      </span>
+                    )}
+                    {filters.isPeanutFree && (
+                      <span className="bg-muted px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                        <NutOff size={12} className="text-amber-600" />
+                        Sans Arachides
+                      </span>
+                    )}
+                    {filters.isSpicy && (
+                      <span className="bg-muted px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                        <Flame size={12} className="text-red-600" />
+                        Épicé
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
               
-              {/* Menu Grid - Using MenuItemCard */}
+              {/* Menu Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6" ref={ref}>
                 {filteredItems.length === 0 ? (
-                  <p className="text-center text-bistro-wood/70 col-span-2 py-8">
-                    Aucun élément trouvé dans cette catégorie.
+                  <p className="text-center text-muted-foreground col-span-2 py-8">
+                    Aucun élément trouvé correspondant aux critères de filtrage.
                   </p>
                 ) : (
                   filteredItems.map((item) => (
                     <AnimatedSection key={item.id} delay={0.1} className="h-full">
                       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full">
-                        <MenuItemCard 
-                          item={item}
-                          onEdit={() => handleItemClick(item)} 
-                        />
+                        <div className="relative">
+                          <MenuItemCard 
+                            item={item}
+                            onEdit={() => handleItemClick(item)} 
+                          />
+                          
+                          {/* Add share button */}
+                          <div className="absolute bottom-3 right-3">
+                            <SocialShare 
+                              title={item.nom}
+                              description={item.description}
+                              imageUrl={item.image_url}
+                              url={`${window.location.origin}/menu/${item.id}`}
+                            />
+                          </div>
+                        </div>
                       </div>
                     </AnimatedSection>
                   ))
@@ -161,7 +245,7 @@ const Menu = () => {
           {selectedItem && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-2xl font-playfair font-bold text-bistro-wood">
+                <DialogTitle className="text-2xl font-playfair font-bold text-secondary">
                   {selectedItem.nom}
                 </DialogTitle>
               </DialogHeader>
@@ -179,24 +263,24 @@ const Menu = () => {
                 )}
                 
                 {/* Price */}
-                <div className="text-xl font-bold text-bistro-olive mb-3">
+                <div className="text-xl font-bold text-primary mb-3">
                   {selectedItem.prix} CAD
                 </div>
                 
                 {/* Description */}
                 <div className="mb-6">
-                  <h3 className="text-lg font-medium text-bistro-wood mb-2">Description</h3>
-                  <p className="text-bistro-wood/80">{selectedItem.description}</p>
+                  <h3 className="text-lg font-medium text-foreground mb-2">Description</h3>
+                  <p className="text-foreground/80">{selectedItem.description}</p>
                 </div>
                 
                 {/* Dietary Options */}
                 <div>
-                  <h3 className="text-lg font-medium text-bistro-wood mb-2">Options alimentaires</h3>
+                  <h3 className="text-lg font-medium text-foreground mb-2">Options alimentaires</h3>
                   <div className="space-y-2">
                     {selectedItem.is_vegan && (
                       <div className="flex items-center gap-2">
                         <Leaf className="w-5 h-5 text-green-600" />
-                        <span>Végétalien</span>
+                        <span>Végétarien</span>
                       </div>
                     )}
                     
@@ -226,6 +310,17 @@ const Menu = () => {
                       <p className="text-gray-500">Aucune option spéciale</p>
                     )}
                   </div>
+                </div>
+                
+                {/* Share Button */}
+                <div className="flex justify-end mt-4">
+                  <SocialShare 
+                    title={selectedItem.nom}
+                    description={selectedItem.description}
+                    imageUrl={selectedItem.image_url}
+                    url={`${window.location.origin}/menu/${selectedItem.id}`}
+                    className="text-sm"
+                  />
                 </div>
               </div>
             </>

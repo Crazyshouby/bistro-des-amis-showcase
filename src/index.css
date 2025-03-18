@@ -8,35 +8,46 @@
 
 @layer base {
   :root {
-    --background: 40 38% 97%;
-    --foreground: 30 10% 15%;
+    /* Updated color palette based on specifications */
+    --background: 39 40% 91%; /* Beige crème doux #F5E9D7 */
+    --foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
 
-    --card: 35 40% 98%;
-    --card-foreground: 30 10% 15%;
+    --card: 34 32% 92%; /* Blanc cassé légèrement grisé #EDE4D8 */
+    --card-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
 
-    --popover: 35 40% 98%;
-    --popover-foreground: 30 10% 15%;
+    --popover: 34 32% 92%; /* Blanc cassé #EDE4D8 */
+    --popover-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
 
-    --primary: 15 60% 48%;
-    --primary-foreground: 35 40% 98%;
+    --primary: 95 21% 30%; /* Vert olive profond #4A5E3A */
+    --primary-foreground: 39 40% 91%; /* Beige crème #F5E9D7 */
 
-    --secondary: 40 60% 80%;
-    --secondary-foreground: 30 10% 15%;
+    --secondary: 41 78% 46%; /* Ocre doré #D4A017 */
+    --secondary-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
 
-    --muted: 40 30% 92%;
-    --muted-foreground: 30 10% 40%;
+    --muted: 34 32% 92%; /* Blanc cassé #EDE4D8 */
+    --muted-foreground: 220 0% 36%; /* Gris anthracite #5A5A5A */
 
-    --accent: 80 30% 30%;
-    --accent-foreground: 35 40% 98%;
+    --accent: 41 78% 46%; /* Ocre doré #D4A017 */
+    --accent-foreground: 30 32% 18%; /* Marron foncé #3A2E1F */
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 35 40% 98%;
+    --destructive-foreground: 39 40% 91%; /* Beige crème #F5E9D7 */
 
-    --border: 30 20% 85%;
-    --input: 30 20% 85%;
-    --ring: 15 60% 48%;
+    --border: 220 0% 36%; /* Gris anthracite #5A5A5A */
+    --input: 220 0% 36%; /* Gris anthracite #5A5A5A */
+    --ring: 41 78% 46%; /* Ocre doré #D4A017 */
 
     --radius: 0.5rem;
+    
+    /* Bistro colors for direct usage */
+    --bistro-brick: #6B2D2D; /* Bordeaux chaleureux */
+    --bistro-brick-light: #823636;
+    --bistro-sand: #F5E9D7; /* Beige crème */
+    --bistro-sand-light: #FFF8E7;
+    --bistro-wood: #3A2E1F; /* Marron foncé */
+    --bistro-wood-light: #5A4B37;
+    --bistro-olive: #4A5E3A; /* Vert olive profond */
+    --bistro-olive-light: #5F7946;
   }
 }
 
@@ -54,7 +65,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-playfair font-bold;
+    @apply font-playfair font-bold text-secondary;
   }
 
   .bg-texture {
@@ -66,11 +77,11 @@
   }
   
   .btn-primary {
-    @apply bg-bistro-olive hover:bg-bistro-olive-light text-white font-medium py-2 px-6 rounded-md transition-all duration-300 shadow-sm hover:shadow-md inline-block;
+    @apply bg-bistro-olive hover:bg-bistro-olive-light text-bistro-sand font-medium py-2 px-6 rounded-md transition-all duration-300 shadow-sm hover:shadow-md inline-block;
   }
   
   .btn-secondary {
-    @apply bg-bistro-sand hover:bg-bistro-sand-light text-bistro-wood font-medium py-2 px-6 rounded-md transition-all duration-300 shadow-sm hover:shadow-md inline-block;
+    @apply bg-secondary hover:bg-secondary/80 text-bistro-wood font-medium py-2 px-6 rounded-md transition-all duration-300 shadow-sm hover:shadow-md inline-block;
   }
   
   .parallax-container {
@@ -124,6 +135,16 @@
   }
   
   .section-title {
-    @apply text-3xl lg:text-4xl font-playfair font-bold mb-6 text-bistro-brick relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-1/2 after:h-[3px] after:bg-bistro-olive-light pb-2;
+    @apply text-3xl lg:text-4xl font-playfair font-bold mb-6 text-secondary relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-1/2 after:h-[3px] after:bg-bistro-olive-light pb-2;
+  }
+  
+  /* Social sharing button styles */
+  .share-button {
+    @apply flex items-center gap-1 text-muted-foreground hover:text-secondary transition-colors duration-200 text-sm;
+  }
+  
+  /* Filter button styles */
+  .filter-button {
+    @apply bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground px-4 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 text-sm font-medium;
   }
 }
