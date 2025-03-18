@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { Leaf, Flame, NutOff, WheatOff } from "lucide-react";
 import { MenuFilter, FilterOptions } from "@/components/menu/MenuFilter";
-import { SocialShare } from "@/components/shared/SocialShare";
 
 // Définition de l'ordre fixe des catégories
 const CATEGORY_ORDER = ["Apéritifs", "Entrées", "Plats", "Desserts", "Boissons"];
@@ -218,16 +217,6 @@ const Menu = () => {
                             item={item}
                             onEdit={() => handleItemClick(item)} 
                           />
-                          
-                          {/* Add share button */}
-                          <div className="absolute bottom-3 right-3">
-                            <SocialShare 
-                              title={item.nom}
-                              description={item.description}
-                              imageUrl={item.image_url}
-                              url={`${window.location.origin}/menu/${item.id}`}
-                            />
-                          </div>
                         </div>
                       </div>
                     </AnimatedSection>
@@ -310,17 +299,6 @@ const Menu = () => {
                       <p className="text-gray-500">Aucune option spéciale</p>
                     )}
                   </div>
-                </div>
-                
-                {/* Share Button */}
-                <div className="flex justify-end mt-4">
-                  <SocialShare 
-                    title={selectedItem.nom}
-                    description={selectedItem.description}
-                    imageUrl={selectedItem.image_url}
-                    url={`${window.location.origin}/menu/${selectedItem.id}`}
-                    className="text-sm"
-                  />
                 </div>
               </div>
             </>

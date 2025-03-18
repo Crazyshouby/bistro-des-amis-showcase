@@ -138,13 +138,10 @@
     @apply text-3xl lg:text-4xl font-playfair font-bold mb-6 text-secondary relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-1/2 after:h-[3px] after:bg-bistro-olive-light pb-2;
   }
   
-  /* Social sharing button styles */
-  .share-button {
-    @apply flex items-center gap-1 text-muted-foreground hover:text-secondary transition-colors duration-200 text-sm;
-  }
+  /* Social sharing button styles - removed */
   
-  /* Filter button styles */
+  /* Filter button styles - updated to be darker */
   .filter-button {
-    @apply bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground px-4 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 text-sm font-medium;
+    @apply bg-bistro-wood text-bistro-sand hover:bg-secondary hover:text-secondary-foreground px-4 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 text-sm font-medium;
   }
 }
