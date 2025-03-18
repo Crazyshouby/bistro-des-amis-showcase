@@ -22,7 +22,7 @@ export const AdminTabs = ({
         {tabs.map(tab => <TabsTrigger key={tab.id} value={tab.id} style={{
         backgroundColor: 'var(--state=active, #4A5E3A, transparent)',
         color: 'var(--state=active, var(--dynamic-background), var(--dynamic-text))'
-      }} className="flex-1 md:flex-none text-sm py-1.5 text-zinc-950 bg-orange-300 hover:bg-orange-200 rounded-lg font-medium md:text-base mx-[46px]">
+      }} className="flex-1 md:flex-none text-sm py-1.5 text-zinc-950 bg-orange-300 hover:bg-orange-200 rounded-lg font-medium md:text-base mx-[5px]">
             {tab.label}
           </TabsTrigger>)}
       </TabsList>
