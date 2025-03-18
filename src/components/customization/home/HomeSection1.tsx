@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -315,6 +314,7 @@ export const HomeSection1 = () => {
                     <div className="space-y-2">
                       <Label>Couleur du titre</Label>
                       <ColorPicker 
+                        label="Couleur du titre"
                         value={heroTitleColor} 
                         onChange={(color) => {
                           setHeroTitleColor(color);
@@ -325,6 +325,7 @@ export const HomeSection1 = () => {
                     <div className="space-y-2">
                       <Label>Couleur du sous-titre</Label>
                       <ColorPicker 
+                        label="Couleur du sous-titre"
                         value={heroSubtitleColor} 
                         onChange={(color) => {
                           setHeroSubtitleColor(color);

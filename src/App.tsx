@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider, useAuth } from "@/components/auth/AuthProvider";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import SuperAdminRoute from "@/components/superadmin/SuperAdminRoute";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { SuperAdminRoute } from "@/components/superadmin/SuperAdminRoute";
 import { useEffect } from "react";
 import "./App.css";
 
