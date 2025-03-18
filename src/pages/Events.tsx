@@ -4,10 +4,12 @@ import EventsBanner from "./events/EventsBanner";
 import EventsContent from "./events/EventsContent";
 import EventsViewToggle from "./events/EventsViewToggle";
 import EventsFilter from "./events/EventsFilter";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 const Events = () => {
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [showPast, setShowPast] = useState(false);
+  const { colors, texts } = useTheme();
 
   return (
     <div className="bg-texture">
@@ -15,11 +17,17 @@ const Events = () => {
       <section className="py-16 md:py-24">
         <div className="content-container">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-playfair font-bold text-bistro-wood mb-4">
-              Activités & Divertissements
+            <h2 
+              className="text-3xl md:text-4xl font-playfair font-bold mb-4"
+              style={{ color: colors.eventsTitleColor }}
+            >
+              {texts.eventsTitle || "Activités & Divertissements"}
             </h2>
-            <p className="text-bistro-wood/80 max-w-2xl mx-auto">
-              Découvrez notre programmation d'événements spéciaux: soirées musicales, dégustations, quiz et bien plus encore.
+            <p 
+              className="max-w-2xl mx-auto"
+              style={{ color: colors.eventsSubtitleColor }}
+            >
+              {texts.eventsSubtitle || "Découvrez notre programmation d'événements spéciaux: soirées musicales, dégustations, quiz et bien plus encore."}
             </p>
           </div>
           
