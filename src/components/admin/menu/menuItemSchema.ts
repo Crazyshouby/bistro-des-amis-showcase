@@ -11,10 +11,7 @@ export const menuItemSchema = z.object({
   is_vegan: z.boolean().optional().default(false),
   is_spicy: z.boolean().optional().default(false),
   is_peanut_free: z.boolean().optional().default(false),
-  is_gluten_free: z.boolean().optional().default(false),
-  calories: z.number().optional(),
-  preparation_time: z.number().optional(),
-  allergens: z.array(z.string()).optional().default([])
+  is_gluten_free: z.boolean().optional().default(false)
 });
 
 export type MenuItemFormValues = z.infer<typeof menuItemSchema>;
@@ -28,8 +25,5 @@ export const defaultFormValues: MenuItemFormValues = {
   is_vegan: false,
   is_spicy: false,
   is_peanut_free: false,
-  is_gluten_free: false,
-  calories: undefined,
-  preparation_time: undefined,
-  allergens: []
+  is_gluten_free: false
 };
