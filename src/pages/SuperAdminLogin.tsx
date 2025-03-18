@@ -141,9 +141,9 @@ const SuperAdminLogin = () => {
   };
 
   return (
-    <div className="bg-[#E5E7EB] min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white shadow-lg border border-[#6B7280]">
-        <CardHeader className="border-b border-[#6B7280] bg-[#F3F4F6]">
+    <div className="bg-[#1A1F2C] min-h-screen flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-[#222222] shadow-lg border border-[#333333]">
+        <CardHeader className="border-b border-[#333333] bg-[#2A2A2A]">
           <CardTitle className="text-[#2DD4BF] font-sans text-xl text-center">Super Admin - Bistro des Amis</CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
@@ -154,16 +154,16 @@ const SuperAdminLogin = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#374151]">Email</FormLabel>
+                    <FormLabel className="text-gray-300">Email</FormLabel>
                     <FormControl>
                       <Input 
                         {...field} 
-                        placeholder="superadmin@bistrodesamis.com" 
+                        placeholder="email@example.com" 
                         type="email"
-                        className="border-[#6B7280] focus:border-[#2DD4BF] focus:ring-[#2DD4BF]"
+                        className="border-[#444444] focus:border-[#2DD4BF] focus:ring-[#2DD4BF] bg-[#333333] text-white"
                       />
                     </FormControl>
-                    <FormMessage className="text-red-500" />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -173,49 +173,43 @@ const SuperAdminLogin = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#374151]">Mot de passe</FormLabel>
+                    <FormLabel className="text-gray-300">Mot de passe</FormLabel>
                     <div className="relative">
                       <FormControl>
                         <Input 
                           {...field} 
                           type={showPassword ? "text" : "password"} 
                           placeholder="••••••••" 
-                          className="border-[#6B7280] focus:border-[#2DD4BF] focus:ring-[#2DD4BF] pr-10"
+                          className="border-[#444444] focus:border-[#2DD4BF] focus:ring-[#2DD4BF] pr-10 bg-[#333333] text-white"
                         />
                       </FormControl>
                       <button 
                         type="button" 
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6B7280]"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                     </div>
-                    <FormMessage className="text-red-500" />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
 
               {loginError && (
-                <div className="text-red-500 text-sm p-2 bg-red-50 border border-red-200 rounded">
+                <div className="text-red-400 text-sm p-2 bg-red-900/20 border border-red-800/30 rounded">
                   {loginError}
                 </div>
               )}
 
-              <div className="text-sm text-[#6B7280]">
-                <p className="mb-1">Identifiants de démonstration:</p>
-                <p>Email: superadmin@bistrodesamis.com</p>
-                <p>Mot de passe: SuperAdmin2025!</p>
-              </div>
-
               <Button 
                 type="submit" 
                 disabled={loading}
-                className="w-full bg-[#2DD4BF] text-[#E5E7EB] hover:bg-[#6B7280] transition-colors"
+                className="w-full bg-[#2DD4BF] text-[#222222] hover:bg-[#25A699] transition-colors"
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#222222]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>

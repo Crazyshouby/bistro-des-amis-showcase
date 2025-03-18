@@ -21,14 +21,14 @@ export const SuperAdminLayout = ({ children }: SuperAdminLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#E5E7EB]">
-      <header className="bg-[#6B7280] shadow-md">
+    <div className="min-h-screen bg-[#1A1F2C]">
+      <header className="bg-[#222222] shadow-md border-b border-[#333333]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-[#2DD4BF] font-sans">Super Admin - Configuration du site</h1>
           <Button 
             onClick={handleLogout}
             variant="outline" 
-            className="bg-[#2DD4BF] text-[#E5E7EB] hover:bg-[#E5E7EB] hover:text-[#374151] border-none"
+            className="bg-[#2DD4BF] text-[#222222] hover:bg-[#25A699] hover:text-white border-none"
           >
             <LogOut className="mr-2 h-4 w-4" />
             Se déconnecter
