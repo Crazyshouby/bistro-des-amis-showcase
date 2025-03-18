@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -243,4 +244,109 @@ export const HomeSection1 = () => {
                         variant="outline" 
                         className="relative" 
                         disabled={uploading}
-                     
+                      >
+                        <input
+                          id="background-image"
+                          type="file"
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          onChange={handleImageUpload}
+                          accept="image/jpeg,image/png,image/gif,image/webp"
+                          disabled={uploading}
+                        />
+                        <Upload className="mr-2 h-4 w-4" />
+                        Télécharger une image
+                      </Button>
+                      <Button 
+                        onClick={handleApplyImage} 
+                        disabled={!changed || uploading}
+                      >
+                        Appliquer
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="texts" className="pt-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="hero-title">Titre principal</Label>
+                    <Input
+                      id="hero-title"
+                      value={heroTitle}
+                      onChange={handleTextChange(setHeroTitle)}
+                      placeholder="Titre du héro"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="hero-subtitle">Sous-titre</Label>
+                    <Input
+                      id="hero-subtitle"
+                      value={heroSubtitle}
+                      onChange={handleTextChange(setHeroSubtitle)}
+                      placeholder="Sous-titre du héro"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="hero-title-font">Police du titre</Label>
+                    <Select 
+                      value={heroTitleFont} 
+                      onValueChange={(val) => {
+                        setHeroTitleFont(val);
+                        setChanged(true);
+                      }}
+                    >
+                      <SelectTrigger id="hero-title-font">
+                        <SelectValue placeholder="Sélectionner une police" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fontOptions.map(option => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Couleur du titre</Label>
+                      <ColorPicker 
+                        value={heroTitleColor} 
+                        onChange={(color) => {
+                          setHeroTitleColor(color);
+                          setChanged(true);
+                        }} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Couleur du sous-titre</Label>
+                      <ColorPicker 
+                        value={heroSubtitleColor} 
+                        onChange={(color) => {
+                          setHeroSubtitleColor(color);
+                          setChanged(true);
+                        }} 
+                      />
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={handleSaveTexts} 
+                    disabled={!changed || uploading} 
+                    className="mt-4"
+                  >
+                    Sauvegarder les textes
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      )}
+    </>
+  );
+};
