@@ -144,13 +144,13 @@ const Events = () => {
           ) : (
             <>
               {viewMode === 'calendar' ? (
-                <div className="flex flex-col md:flex-row gap-8 bg-white/50 p-6 rounded-lg shadow-sm">
+                <div className="flex flex-col md:flex-row gap-8 bg-white/50 p-6 rounded-lg shadow-sm max-w-5xl mx-auto">
                   <div className="w-full md:w-1/2">
                     <Calendar
                       mode="single"
                       selected={selectedDate}
                       onSelect={setSelectedDate}
-                      className="rounded-md border bg-white"
+                      className="rounded-md border bg-white w-full max-w-full"
                       modifiers={{
                         hasEvent: eventDates
                       }}
@@ -190,7 +190,7 @@ const Events = () => {
                             : "Aucun événement à venir pour le moment."}
                       </p>
                     ) : (
-                      <div className="space-y-4">
+                      <div className="space-y-4 overflow-y-auto pr-2" style={{ maxHeight: "400px" }}>
                         {filteredEvents.map(event => (
                           <EventCard key={event.id} event={event} compact={true} />
                         ))}
