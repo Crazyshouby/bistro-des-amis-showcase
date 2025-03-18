@@ -7,7 +7,7 @@ import { useParallax } from "@/lib/hooks";
 
 const Index = () => {
   // Hook personnalisé pour l'effet parallax
-  const parallaxRef = useParallax(0.15);
+  const parallaxRef = useParallax(0.1); // Réduction légère de la vitesse de parallax
   
   useEffect(() => {
     const images = [
@@ -31,12 +31,15 @@ const Index = () => {
   return (
     <div className="bg-texture">
       <div className="relative h-screen overflow-hidden">
-        {/* Image avec effet parallax et léger flou */}
+        {/* Image avec effet parallax et léger flou - ajustement de taille et position */}
         <div 
           ref={parallaxRef}
-          className="absolute inset-0 bg-cover bg-center scale-110 filter blur-[2px]"
+          className="absolute inset-0 bg-cover bg-center scale-125 filter blur-[2px]"
           style={{ 
-            backgroundImage: "url('/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png')"
+            backgroundImage: "url('/lovable-uploads/3879cbc3-d347-45e2-b93d-53a58b78ba5a.png')",
+            transformOrigin: "center center",
+            top: "-10%",
+            height: "120%"  // Augmentation de la hauteur pour éviter les espaces vides
           }}
         />
         {/* Superposition semi-transparente pour améliorer la lisibilité du texte */}
