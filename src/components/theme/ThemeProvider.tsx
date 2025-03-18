@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -149,7 +148,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         
         data.forEach(item => {
           switch (item.key) {
-            // Colors
             case 'background_color':
               newColors.backgroundColor = item.value;
               break;
@@ -169,7 +167,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               newColors.featuresSectionBg = item.value;
               break;
             
-            // Images
             case 'home_image_url':
               if (item.value) newImages.homeImageUrl = item.value;
               break;
@@ -186,7 +183,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               if (item.value) newImages.historyImageUrl = item.value;
               break;
               
-            // Text Content
             case 'hero_title':
               newTextContent.heroTitle = item.value;
               break;
@@ -257,7 +253,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         console.log("Applied theme images:", newImages);
         console.log("Applied theme text content:", newTextContent);
         
-        // Appliquer les couleurs au document
         applyColors(newColors);
       } else {
         console.log("No theme data found, using defaults");
@@ -270,7 +265,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Fonction pour appliquer les couleurs dynamiquement
   const applyColors = (colors: ThemeColors) => {
     document.documentElement.style.setProperty('--dynamic-background', colors.backgroundColor);
     document.documentElement.style.setProperty('--dynamic-text', colors.textColor);
@@ -286,53 +280,86 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     textContent?: Partial<ThemeTextContent>;
   }) => {
     try {
-      // Update colors if provided
+      console.log("Updating theme with:", updates);
+      
       if (updates.colors) {
         const newColors = { ...colors, ...updates.colors };
         
-        for (const [key, value] of Object.entries(updates.colors)) {
+        const colorUpserts = Object.entries(updates.colors).map(([key, value]) => {
           const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
-          await supabase
+          return {
+            key: snakeKey,
+            value: value
+          };
+        });
+        
+        if (colorUpserts.length > 0) {
+          const { error } = await supabase
             .from('site_config')
-            .upsert({ key: snakeKey, value })
-            .eq('key', snakeKey);
+            .upsert(colorUpserts);
+            
+          if (error) throw error;
         }
         
         setColors(newColors);
         applyColors(newColors);
       }
       
-      // Update images if provided
       if (updates.images) {
         const newImages = { ...images, ...updates.images };
+        console.log("Updating images to:", newImages);
         
-        for (const [key, value] of Object.entries(updates.images)) {
+        const imageUpserts = Object.entries(updates.images).map(([key, value]) => {
           const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
-          await supabase
+          console.log(`Preparing to upsert ${snakeKey} with value ${value}`);
+          return {
+            key: snakeKey,
+            value: value
+          };
+        });
+        
+        if (imageUpserts.length > 0) {
+          console.log("Upserting images:", imageUpserts);
+          const { data, error } = await supabase
             .from('site_config')
-            .upsert({ key: snakeKey, value })
-            .eq('key', snakeKey);
+            .upsert(imageUpserts);
+            
+          if (error) {
+            console.error("Error upserting images:", error);
+            throw error;
+          }
+          
+          console.log("Upsert response:", data);
         }
         
         setImages(newImages);
       }
       
-      // Update text content if provided
       if (updates.textContent) {
         const newTextContent = { ...textContent, ...updates.textContent };
         
-        for (const [key, value] of Object.entries(updates.textContent)) {
+        const textUpserts = Object.entries(updates.textContent).map(([key, value]) => {
           const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
-          await supabase
+          return {
+            key: snakeKey,
+            value: value
+          };
+        });
+        
+        if (textUpserts.length > 0) {
+          const { error } = await supabase
             .from('site_config')
-            .upsert({ key: snakeKey, value })
-            .eq('key', snakeKey);
+            .upsert(textUpserts);
+            
+          if (error) throw error;
         }
         
         setTextContent(newTextContent);
       }
       
       console.log("Theme updated successfully");
+      
+      await fetchThemeData();
     } catch (error) {
       console.error('Error updating theme:', error);
       throw error;
@@ -342,7 +369,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     fetchThemeData();
     
-    // Configurer un écouteur temps réel pour les changements de configuration
     const subscription = supabase
       .channel('site_config_changes')
       .on(
