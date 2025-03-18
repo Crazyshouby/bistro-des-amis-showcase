@@ -6,7 +6,7 @@ const EventsBanner = () => {
   const { images } = useTheme();
   
   // Utiliser l'image d'en-tête des événements depuis le ThemeProvider ou une image par défaut
-  const backgroundImage = images.eventsHeaderImage || "/lovable-uploads/00ac4d79-14ae-4287-8ca4-c2b40d004275.png";
+  const backgroundImage = images.eventsImageUrl || "/lovable-uploads/00ac4d79-14ae-4287-8ca4-c2b40d004275.png";
 
   return (
     <div 

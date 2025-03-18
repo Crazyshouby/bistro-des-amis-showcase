@@ -6,7 +6,7 @@ const MenuBanner = () => {
   const { images } = useTheme();
   
   // Utiliser l'image d'en-tête du menu depuis le ThemeProvider ou une image par défaut
-  const backgroundImage = images.menuHeaderImage || "/lovable-uploads/19408610-7939-4299-999c-208a2355a264.png";
+  const backgroundImage = images.menuImageUrl || "/lovable-uploads/19408610-7939-4299-999c-208a2355a264.png";
 
   return (
     <div 

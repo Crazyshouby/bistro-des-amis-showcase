@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +24,7 @@ const Contact = () => {
   const { images } = useTheme();
   
   // Utiliser l'image d'en-tête du contact depuis le ThemeProvider ou une image par défaut
-  const backgroundImage = images.contactHeaderImage || "/lovable-uploads/00ac4d79-14ae-4287-8ca4-c2b40d004275.png";
+  const backgroundImage = images.contactImageUrl || "/lovable-uploads/00ac4d79-14ae-4287-8ca4-c2b40d004275.png";
   
   // Configuration du formulaire avec React Hook Form et Zod
   const form = useForm<z.infer<typeof formSchema>>({
