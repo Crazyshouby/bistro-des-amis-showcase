@@ -98,27 +98,42 @@ export const ContentSettings = () => {
       const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
       const filePath = `home-images/${fileName}`;
 
+      // Start simulating progress before actual upload
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
       // Upload the file to Supabase Storage
       const { data, error } = await supabase.storage
         .from('site_images')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: true,
-          onUploadProgress: (progress) => {
-            const percentage = (progress.loaded / progress.total!) * 100;
-            setUploadProgress(Math.round(percentage));
-          }
+          upsert: true
         });
 
+      clearInterval(progressInterval);
+      
       if (error) {
         throw error;
       }
 
+      // Set progress to 100% when upload completes
+      setUploadProgress(100);
+      
       // Get public URL for the file
       const { data: { publicUrl } } = supabase.storage
         .from('site_images')
         .getPublicUrl(filePath);
 
+      // Reset progress after a short delay
+      setTimeout(() => setUploadProgress(0), 500);
+      
       return publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -129,7 +144,7 @@ export const ContentSettings = () => {
       });
       return null;
     } finally {
-      setUploadProgress(0);
+      setTimeout(() => setUploadProgress(0), 500);
     }
   };
 

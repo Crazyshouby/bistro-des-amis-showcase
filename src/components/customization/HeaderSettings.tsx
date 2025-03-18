@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -120,33 +119,58 @@ export const HeaderSettings = () => {
       const fileName = `${pageType}_header_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
       const filePath = `header-images/${fileName}`;
 
+      // Start simulating progress before actual upload
+      const progressInterval = setInterval(() => {
+        setHeaderImages(prev => ({
+          ...prev,
+          [pageType]: {
+            ...prev[pageType],
+            uploadProgress: prev[pageType].uploadProgress >= 90 
+              ? 90 
+              : prev[pageType].uploadProgress + 10
+          }
+        }));
+      }, 200);
+
       // Upload the file to Supabase Storage
       const { data, error } = await supabase.storage
         .from('site_images')
         .upload(filePath, headerImage.file, {
           cacheControl: '3600',
-          upsert: true,
-          onUploadProgress: (progress) => {
-            const percentage = (progress.loaded / progress.total!) * 100;
-            setHeaderImages(prev => ({
-              ...prev,
-              [pageType]: {
-                ...prev[pageType],
-                uploadProgress: Math.round(percentage)
-              }
-            }));
-          }
+          upsert: true
         });
 
+      clearInterval(progressInterval);
+      
       if (error) {
         throw error;
       }
+
+      // Set progress to 100% when upload completes
+      setHeaderImages(prev => ({
+        ...prev,
+        [pageType]: {
+          ...prev[pageType],
+          uploadProgress: 100
+        }
+      }));
 
       // Get public URL for the file
       const { data: { publicUrl } } = supabase.storage
         .from('site_images')
         .getPublicUrl(filePath);
 
+      // Reset progress after a short delay
+      setTimeout(() => {
+        setHeaderImages(prev => ({
+          ...prev,
+          [pageType]: {
+            ...prev[pageType],
+            uploadProgress: 0
+          }
+        }));
+      }, 500);
+      
       return publicUrl;
     } catch (error) {
       console.error(`Error uploading ${pageType} header image:`, error);
@@ -157,13 +181,15 @@ export const HeaderSettings = () => {
       });
       return null;
     } finally {
-      setHeaderImages(prev => ({
-        ...prev,
-        [pageType]: {
-          ...prev[pageType],
-          uploadProgress: 0
-        }
-      }));
+      setTimeout(() => {
+        setHeaderImages(prev => ({
+          ...prev,
+          [pageType]: {
+            ...prev[pageType],
+            uploadProgress: 0
+          }
+        }));
+      }, 500);
     }
   };
 
