@@ -81,7 +81,7 @@ export const insertData = async <T>(
   }
 };
 
-// Fonction utilitaire pour les mises à jour - avec type explicite pour éviter l'erreur TS2589
+// Fonction utilitaire pour les mises à jour - simplifié pour éviter l'erreur TS2589
 export const updateData = async (
   tableName: TableNames,
   id: string | number,
@@ -100,7 +100,7 @@ export const updateData = async (
       return null;
     }
     
-    return updatedData[0] || null;
+    return updatedData.length > 0 ? updatedData[0] : null;
   } catch (error) {
     handleSupabaseError(error, `Erreur lors de la mise à jour dans ${tableName}`);
     return null;
