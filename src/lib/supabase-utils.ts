@@ -88,21 +88,20 @@ export const updateData = async (
   id: string | number,
   data: any,
   idColumn: string = 'id'
-): Promise<any | null> => {
+) => {
   try {
     const { data: updatedData, error } = await supabase
       .from(tableName)
       .update(data)
       .eq(idColumn, id)
-      .select()
-      .single();
+      .select();
     
     if (error) {
       handleSupabaseError(error, `Impossible de mettre à jour dans ${tableName}`);
       return null;
     }
     
-    return updatedData;
+    return updatedData[0] || null;
   } catch (error) {
     handleSupabaseError(error, `Erreur lors de la mise à jour dans ${tableName}`);
     return null;
