@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
@@ -82,7 +81,7 @@ export const insertData = async <T>(
   }
 };
 
-// Fonction utilitaire pour les mises à jour - Simplification des types pour éviter l'erreur TS2589
+// Fonction utilitaire pour les mises à jour - avec type explicite pour éviter l'erreur TS2589
 export const updateData = async (
   tableName: TableNames,
   id: string | number,

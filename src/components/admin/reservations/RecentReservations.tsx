@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Sync, Trash2 } from "lucide-react";
+import { RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
@@ -166,7 +166,7 @@ export const RecentReservations = () => {
                         onClick={() => handleSync(reservation.id)}
                         disabled={reservation.synced}
                       >
-                        <Sync className="h-4 w-4 mr-1" />
+                        <RefreshCw className="h-4 w-4 mr-1" />
                         Sync
                       </Button>
                       <Button
