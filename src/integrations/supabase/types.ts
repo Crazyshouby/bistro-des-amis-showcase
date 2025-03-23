@@ -201,6 +201,45 @@ export type Database = {
         }
         Relationships: []
       }
+      reservations: {
+        Row: {
+          created_at: string
+          date: string
+          email: string
+          id: string
+          name: string
+          people: number
+          phone: string
+          status: string
+          time: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          email: string
+          id?: string
+          name: string
+          people: number
+          phone: string
+          status?: string
+          time: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          email?: string
+          id?: string
+          name?: string
+          people?: number
+          phone?: string
+          status?: string
+          time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_config: {
         Row: {
           created_at: string

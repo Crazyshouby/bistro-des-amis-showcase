@@ -86,11 +86,7 @@ export default function Reservations() {
     const formattedDate = format(date, "yyyy-MM-dd");
     
     try {
-      // For now, we'll simply return true since the reservations table might not exist yet
-      // In a real implementation, you would query the actual table
-      return true;
-      
-      /* Commented out until table exists
+      // Vérifier le nombre total de personnes déjà réservées pour cette date et heure
       const { data, error } = await supabase
         .from("reservations")
         .select("people")
@@ -101,14 +97,15 @@ export default function Reservations() {
         throw new Error(error.message);
       }
       
+      // Calcul du nombre total de personnes déjà réservées
       const totalPeopleBooked = data.reduce((sum, reservation) => sum + reservation.people, 0);
       
+      // Vérifier si l'ajout des nouvelles personnes dépasse la capacité
       if (totalPeopleBooked + people > 20) {
         return false;
       }
       
       return true;
-      */
     } catch (error) {
       console.error("Erreur lors de la vérification de la capacité:", error);
       return false;
@@ -132,19 +129,7 @@ export default function Reservations() {
       // Format de la date pour Supabase (YYYY-MM-DD)
       const formattedDate = format(data.date, "yyyy-MM-dd");
       
-      // For demonstration purposes, we'll just log the data and show success
-      // In a real implementation, you would insert into the actual table
-      console.log("Reservation data:", {
-        date: formattedDate,
-        time: data.time,
-        people: data.people,
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        status: "pending"
-      });
-      
-      /* Commented out until table exists
+      // Enregistrer la réservation dans Supabase
       const { error } = await supabase
         .from("reservations")
         .insert({
@@ -160,9 +145,8 @@ export default function Reservations() {
       if (error) {
         throw new Error(error.message);
       }
-      */
       
-      // Réservation réussie (simulate)
+      // Réservation réussie
       setIsSuccess(true);
       toast({
         title: "Réservation confirmée !",
