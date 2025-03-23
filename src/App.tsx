@@ -10,7 +10,7 @@ import Index from "./pages/Index";
 import Menu from "./pages/Menu";
 import Events from "./pages/Events";
 import Contact from "./pages/Contact";
-import Reservations from "./pages/Reservations"; // Ajout de la page Reservations
+import Reservations from "./pages/Reservations";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -42,13 +42,11 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <NavigationProvider>
-            <ThemeProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <NavigationProvider>
               <Routes>
                 <Route path="/" element={
                   <AppLayout>
@@ -100,11 +98,13 @@ const App = () => (
                   </AppLayout>
                 } />
               </Routes>
-            </ThemeProvider>
-          </NavigationProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+              <Toaster />
+              <Sonner />
+            </NavigationProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
