@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { Event, MenuItem } from "@/types";
@@ -8,6 +9,7 @@ import { AdminTabs } from "./AdminTabs";
 import { MenuTab } from "./MenuTab";
 import { EventsTab } from "./EventsTab";
 import { AccountTab } from "./AccountTab";
+import { ReservationsTab } from "./reservations/ReservationsTab";
 import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -145,6 +147,11 @@ export const AdminContent = ({
           onDeleteRequest={confirmDeleteItem} 
         />
       )
+    },
+    {
+      id: "reservations",
+      label: "Réservations",
+      content: <ReservationsTab />
     },
     {
       id: "account",

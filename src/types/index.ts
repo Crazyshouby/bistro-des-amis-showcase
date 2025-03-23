@@ -20,6 +20,18 @@ export interface Event {
   image_url?: string;
 }
 
+export interface Reservation {
+  id: string;
+  date: string;
+  time: string;
+  name: string;
+  email: string;
+  phone: string;
+  people: number;
+  status: string;
+  synced?: boolean;
+}
+
 export interface ContactFormData {
   nom: string;
   email: string;
