@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Menu from "./pages/Menu";
 import Events from "./pages/Events";
 import Contact from "./pages/Contact";
+import Reservations from "./pages/Reservations"; // Ajout de la page Reservations
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -67,6 +68,11 @@ const App = () => (
                 <Route path="/contact" element={
                   <AppLayout>
                     <Contact />
+                  </AppLayout>
+                } />
+                <Route path="/reservations" element={
+                  <AppLayout>
+                    <Reservations />
                   </AppLayout>
                 } />
                 <Route path="/auth" element={

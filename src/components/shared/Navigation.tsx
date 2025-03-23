@@ -20,6 +20,7 @@ const Navigation = () => {
     { name: "Accueil", path: "/" },
     { name: "Menu", path: "/menu" },
     { name: "Événements", path: "/events" },
+    { name: "Réserver", path: "/reservations" }, // Ajout du lien de réservation
     { name: "Contact", path: "/contact" },
     // Conditionally show Admin or Auth based on auth status
     ...(user ? [{ name: "Admin", path: "/admin" }] : [{ name: "Connexion", path: "/auth" }])

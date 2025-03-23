@@ -82,13 +82,13 @@ export const insertData = async <T>(
   }
 };
 
-// Fonction utilitaire pour les mises à jour
+// Fonction utilitaire pour les mises à jour - Fix du problème d'instanciation de type
 export const updateData = async (
   tableName: TableNames,
   id: string | number,
   data: any,
   idColumn: string = 'id'
-) => {
+): Promise<any | null> => {
   try {
     const { data: updatedData, error } = await supabase
       .from(tableName)
