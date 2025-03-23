@@ -82,13 +82,13 @@ export const insertData = async <T>(
   }
 };
 
-// Fonction utilitaire pour les mises à jour - Fix du problème d'instanciation de type
+// Fonction utilitaire pour les mises à jour - Simplification des types pour éviter l'erreur TS2589
 export const updateData = async (
   tableName: TableNames,
   id: string | number,
-  data: any,
+  data: Record<string, any>,
   idColumn: string = 'id'
-): Promise<any | null> => {
+): Promise<Record<string, any> | null> => {
   try {
     const { data: updatedData, error } = await supabase
       .from(tableName)
